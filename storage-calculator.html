@@ -166,8 +166,9 @@
 
     <div class="hsc-result" aria-live="polite">
       <h2>GET STORING</h2>
-      <div class="hsc-mode" id="hsc-mode" hidden style="display:none" role="group" aria-label="How should it be packed?"><button type="button" data-mode="room" aria-pressed="true">Room to get in and organise</button><button type="button" data-mode="max" aria-pressed="false">Packed to the max</button></div>
-      <p class="hsc-modenote" id="hsc-modenote" hidden style="display:none"></p>
+      <div class="hsc-mode" id="hsc-mode" role="group" aria-label="How should it be packed?"><button type="button" data-mode="room" aria-pressed="true">Room to get in and organise</button><button type="button" data-mode="max" aria-pressed="false">Packed to the max</button></div>
+      <div class="hsc-mode hsc-lane" id="hsc-lane" role="group" aria-label="Loading lane"><button type="button" data-lane="auto" aria-pressed="true">Lane: Auto</button><button type="button" data-lane="side" aria-pressed="false">Side</button><button type="button" data-lane="middle" aria-pressed="false">Middle</button></div>
+      <p class="hsc-modenote" id="hsc-modenote"></p>
       <p class="hsc-sub" id="hsc-empty">Start by adding items to your storage unit</p>
       <div class="hsc-filled" id="hsc-filled" hidden>
         <div class="hsc-stats">
@@ -312,211 +313,81 @@ var CALC_CONFIG = {
 /* ======================= END OF CONFIG ======================= */
 
 /* =====================================================================
-   FLOOR-PLAN FIT ENGINE  –  hsFit(load, lengthM, nContainers)
-   Container internal 5.90 (20ft) / 2.80 (10ft) × 2.35 m. A clear 0.65 m loading lane runs the full length, either
-   down the middle (two 0.85 m deep zones) or along one side wall (one 1.70 m zone); both are tried per load.
-   Nothing sticks into the lane. Practical stacking height 2.1 m (internal ~2.39 m).
-   Order: pallets (never stacked, nothing on top) → floor-only items, largest first → heavy stackables →
-   light items → boxes, each into the best physical fit (see the physical model below).
+   STORAGE CALCULATOR ENGINE v2 (rebuilt from scratch 15/10/2026)
+   Internal size: 20ft 5.90 m long x 2.35 m wide x 2.39 m high; 10ft 2.80 m long, same width/height.
+   Organise mode keeps a 0.65 m loading lane clear for the full length, along one side (one 1.70 m strip)
+   or down the middle (two 0.85 m strips). Packed mode uses the full 2.35 m width.
+   Practical packing height 2.1 m (internal 2.39 m, room to lift and clear the door). Boxes stack to 1.8 m.
+   Rules: pallets never stacked; furniture never stacked except dining chairs (nest up to 4 high);
+   appliances and wardrobes never stacked; fridge / washer / dishwasher / cooker stay upright;
+   everything else may be turned any way if that fits more.
+   How full: each item takes 1 / (most of that item one container holds) of the container. That share
+   already includes the gaps a container full of that item leaves (gaps count as used). A mixed load
+   adds the shares, so adding anything always raises the reading, one item type alone rises in equal
+   steps and reads 100% when no more fit. Containers are filled largest items first.
    ===================================================================== */
-var HS_FIT = { REACH: 1.5, REACH_D: 0.9, CLR: 0.05, MIN: 0.30, W: 2.35, LANE: 0.65, ZD: 0.85, H: 2.1, BAY: 0, OV_BOTH: 0, OV_ONE: 0, DOOR_H: 2.28 };
-var HS_MODE = 'room';   // 'room' = 0.65 m loading lane kept clear front to back; 'max' = no lane, full 2.35 m width packed
-var HS_LAYOUT_NAME = { 1: 'down the middle', 2: 'along one side', 3: 'no lane' };
-function hsFit(load, L, n, mode) {
-  // Organise mode (15/10/2026): a clear 0.65 m loading lane runs the full internal length, either
-  //   1. down the middle – two side zones (2.35 − 0.65) / 2 = 0.85 m deep, or
-  //   2. along one side wall – one 1.70 m deep zone.
-  // Both are tried and the one that fits (then leaves most room) is used for the whole load. Nothing sticks into the lane.
-  var maxMode = (mode || HS_MODE) === 'max', best = null, st = { pallets: 0, floor: 1, space: 2, '': 3 };
-  var cands = [[1, Object.assign({}, HS_FIT, { ZD: (HS_FIT.W - HS_FIT.LANE) / 2 })], [2, Object.assign({}, HS_FIT, { ZD: HS_FIT.W - HS_FIT.LANE })]];
-  if (maxMode) cands.push([3, Object.assign({}, HS_FIT, { ZD: 0.9 })]);   // packed to the max: rows across the full width
-  var singleType = load.length === 1;
-  cands.forEach(function (cd) {
-    var r = hsFitLayout(load, L, n, cd[0], cd[1]);
-    r._F = cd[1];
-    r._hr = (singleType && r.ok) ? hsHeadroom(load, L, r) : 0;
-    if (!best) { best = r; return; }
-    if (st[r.fail] > st[best.fail]) { best = r; return; }
-    if (st[r.fail] < st[best.fail]) return;
-    // Single item type: prefer more headroom (coffee tables etc. must not pack into the side zone until it is
-    // full, read ~half full, then jump to 2 containers while the middle layout still had room).
-    // Mixed loads: prefer lower committed volume so adding a small item does not thrash the layout.
-    if (singleType && r.ok && r._hr > best._hr) { best = r; return; }
-    if (singleType && r.ok && r._hr < best._hr) return;
-    if (r.consumed < best.consumed - 1e-9) best = r;
+var HS_FIT = { W: 2.35, LANE: 0.65, H: 2.1, INT_H: 2.39, BOX_H: 1.8, L20: 5.9, L10: 2.8, NEST_STEP: 0.32, NEST_MAX: 4 };
+var HS_MODE = 'room';     // 'room' = organise (lane kept clear), 'max' = packed (no lane)
+var HS_LANE = 'auto';     // 'auto' | 'side' | 'middle'
+var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1 };
+var HS_PAL = { E: [1.2, 0.8], U: [1.2, 1.0], H: [0.8, 0.6] };
+function hsStrips(layout) { var F = HS_FIT; return layout === 'packed' ? [F.W] : layout === 'middle' ? [(F.W - F.LANE) / 2, (F.W - F.LANE) / 2] : [F.W - F.LANE]; }
+function hsFl(x, a) { return a > 0 ? Math.floor(x / a + 1e-9) : 0; }
+// Every way the item may stand: footprint a x b and how many high.
+function hsOrients(it) {
+  var F = HS_FIT, out = [];
+  if (it.pal) { var p = HS_PAL[it.pal]; return [{ a: p[0], b: p[1], layers: 1, h: 0 }]; }
+  var d = it.d, perms = HS_FIXED[it.id] ? [[d[0], d[1], d[2]]] :
+    [[d[0], d[1], d[2]], [d[0], d[2], d[1]], [d[1], d[2], d[0]]];   // (footprint pair, height); footprint is also turned 90 deg below
+  perms.forEach(function (q) {
+    var h = q[2]; if (h > F.H + 1e-9) return;
+    var layers = 1;
+    if (it.box) layers = Math.max(1, hsFl(F.BOX_H, h));
+    else if (it.id === 'dchair' && q[2] === d[2]) { layers = 1; while (layers < F.NEST_MAX && d[2] + layers * F.NEST_STEP <= F.H + 1e-9) layers++; }
+    out.push({ a: q[0], b: q[1], layers: layers, h: h });
   });
+  return out;
+}
+// Most of one footprint (a x b, may be turned 90 deg) on a strip L long x W deep. Tries rows of one way then the other
+// both along the length and across the width; plain guillotine rows that anyone can check with a tape measure.
+function hsStripCount(L, W, a, b) {
+  var best = 0, i, n;
+  for (i = 0; i <= hsFl(L, a); i++) { n = i * hsFl(W, b) + hsFl(L - i * a, b) * hsFl(W, a); if (n > best) best = n; }
+  for (i = 0; i <= hsFl(W, b); i++) { n = i * hsFl(L, a) + hsFl(W - i * b, a) * hsFl(L, b); if (n > best) best = n; }
   return best;
 }
-// Extra copies of the busiest item that still fit in this layout. Used to pick middle vs side (single-type
-// loads) and to detect "effectively full" for the % reading.
-function hsHeadroom(load, L, r) {
-  if (!r.ok || !load.length || !r._F) return -1;
-  if (r._hrCached !== undefined) return r._hrCached;
-  var main = load[0], i;
-  for (i = 1; i < load.length; i++) if (load[i].n > main.n) main = load[i];
-  var lo = 0, hi = 30;
-  while (lo < hi) {
-    var mid = (lo + hi + 1) >> 1, scaled = load.map(function (x) { return x.item.id === main.item.id ? { item: x.item, n: x.n + mid } : x; });
-    if (hsFitLayout(scaled, L, r.n, r.layout, r._F).ok) lo = mid; else hi = mid - 1;
-  }
-  return (r._hrCached = lo);
+var hsMaxCache = {};
+function hsItemMax(it, L, layout) {   // most of this item ONE container holds in this layout
+  var k = it.id + '|' + L + '|' + layout; if (hsMaxCache[k] !== undefined) return hsMaxCache[k];
+  var best = 0;
+  hsOrients(it).forEach(function (o) {
+    var n = hsStrips(layout).reduce(function (s, W) { return s + hsStripCount(L, W, o.a, o.b); }, 0) * o.layers;
+    if (n > best) best = n;
+  });
+  return (hsMaxCache[k] = best);
 }
-/* Physical model (15/10/2026 rework). Every item is a real box (L×D×H, turned on the floor if that helps).
-   Each floor zone ("lane") starts as one empty surface. Placing an item on a surface uses a rectangle of it
-   (plus ~5 cm clearance to the next stack on the floor) and leaves: the strip beside it, the strip in front of
-   it, and a new surface on top of the item. Items only go where they physically fit: footprint within the
-   surface, top below the practical height, heavy items never above 1.5 m, only on tops that can take them
-   (any / light only / none), and the same item only as many high as it sensibly stacks (chairs seat-to-seat 2).
-   Left-over pieces too small or too low for even a small box (30 cm) are lost space and count as used.
-   Order: pallets → floor-only items (largest first) → heavy stackables → light items → boxes (large first). */
-function hsFitLayout(load, L, n, layout, F) {
-  var HS_ITEMS = {}; load.forEach(function (x) { HS_ITEMS[x.item.id] = x.item; });
-  var lanes = [], c, i;
-  for (c = 0; c < n; c++) {
-    if (layout === 3) {
-      var rows = Math.floor(L / F.ZD + 1e-9);
-      for (i = 0; i < rows; i++) lanes.push({ c: c, k: 'X' + i, len: F.W, ov: 0, pal: true });
-    } else if (layout === 1) {   // lane down the middle: a zone along each wall
-      lanes.push({ c: c, k: 'A', len: L, ov: 0, pal: true });
-      lanes.push({ c: c, k: 'B', len: L, ov: 0, pal: true });
-    } else {                     // lane along one side: one deep zone
-      lanes.push({ c: c, k: 'A', len: L, ov: 0, pal: true });
-    }
-  }
-  var cap = lanes.reduce(function (s, ln) { return s + ln.len; }, 0) * F.ZD * F.H;
-  var res = { ok: true, layout: layout, layoutName: HS_LAYOUT_NAME[layout], zoneDepth: F.ZD, n: n, cap: cap, capOne: cap / n, narrows: false, fail: '', placed: [], pools: [], lanes: lanes };
-  // surface: l (along lane) × d (across), at height z; top = 'floor' | 'any' | 'light' | 'none'; own = item id under it, sn = how many high
-  var surfs = lanes.map(function (ln) { return { ln: ln, l: ln.len, d: F.ZD, y: 0, z: 0, top: 'floor', front: true, own: null, sn: 0 }; });
-  var own = []; for (c = 0; c < n; c++) own.push(0);
-  // units in placement order
-  var units = [];
-  function addUnits(it, cnt, rank) { for (var j = 0; j < cnt; j++) units.push({ it: it, rank: rank }); }
-  load.forEach(function (x) {
-    var it = x.item, m = it.mode;
-    var rank = m === 'pallet' ? 0 : (m === 'floor' || m === 'edge') ? 1 : it.box ? 4 : it.light ? 3 : 2;
-    addUnits(it, x.n, rank);
-  });
-  function foot(it) { return it.mode === 'pallet' ? { E: [1.2, 0.8], U: [1.2, 1.0], H: [0.8, 0.6] }[it.pal] : [it.d[0], it.d[1]]; }
-  units.sort(function (p, q) {
-    if (p.rank !== q.rank) return p.rank - q.rank;
-    var fp = foot(p.it), fq = foot(q.it);
-    return (fq[0] * fq[1] - fp[0] * fp[1]) || (q.it.d ? q.it.d[2] : 0) - (p.it.d ? p.it.d[2] : 0) || (p.it.id < q.it.id ? -1 : p.it.id > q.it.id ? 1 : 0);
-  });
-  var CATALOG = [];
-  if (typeof CALC_CONFIG !== 'undefined') CALC_CONFIG.categories.forEach(function (c) { c.items.forEach(function (x) { if (x.d || x.pal) CATALOG.push(x); }); });
-  // every way item `it` physically fits on surface `s` (orientation, height it adds, whether it is its own stack)
-  function opts(it, s) {
-    var pal = it.mode === 'pallet', f = foot(it), h = pal ? F.H : it.d[2], ms = it.box ? 99 : it.maxStack || 1, light = !!it.light, out = [];
-    var self = s.own === it.id && s.sn < ms && s.z > 0;
-    if (s.z > 0 && !self) {
-      if (pal || it.mode === 'floor' || it.mode === 'edge') return out;   // floor items and slabs stand on the floor (sofas only on their pair)
-      if (s.top === 'none' || (s.top === 'light' && !light)) return out;
-      if (s.own === it.id) return out;
-    }
-    var hh = self && it.stackH ? it.stackH : h;
-    if (s.z + hh > F.H + 1e-9) return out;
-    if (!light && s.z > 0 && s.z + hh > F.REACH + 1e-9) return out;   // heavy things stay low
-    if (pal && (!s.ln.pal || s.z > 0)) return out;
-    var full = false;   // nothing may stick into the loading lane (15/10/2026)
-    function tryO(o, hh, end) {
-      if (s.z + hh > F.H + 1e-9) return;
-      var dl = full ? s.d + s.ln.ov : s.d + (s.z > 0 ? 0.02 : 0);
-      if (o[0] > s.l + (s.z > 0 ? 0.02 : 0) + 1e-9 || o[1] > dl + 1e-9) return;
-      if (o[1] - s.d > 0.35 * o[1] + 1e-9) return;   // mostly-in-the-walkway doesn't count: at most about a third of an item may stick out
-      // the person loading stands in the lane: an item must be within reach (~0.9 m) of the lane edge. Try it at the
-      // back of this piece first, else at the front of it (the piece's lane side).
-      var gapBack = F.ZD - (s.y + o[1]), gapFront = F.ZD - (s.y + s.d);
-      if (gapBack <= F.REACH_D + 1e-9) out.push({ o: o, hh: hh, self: self, pos: 'back', end: end });
-      else if (gapFront <= F.REACH_D + 1e-9) out.push({ o: o, hh: hh, self: self, pos: 'front', end: end });
-    }
-    tryO(f, hh, false); tryO([f[1], f[0]], hh, false);   // either way round (pallets too)
-    // a sofa can stand on its end (arm down) if it won't fit upright: footprint depth × height, as tall as it is long
-    if (it.sofa && s.z === 0 && !out.length) { tryO([it.d[1], it.d[2]], it.d[0], true); tryO([it.d[2], it.d[1]], it.d[0], true); }
-    return out;
-  }
-  function freeOf(p) { return usable(p) ? (p.al !== undefined ? p.al * p.ad : p.l * Math.min(p.d, F.ZD)) * (F.H - p.z) : 0; }
-  function usable(s) { return CATALOG.some(function (x) { return opts(x, s).length > 0; }); }
-  function tryPlace(it) {
-    var best = null, pal = it.mode === 'pallet';
-    surfs.forEach(function (s) {
-      opts(it, s).forEach(function (p) {
-        var o = p.o, waste = s.l * s.d - o[0] * o[1];
-        // score: own stack first, then other tops (lowest waste), then part-used floor, then fresh floor (best fit)
-        var sc = s.ln.c * 1e5 + (p.self ? 0 : s.z > 0 ? 1e3 : 2e3) + waste * 10 + s.z + (it.box ? 0 : o[0]);   // tie: least length along the zone (furniture)   // fill container 1 before 2
-        if (s.z === 0) sc += (s.l < s.ln.len - 1e-9 || s.d < F.ZD - 1e-9 ? 0 : 500);
-        if (o[1] > s.d + 1e-9) sc += 300;   // don't stick into the walkway if there's a way round it
-        if (!best || sc < best.sc - 1e-9) best = { s: s, o: o, sc: sc + (p.pos === 'front' ? 1 : 0) + (p.end ? 50 : 0), hh: p.hh, self: p.self, pos: p.pos, end: p.end };
-      });
-    });
-    if (!best) return false;
-    var s = best.s, o = best.o, onFloor = s.z === 0, cl = onFloor && !pal ? F.CLR : 0;
-    var ul = Math.min(s.l, o[0] + cl), ud = Math.min(s.d, o[1] + cl);
-    if (o[1] > s.d + 1e-9) { res.narrows = true; ud = s.d; }
-    var nBefore = surfs.length, freeBefore = freeOf(s);
-    surfs.splice(surfs.indexOf(s), 1);
-    // leftover: strip beside (full depth) and strip in front (item length)
-    var pal0 = s.al !== undefined ? s.al : s.l, pad0 = s.ad !== undefined ? s.ad : Math.min(s.d, F.ZD);   // accounted size of the piece
-    // split what's left the way that keeps the bigger usable rectangle (A: full-depth strip beside + strip in front
-    // of the item; B: full-length strip in front + strip beside the item)
-    var cut = (s.l - ul) * s.d >= ul * (s.d - ud) ? (s.l - ul) * s.d : ul * (s.d - ud);
-    var cutB = s.l * (s.d - ud) >= (s.l - ul) * ud ? s.l * (s.d - ud) : (s.l - ul) * ud;
-    var iy = best.pos === 'front' ? s.y + s.d - ud : s.y, ry = best.pos === 'front' ? s.y : s.y + ud;   // item / remaining-strip position across the zone
-    var kp = function (l, d, al, ad, y) { if (l > 1e-6 && d > 1e-6) surfs.push({ ln: s.ln, l: l, d: d, y: y, al: Math.max(0, al), ad: Math.max(0, ad), z: s.z, top: s.top, front: s.front, own: s.own, sn: s.sn }); };
-    if (cutB > cut + 1e-9) { kp(s.l, s.d - ud, pal0, pad0 - ud, ry); kp(s.l - ul, Math.min(ud, s.d), pal0 - ul, Math.min(ud, pad0), iy); }
-    else { kp(s.l - ul, s.d, pal0 - ul, pad0, s.y); kp(ul, s.d - ud, Math.min(ul, pal0), pad0 - ud, ry); }
-    // top of the item becomes a surface
-    var z2 = s.z + best.hh, sn = best.end ? 99 : best.self ? s.sn + 1 : 1;
-    surfs.push({ ln: s.ln, l: o[0], d: o[1], y: iy, al: Math.min(o[0], ul, pal0), ad: Math.min(o[1], ud, pad0), z: z2, top: pal || best.end ? 'none' : it.box ? 'any' : (it.top || 'none'), front: false, own: it.id, sn: sn, cu: Math.min(ul, pal0) * Math.min(ud, pad0), h0: best.hh });
-    // the item's own space: footprint incl. its clearance × its height (a seat-to-seat pair is shared equally)
-    // items nothing can go on commit their whole column (shared equally within a self-stack, e.g. a chair pair)
-    var hOwn;
-    if (pal) hOwn = F.H;
-    else if (it.box || (it.top && it.top !== 'none')) hOwn = it.stackH ? (it.d[2] + it.stackH) / 2 : best.hh;
-    else { var lay = Math.max(1, Math.min(it.maxStack || 1, 1 + Math.floor((F.H - it.d[2]) / (it.stackH || it.d[2]) + 1e-9))); hOwn = F.H / lay; }
-    own[s.ln.c] += (o[0] + cl) * (o[1] + cl) * hOwn;
-    var x1 = freeBefore; for (var q = nBefore - 1; q < surfs.length; q++) x1 -= freeOf(surfs[q]);
-    surfs[surfs.length - 1].x1 = x1;   // space this placement committed
-    res.placed.push({ id: it.id, lane: s.ln.k, c: s.ln.c, z: s.z, l: o[0], d: o[1], ul: ul, ud: ud, h: best.hh, x1: x1, y: iy, end: !!best.end });
-    return true;
-  }
-  for (i = 0; i < units.length; i++) {
-    if (!tryPlace(units[i].it)) { res.ok = false; var m = units[i].it.mode; res.fail = m === 'pallet' ? 'pallets' : (m === 'floor' || m === 'edge') ? 'floor' : 'space'; break; }
-  }
-  // % full (15/10/2026): the space is a set of pieces (floor strips, tops of items). Every placement turns part of a
-  // piece into: the item itself + its clearance + anything left above/beside it that nothing in the catalogue could
-  // ever use. Pieces never grow, so "usable" never changes once decided: committed space = capacity − usable pieces.
-  // Each item therefore adds exactly the space it commits, and 100% = nothing more can physically go in.
-  var freeVol = [], freeFloor = 0;
-  for (c = 0; c < n; c++) freeVol.push(0);
-  surfs.forEach(function (s) {
-    if (!usable(s)) return;
-    var area = (s.al !== undefined ? s.al * s.ad : s.l * Math.min(s.d, F.ZD));
-    freeVol[s.ln.c] += area * (F.H - s.z);
-    if (s.z === 0) freeFloor += area;
-  });
-  var floorTotal = lanes.reduce(function (s, ln) { return s + ln.len; }, 0) * F.ZD, capOne = cap / n;
-  // A seat-to-seat pair (sofas, chairs) shares one column: each of the two commits half of it, so both clicks add the same.
-  // For a pair still waiting for its 2nd item, swap what the 1st physically commits for half the finished pair's column.
-  var adj = freeVol.map(function () { return 0; });
-  surfs.forEach(function (s) {
-    var it = s.own && HS_ITEMS[s.own];
-    if (!it || !it.stackH || s.sn !== 1 || s.z <= 0 || s.x1 === undefined || !usable(s)) return;
-    var top = s.al * s.ad, pairH = it.d[2] + it.stackH;
-    var pairTop = (it.top && it.top !== 'none' && F.H - pairH >= F.MIN - 1e-9) ? top * (F.H - pairH) : 0;   // room left above the finished pair
-    var x2 = top * (F.H - s.h0) - pairTop;   // what the 2nd of the pair will commit
-    adj[s.ln.c] += (x2 - s.x1) / 2;
-  });
-  res.byCont = freeVol.map(function (v, k) { return Math.max(0, Math.min(capOne, capOne - v + adj[k])); });
-  res.consumed = res.byCont.reduce(function (a, b) { return a + b; }, 0);
-  res.lastConsumed = res.byCont[n - 1];
-  res.pieces = surfs.map(function (s) { return { lane: s.ln.k, c: s.ln.c, l: s.l, d: s.d, al: s.al, ad: s.ad, z: s.z, top: s.top, own: s.own, usable: usable(s) }; });   // for checking
-  res.dead = 0;   // already included in consumed
-  res.floorTotal = floorTotal;
-  res.floorUsed = Math.max(0, floorTotal - freeFloor);
-  res.floorPct = Math.min(100, res.floorUsed / floorTotal * 100);
-  res.volPct = res.consumed / cap * 100;
-  return res;
+// How many containers' worth a load takes in one layout (1.0 = exactly one full container).
+function hsShare(load, L, layout) {
+  return load.reduce(function (s, x) { var m = hsItemMax(x.item, L, layout); return s + (m > 0 ? x.n / m : Infinity); }, 0);
 }
+// Layout used: packed, or the lane choice. Auto = side lane unless the middle lane holds this load in less space.
+function hsLayout(load, L, mode, lane) {
+  mode = mode || HS_MODE; lane = lane || HS_LANE;
+  if (mode === 'max') return { layout: 'packed', share: hsShare(load, L, 'packed') };
+  if (lane === 'side' || lane === 'middle') {
+    var f = hsShare(load, L, lane);
+    if (f === Infinity) {   // e.g. UK pallets are wider than a 0.85 m middle-lane strip: lane moves to the side.
+      // Kept monotonic: never less than the middle-lane share of the items that did fit plus the side share of the rest.
+      var mix = load.reduce(function (s, x) { var m = hsItemMax(x.item, L, lane); return s + x.n / (m > 0 ? m : hsItemMax(x.item, L, 'side')); }, 0);
+      return { layout: 'side', share: Math.max(hsShare(load, L, 'side'), mix), forced: lane };
+    }
+    return { layout: lane, share: f };
+  }
+  var s = hsShare(load, L, 'side'), m = hsShare(load, L, 'middle');
+  return m < s - 1e-9 ? { layout: 'middle', share: m } : { layout: 'side', share: s };
+}
+function hsContainers(share) { return share <= 0 ? 0 : Math.max(1, Math.ceil(share - 1e-9)); }
+var HS_LAYOUT_NAME = { side: 'along one side', middle: 'down the middle', packed: 'no lane (packed)' };
 /* ======================= END OF ENGINE ======================= */
 
 (function () {
@@ -586,35 +457,15 @@ function hsFitLayout(load, L, n, layout, F) {
   /* ---------- State ---------- */
   var counts = {}, itemsById = {}, activeCat = C.categories[0].id;
   C.categories.forEach(function (cat) { cat.items.forEach(function (it) { counts[it.id] = 0; itemsById[it.id] = it; it.cat = cat.id; }); });
-  var usable = Math.round(hsFit([], 5.9, 1, 'room').cap * 35.3147);
-  var usable10 = Math.round(hsFit([], 2.8, 1, 'room').cap * 35.3147);
+  var usable = Math.round(HS_FIT.L20 * (HS_FIT.W - HS_FIT.LANE) * HS_FIT.H * 35.3147);
+  var usable10 = Math.round(HS_FIT.L10 * (HS_FIT.W - HS_FIT.LANE) * HS_FIT.H * 35.3147);
 
   var $ = function (id) { return document.getElementById(id); };
   function fmt(n, dp) { return Number(n).toLocaleString('en-GB', { minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0 }); }
   function money(n) { return C.pricing.currency + fmt(n, n % 1 ? 2 : 0); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
-  var palMaxCache = {};
-  function hsPalMax(id) {   // most pallets of one kind in a 20ft (worked out by the fit engine, cached)
-    if (palMaxCache[id]) return palMaxCache[id];
-    var k = 0; while (k < 60 && hsFit([{ item: itemsById[id], n: k + 1 }], 5.9, 1).ok) k++;
-    return (palMaxCache[id] = k);
-  }
-  var itemMaxCache = {};
-  function hsItemMax(it) {   // most of one item a 20ft holds (organise mode), cached
-    if (itemMaxCache[it.id] !== undefined) return itemMaxCache[it.id];
-    var lo = 0, hi = 1;
-    while (hi < 2000 && hsFit([{ item: it, n: hi }], 5.9, 1).ok) { lo = hi; hi *= 2; }
-    while (hi - lo > 1) { var m = (lo + hi) >> 1; if (hsFit([{ item: it, n: m }], 5.9, 1).ok) lo = m; else hi = m; }
-    return (itemMaxCache[it.id] = lo);
-  }
-  var itemGapCache = {};
-  function hsItemGap(it) {   // per-item share of the space that a full 20ft of this item can't use (fraction of one 20ft)
-    if (itemGapCache[it.id] !== undefined) return itemGapCache[it.id];
-    var M = hsItemMax(it), g = 0;
-    if (M > 0) { var r = hsFit([{ item: it, n: M }], 5.9, 1); g = Math.max(0, 1 / M - r.consumed / r.capOne / M); }
-    return (itemGapCache[it.id] = g);
-  }
+  function hsItemVol(it) { return it.pal ? HS_PAL[it.pal][0] * HS_PAL[it.pal][1] : it.d[0] * it.d[1] * it.d[2]; }
   function calc() {
     var total = 0, lines = [], itemCount = 0, load = [];
     C.categories.forEach(function (cat) {
@@ -624,56 +475,33 @@ function hsFitLayout(load, L, n, layout, F) {
       });
     });
     total = Math.round(total * 100) / 100;
-    var L20 = 5.9, L10 = 2.8;
-    if (!load.length) return { total: 0, ratio: 0, pct: 0, containers: 0, lines: lines, itemCount: 0, fits10: false, palLine: '', floorPct: 0, volPct: 0, narrows: false };
-    // Floor-plan fit (see FIT ENGINE above): smallest number of 20ft containers that holds everything.
-    var n = 1, r20 = hsFit(load, L20, 1), one = r20;
-    while (!r20.ok && n < 999) { n++; r20 = hsFit(load, L20, n); }   // was capped at 99 (15/10/2026)
-    var r10 = (C.container10 && C.pricing.small10) ? hsFit(load, L10, 1) : { ok: false };
-    // "How full": the larger of floor used and overall space used (a floor full of sofas is full even with air above).
-    // 15/10/2026: "how full" = space taken + gaps too low to use. Floor % is shown separately; it no longer masks
-    // items stacked on top (previously anything placed on top of furniture showed as taking no space).
-    // 15/10/2026 physical model: "how full" = space taken by items + clearances + space left that nothing can use.
-    // containers are filled in turn: n-1 full ones plus the share of the last one
-    // n-1 containers plus the overall fill: every item counts, wherever it ends up
-    // % full = space committed by the actual layout ÷ practical capacity (usable floor × 2.1 m). Containers fill in turn.
-    // several containers: n-1 plus how full the n containers are overall (every item counts, wherever it goes)
-    var ratio = n === 1 ? r20.consumed / r20.capOne : n - 1 + Math.max(0.01, r20.consumed / r20.cap);
-    // Gaps (15/10/2026): space the packing engine leaves free can still look "free" even when no more of an item can
-    // use it (e.g. 8 Euro pallets fill a 20ft but only cover 81% of it). Each item therefore also carries its fair
-    // share of the gaps it leaves when a 20ft is packed with it: gap = 1/M − (space M of them physically commit)/M,
-    // where M is the most of that item a 20ft holds. Same item → same step; one item alone reaches 100% exactly
-    // when no more fit; adding a different item never drops the reading.
-    var gapAdd = load.reduce(function (s, x) { return s + x.n * hsItemGap(x.item); }, 0);
-    // Gap shares can overlap space other items do use (chairs in the gaps beside sofas), so they fill the free space
-    // that is left smoothly and never claim more than is physically free (never reads "full" while things still fit).
-    var used = r20.consumed / r20.capOne, freeC = Math.max(1e-9, n - used);
-    ratio = used + freeC * (1 - Math.exp(-gapAdd / freeC));
-    // One item type: the same sum averaged over the item's own packing pattern (pairs, rows, stacks), i.e. exactly
-    // n/M – every click the same step, 100% when the last one that fits goes in.
-    if (load.length === 1 && hsItemMax(load[0].item) > 0) ratio = load[0].n / hsItemMax(load[0].item);
-    if (n > 1) ratio = Math.min(n, ratio);
-    if (n > 1) ratio = Math.max(ratio, n - 1 + 0.01);      // multi-container: always reads as more than n-1
-    else ratio = Math.min(ratio, 1);
-    var containers = n, fits10 = !!r10.ok;
-    // Compare with the other packing mode and mention it if it needs a smaller size.
-    var other = HS_MODE === 'room' ? 'max' : 'room', on = 1;
-    while (!hsFit(load, L20, on, other).ok && on < 999) on++;
-    var o10 = (C.container10 && C.pricing.small10) ? hsFit(load, L10, 1, other).ok : false;
-    var sz = function (k, t) { return t ? 1 : 1 + k; };   // size rank: 10ft=1, one 20ft=2, two 20ft=3…
-    var altLine = '';
-    if (sz(on, o10) < sz(n, fits10)) altLine = (other === 'max' ? 'Packed to the max' : 'With room to get in and organise') + ' this would fit in ' + (o10 ? 'a 10ft' : on === 1 ? 'one 20ft' : on + ' × 20ft') + '.';
-    else if (HS_MODE === 'max' && sz(on, o10) > sz(n, fits10)) altLine = 'With room to get in and organise you’d need ' + (on === 1 ? 'one 20ft' : on + ' × 20ft') + '.';
-    altLine = ''; // mode toggle removed 14/10/2026
+    var F = HS_FIT, L20 = F.L20, L10 = F.L10;
+    if (!load.length) return { total: 0, ratio: 0, pct: 0, containers: 0, lines: lines, itemCount: 0, fits10: false, palLine: '', fitLine: '', floorPct: 0, volPct: 0, units: [], layout: '' };
+    var r20 = hsLayout(load, L20), ratio = r20.share, n = hsContainers(ratio);
+    var r10 = (C.container10 && C.pricing.small10) ? hsLayout(load, L10) : { share: Infinity };
+    var fits10 = r10.share <= 1 + 1e-9;
+    // Largest items first: fill container 1, then 2, ... (a type may continue into the next container)
+    var order = load.slice().sort(function (p, q) { return hsItemVol(q.item) - hsItemVol(p.item); }), units = [], cur = 0, k = 0;
+    for (var i = 0; i < n; i++) units.push({ fill: 0, items: [] });
+    order.forEach(function (x) {
+      var m = hsItemMax(x.item, L20, r20.layout), left = x.n;
+      while (left > 0 && k < n) {
+        var room = Math.max(0, Math.round((1 - units[k].fill) * m + 1e-6)), put = Math.min(left, room);
+        if (put > 0) { units[k].items.push({ item: x.item, n: put }); units[k].fill += put / m; left -= put; }
+        if (left > 0) k++;
+      }
+      if (left > 0 && n > 0) { units[n - 1].items.push({ item: x.item, n: left }); units[n - 1].fill += left / m; }
+    });
+    var laneNote = r20.forced ? 'A middle lane leaves only ' + fmt((F.W - F.LANE) / 2, 2) + 'm each side, too narrow for some of your items, so the lane goes along one side. ' : '';
+    var lay = r20.layout, usableW = lay === 'packed' ? F.W : F.W - F.LANE;
+    var fitLine = laneNote + 'How this is worked out: 20ft internal ' + fmt(L20, 2) + ' \u00d7 ' + fmt(F.W, 2) + ' \u00d7 ' + fmt(F.INT_H, 2) + 'm (10ft ' + fmt(L10, 2) + 'm long). ' +
+      (lay === 'packed' ? 'Packed wall to wall, no lane' : fmt(F.LANE, 2) + 'm loading lane ' + HS_LAYOUT_NAME[lay] + ' kept clear the full length') +
+      ', leaving ' + fmt(usableW, 2) + 'm usable width, packed to ' + fmt(F.H, 1) + 'm high (boxes stacked to ' + fmt(F.BOX_H, 1) + 'm). ' +
+      'Each item takes 1 \u00f7 (the most of it one container holds) of the space, including gaps nothing more of it can use; mixed loads add these shares, largest items first.';
     var P = { E: counts.palleteuro || 0, H: counts.pallethalf || 0, U: counts.palletuk || 0 }, nPal = P.E + P.H + P.U;
-    var palFits1 = hsFit(load.filter(function (x) { return x.item.mode === 'pallet'; }), L20, 1).ok;
-    var palLine = nPal ? (palFits1 ? 'Pallets: ' + nPal + ' on the floor (pallets aren\u2019t stacked).'
-      : 'Pallets: ' + nPal + ' pallets need more floor space than one 20ft has (max ' + hsPalMax('palleteuro') + ' Euro, ' + hsPalMax('pallethalf') + ' half or ' + hsPalMax('palletuk') + ' UK pallets with the loading lane) \u2013 more than one container needed.') : '';
-    var floorPct = n > 1 ? one.floorPct : r20.floorPct;
-    var fitLine = (n > 1 && !palFits1) ? '' : (n > 1 ? 'Floor space: more than one 20ft is needed' + (one.fail === 'floor' || one.fail === 'pallets' ? ' \u2013 items that can\u2019t be stacked take up all the floor' : '') + '.'
-      : 'How this is worked out: ' + fmt(HS_FIT.LANE, 2) + 'm loading lane ' + r20.layoutName + ', every item within reach of it \u00b7 floor used ' + fmt(r20.floorUsed, 1) + ' of ' + fmt(r20.floorTotal, 1) + ' m\u00b2 \u00b7 space used ' + fmt(r20.consumed, 1) + ' of ' + fmt(r20.cap, 1) + ' m\u00b3 (' + fmt(L20, 2) + 'm \u00d7 ' + fmt(HS_FIT.W - HS_FIT.LANE, 2) + 'm usable \u00d7 ' + fmt(HS_FIT.H, 1) + 'm high).');
-    return { total: total, ratio: ratio, pct: ratio * 100, containers: containers, lines: lines, itemCount: itemCount, fits10: fits10,
-      palLine: palLine, fitLine: fitLine, altLine: altLine, mode: HS_MODE, floorPct: floorPct, volPct: r20.consumed / r20.capOne * 100, narrows: r20.narrows, fit20: r20, fit10: r10 };
+    var palLine = nPal ? 'Pallets: ' + nPal + ' on the floor, not stacked (one 20ft holds ' + hsItemMax(itemsById.palleteuro, L20, lay) + ' Euro, ' + hsItemMax(itemsById.palletuk, L20, lay) + ' UK or ' + hsItemMax(itemsById.pallethalf, L20, lay) + ' half pallets on their own).' : '';
+    return { total: total, ratio: ratio, pct: ratio * 100, containers: n, lines: lines, itemCount: itemCount, fits10: fits10, share10: r10.share,
+      palLine: palLine, fitLine: fitLine, altLine: '', mode: HS_MODE, lane: HS_LANE, layout: lay, units: units, floorPct: 0, volPct: ratio * 100 };
   }
 
   /* ---------- Static text from config ---------- */
@@ -836,13 +664,14 @@ function hsFitLayout(load, L, n, layout, F) {
     return 'One ' + C.container.label + ' \u2013 a snug fit. Stack boxes high and pack furniture tightly.';
   }
 
+  function pctTxt(r) { return r.containers > 1 ? '+' + (r.containers - 1) + ' container' + (r.containers > 2 ? 's' : '') : (r.ratio >= 1 - 1e-9 ? 100 : Math.max(1, Math.min(99, Math.round(r.pct)))) + '%'; }
   function update() {
     var r = calc(), has = r.total > 0, n = r.containers;
     $('hsc-svg').classList.toggle('xray', has);
     $('hsc-empty').hidden = has;
     $('hsc-filled').hidden = !has;
     var pill = $('hsc-pill');
-    pill.textContent = !has ? 'Empty' : (n > 1 ? n + ' \u00d7 20ft needed' : Math.round(r.pct) + '% full' + (r.fits10 ? ' \u00b7 fits a ' + C.container10.lengthFt + 'ft' : ''));
+    pill.textContent = !has ? 'Empty' : (n > 1 ? n + ' \u00d7 20ft needed' : pctTxt(r) + ' full' + (r.fits10 ? ' \u00b7 fits a ' + C.container10.lengthFt + 'ft' : ''));
     pill.classList.toggle('multi', n > 1);
     pill.classList.toggle('ten', !!r.fits10);
     animateFill(Math.min(1, r.ratio));
@@ -850,20 +679,20 @@ function hsFitLayout(load, L, n, layout, F) {
     var u = $('hsc-units');
     if (n > 1) {
       var h = '';
-      for (var i = 0; i < n; i++) { var f = Math.max(0, Math.min(1, r.ratio - i)); h += '<span class="hsc-unit">Unit ' + (i + 1) + '<i><b style="width:' + (f * 100).toFixed(0) + '%"></b></i>' + Math.round(f * 100) + '%</span>'; }
+      for (var i = 0; i < n; i++) { var f = Math.max(0, Math.min(1, r.ratio - i)); h += '<span class="hsc-unit">Unit ' + (i + 1) + '<i><b style="width:' + (f * 100).toFixed(0) + '%"></b></i>' + (f >= 1 - 1e-9 ? 100 : Math.min(99, Math.round(f * 100))) + '%</span>'; }
       u.innerHTML = h;
     } else u.innerHTML = '';
 
     $('hsc-ten').hidden = !r.fits10;
     if (has) {
       $('hsc-vol').textContent = fmt(r.total, r.total % 1 ? 1 : 0);
-      $('hsc-pct').textContent = Math.round(r.pct) + '%';
-      $('hsc-pct-lab').textContent = 'of one ' + C.container.lengthFt + 'ft (usable)';
+      $('hsc-pct').textContent = pctTxt(r);
+      $('hsc-pct-lab').textContent = n > 1 ? n + ' \u00d7 ' + C.container.lengthFt + 'ft needed' : 'of one ' + C.container.lengthFt + 'ft (usable)';
       $('hsc-n').textContent = n;
       $('hsc-n-lab').textContent = (n === 1 ? 'container' : 'containers') + ' needed';
-      $('hsc-bar').classList.toggle('over', r.pct > 100);
+      $('hsc-bar').classList.toggle('over', n > 1);
       $('hsc-bar-fill').style.width = Math.min(100, r.pct).toFixed(1) + '%';
-      $('hsc-bar-txt').textContent = r.pct > 100 ? 'Over one container \u2013 ' + n + ' needed' : 'One ' + C.container.label;
+      $('hsc-bar-txt').textContent = n > 1 ? 'Over one container \u2013 ' + n + ' needed' : 'One ' + C.container.label;
       $('hsc-rec').textContent = recommendation(r);
       $('hsc-alt').hidden = !r.altLine; $('hsc-alt').textContent = r.altLine || '';
       var pl = [r.palLine, r.fitLine].filter(Boolean).join(' ');
@@ -894,7 +723,7 @@ function hsFitLayout(load, L, n, layout, F) {
     var unit = r.fits10 ? '10ft' : 'unsure';
     var items = r.lines.map(function (l) { return l.n + ' x ' + l.item.name; }).join(', ');
     if (items.length > 400) items = items.slice(0, 397) + '...';
-    var summary = 'From the storage calculator: approx. ' + fmt(r.total, 0) + ' cu ft (' + Math.round(r.pct) + '% of one 20ft), ' +
+    var summary = 'From the storage calculator: approx. ' + fmt(r.total, 0) + ' cu ft (' + (r.containers > 1 ? r.containers + ' containers' : pctTxt(r) + ' of one 20ft') + '), ' +
       r.containers + ' x 20ft needed' + (r.fits10 ? ' - a 10ft would fit' : '') + '. Items: ' + items;
     return base + (base.indexOf('?') < 0 ? '?' : '&') + 'unit=' + unit + '&calc=' + encodeURIComponent(summary);
   }
@@ -905,7 +734,7 @@ function hsFitLayout(load, L, n, layout, F) {
       body = 'Hi,\n\nI\u2019ve used the storage calculator on your website and would like to enquire about storage.\n\nItems:\n' +
         r.lines.map(function (l) { return '- ' + l.n + ' x ' + l.item.name; }).join('\n') +
         '\n\nEstimated volume: ' + fmt(r.total, r.total % 1 ? 1 : 0) + ' cu ft' +
-        '\nSpace used: approx. ' + Math.round(r.pct) + '% of one ' + C.container.label + ' (usable space)' +
+        '\nSpace used: approx. ' + (n > 1 ? n + ' containers' : pctTxt(r) + ' of one') + ' ' + C.container.label + ' (usable space)' +
         '\nContainers needed: ' + n +
         '\nEstimate: ground level 20ft ' + money(C.pricing.ground.monthly * n) + ' + VAT/month, or Upper level 20ft ' + money(C.pricing.upstairs.monthly * n) + ' + VAT/month' +
         (r.fits10 ? '\n10ft option: the calculator suggests a ' + C.container10.label + ' would fit this \u2013 ' + money(C.pricing.small10.monthly) + ' + VAT/month' : '') +
@@ -934,12 +763,19 @@ function hsFitLayout(load, L, n, layout, F) {
   function setMode(m) {
     HS_MODE = m === 'max' ? 'max' : 'room';
     [].forEach.call($('hsc-mode').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === HS_MODE)); });
-    $('hsc-modenote').textContent = HS_MODE === 'max' ? 'Packed wall to wall, floor to 2.2m – the most it will hold, but you won’t be able to walk in.' : 'A clear 0.65m loading lane front to back so you can get in to load, find things and organise.';
+    $('hsc-lane').hidden = HS_MODE === 'max'; $('hsc-lane').style.display = HS_MODE === 'max' ? 'none' : '';
+    $('hsc-modenote').textContent = HS_MODE === 'max' ? 'Packed wall to wall to 2.1m \u2013 the most it will hold, but you won\u2019t be able to walk in.' : 'A clear 0.65m loading lane front to back so you can get in to load, reach things and organise. Auto uses a side lane unless a middle lane fits your items better.';
+    update();
+  }
+  function setLane(l) {
+    HS_LANE = (l === 'side' || l === 'middle') ? l : 'auto';
+    [].forEach.call($('hsc-lane').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lane') === HS_LANE)); });
     update();
   }
   $('hsc-mode').addEventListener('click', function (e) { var b = e.target.closest('button[data-mode]'); if (b) setMode(b.getAttribute('data-mode')); });
+  $('hsc-lane').addEventListener('click', function (e) { var b = e.target.closest('button[data-lane]'); if (b) setLane(b.getAttribute('data-lane')); });
   setMode('room');
-  window.HSC = { setMode: setMode, mode: function () { return HS_MODE; }, config: C, counts: counts, calc: calc, usable: usable, usable10: usable10 };
+  window.HSC = { setMode: setMode, setLane: setLane, itemMax: hsItemMax, mode: function () { return HS_MODE; }, config: C, counts: counts, calc: calc, usable: usable, usable10: usable10 };
 })();
 </script>
 </body>
