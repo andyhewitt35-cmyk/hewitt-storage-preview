@@ -277,3 +277,7 @@ h2.h3{font-size:19px;line-height:1.2;margin:0 0 .3em}
 /* modifications hero: Grafotherm spraying photo */
 .page-hero.mods-hero{background:linear-gradient(135deg,rgba(15,42,82,.85) 0%,rgba(23,58,110,.75) 60%,rgba(37,99,201,.6) 100%),url(img/mods-hero-spray.webp) 50% 58%/cover no-repeat}
 @media(min-width:900px){.page-hero.mods-hero{min-height:380px;display:flex;align-items:center;background:linear-gradient(90deg,#0f2a52 0%,#0f2a52 53%,rgba(15,42,82,.85) 60%,rgba(15,42,82,.35) 72%,rgba(23,58,110,.12) 100%),url(img/mods-hero-spray.webp) right 55%/48% auto no-repeat,#0f2a52}.page-hero.mods-hero .wrap{width:100%}}
+/* container hire photo */
+.block.hire-photo{padding-bottom:0}
+.block.hire-photo+.block{padding-top:24px}
+@media(min-width:900px){.hire-photo img{aspect-ratio:21/9!important;max-height:460px}}
