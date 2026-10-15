@@ -600,6 +600,21 @@ function hsFitLayout(load, L, n, layout, F) {
     var k = 0; while (k < 60 && hsFit([{ item: itemsById[id], n: k + 1 }], 5.9, 1).ok) k++;
     return (palMaxCache[id] = k);
   }
+  var itemMaxCache = {};
+  function hsItemMax(it) {   // most of one item a 20ft holds (organise mode), cached
+    if (itemMaxCache[it.id] !== undefined) return itemMaxCache[it.id];
+    var lo = 0, hi = 1;
+    while (hi < 2000 && hsFit([{ item: it, n: hi }], 5.9, 1).ok) { lo = hi; hi *= 2; }
+    while (hi - lo > 1) { var m = (lo + hi) >> 1; if (hsFit([{ item: it, n: m }], 5.9, 1).ok) lo = m; else hi = m; }
+    return (itemMaxCache[it.id] = lo);
+  }
+  var itemGapCache = {};
+  function hsItemGap(it) {   // per-item share of the space that a full 20ft of this item can't use (fraction of one 20ft)
+    if (itemGapCache[it.id] !== undefined) return itemGapCache[it.id];
+    var M = hsItemMax(it), g = 0;
+    if (M > 0) { var r = hsFit([{ item: it, n: M }], 5.9, 1); g = Math.max(0, 1 / M - r.consumed / r.capOne / M); }
+    return (itemGapCache[it.id] = g);
+  }
   function calc() {
     var total = 0, lines = [], itemCount = 0, load = [];
     C.categories.forEach(function (cat) {
@@ -623,11 +638,21 @@ function hsFitLayout(load, L, n, layout, F) {
     // n-1 containers plus the overall fill: every item counts, wherever it ends up
     // % full = space committed by the actual layout ÷ practical capacity (usable floor × 2.1 m). Containers fill in turn.
     // several containers: n-1 plus how full the n containers are overall (every item counts, wherever it goes)
-    // Space committed ÷ capacity. For a single item type, if no more of that item can fit, treat as
-    // effectively full (≥99%): stops coffee tables / TV units reading ~half full then jumping to 2 containers.
-    // (Mixed loads skip this — another item type may still fill the leftover scraps.)
     var ratio = n === 1 ? r20.consumed / r20.capOne : n - 1 + Math.max(0.01, r20.consumed / r20.cap);
-    if (n === 1 && r20.ok && load.length === 1 && hsHeadroom(load, L20, r20) === 0) ratio = Math.max(ratio, 0.99);
+    // Gaps (15/10/2026): space the packing engine leaves free can still look "free" even when no more of an item can
+    // use it (e.g. 8 Euro pallets fill a 20ft but only cover 81% of it). Each item therefore also carries its fair
+    // share of the gaps it leaves when a 20ft is packed with it: gap = 1/M − (space M of them physically commit)/M,
+    // where M is the most of that item a 20ft holds. Same item → same step; one item alone reaches 100% exactly
+    // when no more fit; adding a different item never drops the reading.
+    var gapAdd = load.reduce(function (s, x) { return s + x.n * hsItemGap(x.item); }, 0);
+    // Gap shares can overlap space other items do use (chairs in the gaps beside sofas), so they fill the free space
+    // that is left smoothly and never claim more than is physically free (never reads "full" while things still fit).
+    var used = r20.consumed / r20.capOne, freeC = Math.max(1e-9, n - used);
+    ratio = used + freeC * (1 - Math.exp(-gapAdd / freeC));
+    // One item type: the same sum averaged over the item's own packing pattern (pairs, rows, stacks), i.e. exactly
+    // n/M – every click the same step, 100% when the last one that fits goes in.
+    if (load.length === 1 && hsItemMax(load[0].item) > 0) ratio = load[0].n / hsItemMax(load[0].item);
+    if (n > 1) ratio = Math.min(n, ratio);
     if (n > 1) ratio = Math.max(ratio, n - 1 + 0.01);      // multi-container: always reads as more than n-1
     else ratio = Math.min(ratio, 1);
     var containers = n, fits10 = !!r10.ok;
