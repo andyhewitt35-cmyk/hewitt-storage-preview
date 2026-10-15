@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storage Calculator | Hewitt Storage, Orrell, Wigan</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Work out how much container storage you need at Hewitt Storage, Orrell, Wigan. Add your items and get an instant estimate.">
+<style>
+  :root{
+    --navy:#0f2a52; --navy-2:#173a6e; --blue:#2563c9; --blue-2:#3b7be0; --sky:#e8f0fb;
+    --ink:#1a2433; --muted:#5b6b82; --line:#d8e2f0; --bg:#f6f9fd; --white:#fff;
+    --ok:#1f9d6b; --warn:#d98a1c;
+    --i-a:#12305e; --i-b:#2563c9; --i-c:#dbe7f8; --i-d:#8fb0e6;
+    --i-k:#d4a76a; --i-k2:#bf8f50; --i-t:#f1dcb4; --i-w:#9c6b34;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.4}
+  .hsc{max-width:900px;margin:0 auto;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  /* Header */
+  .hsc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff}
+  .hsc-brand{display:flex;align-items:center;gap:10px}
+  .hsc-logo{width:34px;height:34px;flex:none}
+  .hsc-brand h1{margin:0;font-size:19px;letter-spacing:.2px;font-weight:700}
+  .hsc-brand p{margin:0;font-size:12px;opacity:.8}
+  .hsc-tag{font-size:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:5px 10px;border-radius:999px;white-space:nowrap}
+  /* Tabs */
+  .hsc-tabs{display:flex;gap:6px;overflow-x:auto;padding:14px 16px 4px;scrollbar-width:none}
+  .hsc-tabs::-webkit-scrollbar{display:none}
+  .hsc-tab{flex:none;border:1px solid var(--line);background:#fff;color:var(--navy);font:inherit;font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,color .15s,border-color .15s}
+  .hsc-tab:hover{border-color:var(--blue-2)}
+  .hsc-tab[aria-selected="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .hsc-tab .n{background:var(--blue);color:#fff;font-size:11px;min-width:18px;height:18px;line-height:18px;border-radius:9px;padding:0 5px;text-align:center}
+  .hsc-tab[aria-selected="true"] .n{background:#fff;color:var(--navy)}
+  /* Item strip */
+  .hsc-strip-wrap{position:relative;padding:4px 8px 10px}
+  .hsc-strip{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:10px 34px 6px;scroll-padding-inline:34px;scrollbar-width:none}
+  .hsc-strip::-webkit-scrollbar{display:none}
+  .hsc-arrow{position:absolute;top:50%;transform:translateY(-60%);width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 2px 6px rgba(15,42,82,.08)}
+  .hsc-arrow:disabled{opacity:.35;cursor:default}
+  .hsc-arrow.l{left:8px}.hsc-arrow.r{right:8px}
+  .hsc-item{flex:none;width:106px;scroll-snap-align:start;text-align:center;display:flex;flex-direction:column;align-items:center}
+  .hsc-ico{position:relative;width:78px;height:78px;border-radius:50%;background:var(--sky);border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:transform .15s,border-color .15s,box-shadow .15s}
+  .hsc-ico:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(15,42,82,.12)}
+  .hsc-item.on .hsc-ico{border-color:var(--blue);background:#fff}
+  .hsc-ico svg{width:50px;height:50px}
+  .hsc-badge{position:absolute;top:-4px;right:-2px;min-width:22px;height:22px;border-radius:11px;background:#fff;color:var(--muted);border:1px solid var(--line);font-size:11px;font-weight:700;line-height:20px;padding:0 5px}
+  .hsc-item.on .hsc-badge{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .hsc-name{margin-top:7px;font-size:13px;font-weight:650;color:var(--navy);line-height:1.2;min-height:32px;display:flex;align-items:center}
+  .hsc-vol{font-size:11px;color:var(--muted);margin-top:1px}
+  .hsc-step{display:flex;align-items:center;gap:4px;margin-top:6px;background:var(--navy);border-radius:999px;padding:3px}
+  .hsc-step button{width:24px;height:24px;border-radius:50%;border:0;background:#fff;color:var(--navy);font-size:16px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .hsc-step button:disabled{opacity:.4;cursor:default}
+  .hsc-step span{min-width:22px;color:#fff;font-size:13px;font-weight:700}
+  /* Stage */
+  .hsc-stage{display:grid;grid-template-columns:1.1fr 1fr;gap:8px;border-top:1px solid var(--line);
+    background-color:var(--bg);
+    background-image:repeating-linear-gradient(30deg,rgba(37,99,201,.06) 0 1px,transparent 1px 26px),repeating-linear-gradient(150deg,rgba(37,99,201,.06) 0 1px,transparent 1px 26px)}
+  .hsc-visual{position:relative;padding:18px 12px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .hsc-visual svg.ctr{width:100%;max-width:400px;height:auto;display:block}
+  .hsc-pill{position:absolute;top:14px;left:14px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;color:var(--navy);box-shadow:0 2px 6px rgba(15,42,82,.06)}
+  .hsc-pill.multi{background:var(--warn);color:#fff;border-color:var(--warn)}
+  .hsc-units{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
+  .hsc-unit{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:11px;color:var(--muted)}
+  .hsc-unit i{display:block;width:40px;height:6px;border-radius:3px;background:var(--sky);overflow:hidden}
+  .hsc-unit i b{display:block;height:100%;background:var(--blue)}
+  .walls{transition:opacity .35s ease}
+  .xray .walls{opacity:.16}
+  .xray .roof{opacity:.08}
+  .hidden-edge{opacity:0;transition:opacity .35s}
+  .xray .hidden-edge{opacity:.55}
+  /* Result */
+  .hsc-result{padding:22px 22px 18px;display:flex;flex-direction:column;justify-content:center}
+  .hsc-result h2{margin:0;font-size:22px;letter-spacing:.6px;color:var(--navy);font-weight:800}
+  .hsc-sub{margin:4px 0 0;font-size:14px;color:var(--muted)}
+  .hsc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .hsc-stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+  .hsc-stat b{display:block;font-size:19px;color:var(--navy);line-height:1.15}
+  .hsc-stat small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+  .hsc-bar{margin-top:12px;height:10px;background:#e3eaf5;border-radius:5px;overflow:hidden}
+  .hsc-bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--blue-2));border-radius:5px;transition:width .35s ease,background .35s}
+  .hsc-bar.over span{background:linear-gradient(90deg,var(--warn),#e9a948)}
+  .hsc-barlab{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px}
+  .hsc-rec{margin:10px 0 0;font-size:14px;color:var(--ink);background:#fff;border-left:3px solid var(--blue);padding:8px 10px;border-radius:0 8px 8px 0}
+  .hsc-mode{display:flex;gap:6px;margin:0 0 12px;background:#eef3fb;border-radius:10px;padding:4px}
+  .hsc-mode button{flex:1;border:0;background:transparent;border-radius:8px;padding:8px 6px;font:inherit;font-size:13px;font-weight:650;color:var(--navy);cursor:pointer}
+  .hsc-mode button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 4px rgba(15,42,82,.12);color:var(--blue)}
+  .hsc-modenote{margin:0 0 10px;font-size:12px;color:var(--muted)}
+  .hsc-guide{margin:12px 0 0;font-size:12px;line-height:1.4;color:var(--muted)}
+  .hsc-prices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .hsc-price{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+  .hsc-price .t{font-size:12px;font-weight:700;color:var(--navy)}
+  .hsc-price .s{font-size:11px;color:var(--muted)}
+  .hsc-price .p{font-size:20px;font-weight:800;color:var(--navy);margin-top:4px}
+  .hsc-price .p em{font-style:normal;font-size:12px;font-weight:600;color:var(--muted)}
+  .hsc-price .x{font-size:11px;color:var(--muted)}
+  .hsc-price.ten{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:2px solid var(--blue);background:linear-gradient(135deg,#f3f7ff,#e6efff)}
+  .hsc-price.ten[hidden]{display:none}
+  .hsc-price.ten .tag{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:999px;margin-bottom:3px}
+  .hsc-price.ten .p{margin-top:0;text-align:right}
+  .hsc-price.ten .x{text-align:right}
+  .hsc-pill.ten{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .hsc-list{margin-top:10px;font-size:13px}
+  .hsc-list summary{cursor:pointer;color:var(--navy);font-weight:650}
+  .hsc-list ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+  .hsc-filled[hidden],.hsc-sub[hidden]{display:none}
+  .hsc-ctas{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .hsc-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;padding:10px 14px;cursor:pointer;border:1px solid var(--navy);transition:background .15s,color .15s}
+  .hsc-btn svg{width:16px;height:16px}
+  .hsc-btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+  .hsc-btn.pri:hover{background:#1d52ab}
+  .hsc-btn.sec{background:#fff;color:var(--navy)}
+  .hsc-btn.sec:hover{background:var(--sky)}
+  .hsc-btn.ghost{background:transparent;border-color:transparent;color:var(--muted);padding-left:8px;padding-right:8px}
+  .hsc-btn.ghost:hover{color:var(--navy)}
+  .hsc-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);background:#fff}
+  :focus-visible{outline:3px solid #8fb4f0;outline-offset:2px}
+  /* Icon palette */
+  .a{fill:var(--i-a)}.b{fill:var(--i-b)}.c{fill:var(--i-c)}.d{fill:var(--i-d)}
+  .k{fill:var(--i-k)}.k2{fill:var(--i-k2)}.t{fill:var(--i-t)}.w{fill:var(--i-w)}
+  .sa{fill:none;stroke:var(--i-a);stroke-linecap:round;stroke-linejoin:round}
+  .sb{fill:none;stroke:var(--i-b);stroke-linecap:round;stroke-linejoin:round}
+  @media (max-width:680px){
+    .hsc-stage{grid-template-columns:1fr}
+    .hsc-result{padding:16px}
+    .hsc-head{padding:12px 14px}
+    .hsc-tag{display:none}
+  }
+  @media (max-width:420px){
+    .hsc-stats{grid-template-columns:1fr 1fr}
+    .hsc-stats .hsc-stat:last-child{grid-column:1 / -1}
+    .hsc-prices{grid-template-columns:1fr}
+    .hsc-item{width:100px}
+    .hsc-btn{flex:1 1 auto}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="hsc" id="hsc">
+  <header class="hsc-head">
+    <div class="hsc-brand">
+      <svg class="hsc-logo" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="#2563c9"/><path d="M8 12.5 17 8l9 4.5v10L17 27l-9-4.5z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M8 12.5 17 17l9-4.5M17 17v10" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+      <div><h1 id="hsc-title">Hewitt Storage</h1><p id="hsc-subtitle">Storage calculator</p></div>
+    </div>
+    <span class="hsc-tag" id="hsc-tag" hidden style="display:none"></span>
+  </header>
+
+  <nav class="hsc-tabs" id="hsc-tabs" role="tablist" aria-label="Item categories"></nav>
+
+  <div class="hsc-strip-wrap">
+    <button class="hsc-arrow l" id="hsc-prev" type="button" aria-label="Scroll items left"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <div class="hsc-strip" id="hsc-strip" role="tabpanel"></div>
+    <button class="hsc-arrow r" id="hsc-next" type="button" aria-label="Scroll items right"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M5 2l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <section class="hsc-stage">
+    <div class="hsc-visual">
+      <span class="hsc-pill" id="hsc-pill">Empty</span>
+      <svg class="ctr" id="hsc-svg" viewBox="0 0 360 340" role="img" aria-label="20ft container fill level"></svg>
+      <div class="hsc-units" id="hsc-units"></div>
+    </div>
+
+    <div class="hsc-result" aria-live="polite">
+      <h2>GET STORING</h2>
+      <div class="hsc-mode" id="hsc-mode" hidden style="display:none" role="group" aria-label="How should it be packed?"><button type="button" data-mode="room" aria-pressed="true">Room to get in and organise</button><button type="button" data-mode="max" aria-pressed="false">Packed to the max</button></div>
+      <p class="hsc-modenote" id="hsc-modenote" hidden style="display:none"></p>
+      <p class="hsc-sub" id="hsc-empty">Start by adding items to your storage unit</p>
+      <div class="hsc-filled" id="hsc-filled" hidden>
+        <div class="hsc-stats">
+          <div class="hsc-stat"><b id="hsc-vol">0</b><small>cu ft estimated</small></div>
+          <div class="hsc-stat"><b id="hsc-pct">0%</b><small id="hsc-pct-lab">of one 20ft</small></div>
+          <div class="hsc-stat"><b id="hsc-n">0</b><small id="hsc-n-lab">containers needed</small></div>
+        </div>
+        <div class="hsc-bar" id="hsc-bar"><span id="hsc-bar-fill"></span></div>
+        <div class="hsc-barlab"><span>0%</span><span id="hsc-bar-txt">One 20ft container</span><span>100%</span></div>
+        <p class="hsc-rec" id="hsc-pal" hidden></p>
+        <p class="hsc-rec" id="hsc-rec"></p>
+        <p class="hsc-rec" id="hsc-alt" hidden></p>
+        <div class="hsc-prices">
+          <div class="hsc-price ten" id="hsc-ten" hidden><div><span class="tag" id="hsc-s-tag">10ft fits this</span><div class="t" id="hsc-s-lab"></div><div class="s" id="hsc-s-note" hidden style="display:none"></div></div><div><div class="p"><span id="hsc-s-p"></span> <em>+ VAT /month</em></div><div class="x" id="hsc-s-x"></div></div></div>
+          <div class="hsc-price"><div class="t" id="hsc-g-lab"></div><div class="s" id="hsc-g-note" hidden style="display:none"></div><div class="p"><span id="hsc-g-p"></span> <em>+ VAT /month</em></div><div class="x" id="hsc-g-x"></div></div>
+          <div class="hsc-price"><div class="t" id="hsc-u-lab"></div><div class="s" id="hsc-u-note" hidden style="display:none"></div><div class="p"><span id="hsc-u-p"></span> <em>+ VAT /month</em></div><div class="x" id="hsc-u-x"></div></div>
+        </div>
+        <details class="hsc-list"><summary id="hsc-list-sum">Your items</summary><ul id="hsc-list"></ul></details>
+      </div>
+      <p class="hsc-guide" id="hsc-guide">Please note: this is a guide only, practical space for loading has been factored in.</p>
+      <div class="hsc-ctas">
+        <a class="hsc-btn pri" id="hsc-enquire" hidden style="display:none" href="#" target="_top">Enquire / reserve</a>
+        <a class="hsc-btn sec" id="hsc-call" hidden style="display:none" href="#" target="_top"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 1.5h2l1 3.2-1.4 1A8 8 0 0 0 10.3 11l1-1.4 3.2 1v2A1.6 1.6 0 0 1 12.9 14.5 11.5 11.5 0 0 1 1.5 3.1 1.6 1.6 0 0 1 3.5 1.5z" fill="currentColor"/></svg><span id="hsc-call-txt">Call</span></a>
+        <a class="hsc-btn sec" id="hsc-email" hidden style="display:none" href="#" target="_top"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m2 4 6 5 6-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Email</a>
+        <button class="hsc-btn ghost" id="hsc-reset" type="button">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="hsc-foot">
+    <span id="hsc-disclaimer"></span>
+    <span id="hsc-footbrand"></span>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   HEWITT STORAGE – CALCULATOR CONFIG
+   Edit prices, contact details, container size and item volumes here.
+   Volumes are approximate cubic feet (cu ft) per item.
+   ===================================================================== */
+var CALC_CONFIG = {
+  businessName: 'Hewitt Storage',
+  location: '',
+
+  container: {
+    label: '20ft container',
+    lengthFt: 20, widthFt: 8, heightFt: 8,
+    internalCuFt: 1170,        // internal volume of a 20ft steel container (~5.9 × 2.35 × 2.39 m ≈ 33 m³)
+    packingEfficiency: 0.70    // share of gross volume realistically usable for a mixed load once you allow
+                               // for gaps, uneven stacking and a walkway to reach things (UK guides: ~60–75%)
+  },
+
+  // Space is now worked out on a FLOOR PLAN (see FIT ENGINE below the config): two 0.85 m deep side zones either
+  // side of a clear 0.65 m walkway, stacked to 2.0 m, plus an end zone. Pallets get floor spaces first
+  // (Euro 8 / half 14 / UK 4 per 20ft; 4 / 6 / 2 per 10ft), never stacked, nothing on top.
+  // Reference capacity with the walkway: ≈ 747 cu ft (20ft), ≈ 375 cu ft (10ft).
+  // The values below are kept for reference only; the engine uses item dimensions, not cu ft.
+  usableCuFt20: 750,
+  usableCuFt10: 375,
+
+  container10: {
+    label: '10ft container',
+    lengthFt: 10,
+    internalCuFt: 560
+  },
+
+  pricing: {
+    currency: '£',
+    vatRate: 0.20,             // used only for the small "inc VAT" line
+    ground:   { label: 'Ground level 20ft', note: '', monthly: 125 },
+    upstairs: { label: 'Upper level 20ft',           note: '', monthly: 105 },
+    small10:  { label: '10ft container',           note: '',            monthly: 90 }
+  },
+
+  contact: {
+    enquireUrl: 'reserve.htm',   // the site's reservation page (relative, same folder)
+    phoneDisplay: '01695 681000',
+    phoneTel: '+441695681000',
+    email: 'andrew@hewittstorage.co.uk',
+    emailSubject: 'Storage enquiry – Hewitt Storage calculator'
+  },
+
+  maxPerItem: 500,           // per-item cap (was 99, which silently capped 100+ boxes)
+
+  // FLOOR-PLAN FIT MODEL (12/10/2026). Each item has:
+  //   d: [length, depth, height] in metres AS STORED (beds dismantled, mattresses on edge, white goods upright).
+  //   mode: 'floor'  – must stand on the floor (takes lane length; never goes on top of anything)
+  //         'stack'  – can stand on the floor OR on top of something (boxes, chairs, small furniture)
+  //         'edge'   – flat piece stood on edge against the wall (mattresses, divan bases); several share one 0.85 m deep strip
+  //         'pallet' – floor only, placed first, nothing on top (see pallet notes above)
+  //   top:  what may go on top of it: 'any' (boxes etc.), 'light' (small/medium boxes, chairs only), 'none'
+  //   inner: share of the item's own volume usable for boxes (bookcase / shelving bay shelves)
+  //   sofa: sofas go seat-to-seat 2 high (if under 2.0 m), an odd one stands on end
+  //   light: true if this stack item is light enough to go on a 'light' surface (e.g. a sofa seat or a washing machine)
+  //   cuft: approximate volume shown to the customer (UK removal-company charts)
+  categories: [
+    { id: 'living', label: 'Living', items: [
+      { id: 'chair',        name: 'Chair',            cuft: 10, icon: 'chair',      d: [0.45, 0.50, 0.90], mode: 'stack', light: true },
+      { id: 'armchair',     name: 'Armchair',         cuft: 30, icon: 'armchair',   d: [0.90, 0.85, 0.95], mode: 'floor', top: 'light' },
+      { id: 'sofa2',        name: '2 seat sofa',      cuft: 40, icon: 'sofa2',      d: [1.60, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true },
+      { id: 'sofa3',        name: '3 seat sofa',      cuft: 55, icon: 'sofa3',      d: [2.00, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true },
+      { id: 'coffeetable',  name: 'Coffee table',     cuft: 10, icon: 'coffeetable', d: [1.10, 0.55, 0.45], mode: 'stack' },
+      { id: 'tvunit',       name: 'TV / TV unit',     cuft: 15, icon: 'tvunit',     d: [1.20, 0.45, 0.60], mode: 'stack' },
+      { id: 'bookcase',     name: 'Bookcase',         cuft: 20, icon: 'bookcase',   d: [0.80, 0.30, 1.80], mode: 'floor', top: 'any', inner: 0.75 }   // shelves hold boxes/books
+    ]},
+    { id: 'dining', label: 'Dining', items: [
+      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 30, icon: 'dtable46', d: [1.50, 0.15, 0.90], mode: 'edge' },   // legs off, top on edge,
+      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 50, icon: 'dtable8',  d: [2.00, 0.15, 1.00], mode: 'edge' },   // legs off, top on edge,
+      { id: 'dchair',       name: 'Dining chair',       cuft: 6,  icon: 'dchair',   d: [0.45, 0.50, 0.90], mode: 'stack', light: true }
+    ]},
+    { id: 'bedroom', label: 'Bedroom', items: [
+      { id: 'bedsingle',    name: 'Single bed',       cuft: 30, icon: 'bedsingle', d: [1.90, 0.30, 0.90], mode: 'edge' },   // dismantled: divan/frame on edge
+      { id: 'beddouble',    name: 'Double bed',       cuft: 60, icon: 'beddouble', d: [1.90, 0.60, 0.70], mode: 'edge' },   // 2-piece divan (2 × 68 cm) on edge
+      { id: 'bedking',      name: 'King bed',         cuft: 70, icon: 'bedking',   d: [2.00, 0.60, 0.76], mode: 'edge' },   // 2-piece divan (2 × 76 cm) on edge
+      { id: 'wardrobe',     name: 'Wardrobe',         cuft: 45, icon: 'wardrobe',  d: [1.00, 0.60, 1.85], mode: 'floor', top: 'any' },
+      { id: 'drawers',      name: 'Chest of drawers', cuft: 20, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack' },,
+      { id: 'bedside',      name: 'Bedside table',    cuft: 5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack' },
+      { id: 'mattress',     name: 'Mattress',         cuft: 25, icon: 'mattress',  d: [1.90, 0.25, 1.35], mode: 'edge' }    // double, stood on its long edge
+    ]},
+    { id: 'kitchen', label: 'Kitchen & appliances', items: [
+      { id: 'fridge',       name: 'Fridge freezer',   cuft: 40, icon: 'fridge',     d: [0.60, 0.65, 1.80], mode: 'floor', top: 'light' },   // light items on top; white goods never on each other
+      { id: 'washer',       name: 'Washing machine',  cuft: 20, icon: 'washer',     d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
+      { id: 'dishwasher',   name: 'Dishwasher',       cuft: 20, icon: 'dishwasher', d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
+      { id: 'cooker',       name: 'Cooker',           cuft: 20, icon: 'cooker',     d: [0.60, 0.60, 0.90], mode: 'floor', top: 'light' }
+    ]},
+    { id: 'boxes', label: 'Boxes', items: [
+      { id: 'boxs',         name: 'Small box',        cuft: 1.4, dims: 'approx. 45×30×30 cm', icon: 'boxs', d: [0.45, 0.30, 0.30], mode: 'stack', light: true, box: true },
+      { id: 'boxm',         name: 'Medium box',       cuft: 2.8, dims: 'approx. 50×40×40 cm', icon: 'boxm', d: [0.50, 0.40, 0.40], mode: 'stack', light: true, box: true },
+      { id: 'boxl',         name: 'Large box',        cuft: 4.3, dims: 'approx. 60×45×45 cm', icon: 'boxl', d: [0.60, 0.45, 0.45], mode: 'stack', box: true }
+    ]},
+    { id: 'business', label: 'Business', items: [
+      { id: 'palleteuro',   name: 'Euro pallet', cuft: 68, dims: 'approx. 120×80 cm footprint · not stacked', icon: 'pallet', mode: 'pallet', pal: 'E' },
+      { id: 'palletuk',     name: 'UK pallet',   cuft: 85, dims: 'approx. 120×100 cm footprint · not stacked · narrows the walkway', icon: 'pallet', mode: 'pallet', pal: 'U' },
+      { id: 'pallethalf',   name: 'Half pallet', cuft: 34, dims: 'approx. 80×60 cm footprint · not stacked', icon: 'pallet', mode: 'pallet', pal: 'H' },
+      { id: 'filing',       name: 'Filing cabinet',   cuft: 10, icon: 'filing',      d: [0.47, 0.62, 1.32], mode: 'floor', top: 'any' },
+      { id: 'desk',         name: 'Desk',             cuft: 30, icon: 'desk',        d: [1.40, 0.15, 0.75], mode: 'edge' },   // legs/frame off, top on edge,
+      { id: 'officechair',  name: 'Office chair',     cuft: 10, icon: 'officechair', d: [0.60, 0.60, 1.00], mode: 'stack', light: true },
+      { id: 'shelving',     name: 'Shelving bay',     cuft: 25, icon: 'shelving',    d: [0.90, 0.45, 1.80], mode: 'floor', top: 'any', inner: 0.8 }   // shelf bays hold boxes
+    ]},
+    { id: 'garden', label: 'Garden & garage', items: [
+      { id: 'bike',         name: 'Bike',             cuft: 15, icon: 'bike',      d: [1.75, 0.60, 1.05], mode: 'stack', light: true },  // can go on top of boxes / against the load
+      { id: 'mower',        name: 'Lawnmower',        cuft: 12, icon: 'mower',     d: [0.80, 0.50, 0.50], mode: 'stack' },  // handle folded
+      { id: 'gardenset',    name: 'Garden table set', cuft: 40, icon: 'gardenset', d: [1.20, 0.85, 1.10], mode: 'floor', top: 'light' },  // table + 4 folded/stacked chairs
+      { id: 'toolchest',    name: 'Tool chest',       cuft: 15, icon: 'toolchest', d: [0.70, 0.45, 1.00], mode: 'stack' }
+    ]}
+  ]
+};
+/* ======================= END OF CONFIG ======================= */
+
+/* =====================================================================
+   FLOOR-PLAN FIT ENGINE  –  hsFit(load, lengthM, nContainers)
+   Container internal width 2.35 m. A 0.65 m walkway is kept clear down the middle, leaving two
+   0.85 m deep side zones ("lanes"). Things are stacked to a practical 2.0 m (internal height ~2.39 m).
+   Two layouts are tried and the better one used:
+     1. side lanes run the full length, plus a 0.65 m wide bay at the far end of the walkway;
+     2. a 0.85 m deep row across the back wall (2.35 m wide), side lanes shortened by 0.85 m.
+   (Both give the same storage area; layout 2 lets long items such as sofas go across the back.)
+   Order: pallets (side lanes only, never stacked, nothing on top) → floor-only items, largest first
+   (best-fit into a lane, rotated if that helps) → boxes and stackable items into the space above
+   floor items that can take weight, then into leftover floor.
+   Items deeper than 0.85 m stick into the walkway: up to 0.10 m on either side, up to 0.20 m on
+   one side only (one side + back row) – reported as "narrows the walkway".
+   ===================================================================== */
+var HS_FIT = { W: 2.35, ZD: 0.85, H: 2.2, BAY: 0.65, OV_BOTH: 0.10, OV_ONE: 0.20, BOX_EFF: 0.85, IRR_EFF: 0.80, GAP_EFF: 0.5 };
+var HS_MODE = 'room';   // 'room' = 0.65 m walkway kept clear; 'max' = no walkway, full 2.35 m width packed (still sensible stacking)
+function hsFit(load, L, n, mode) {
+  var F = HS_FIT, best = null;
+  if ((mode || HS_MODE) === 'max') F = Object.assign({}, HS_FIT, { ZD: HS_FIT.W / 2, BAY: 0, OV_BOTH: 0, OV_ONE: 0 });
+  var maxMode = F !== HS_FIT;
+  for (var k = 1; k <= (maxMode ? 5 : 2); k++) {
+    // packed to the max: layout 3 = rows 0.9 m deep across the full 2.35 m width; also tries the walkway layouts
+    // (4, 5) so packing to the max is never reported as holding less than the walkway layout
+    var layout = k > 3 ? k - 3 : k;
+    var r = hsFitLayout(load, L, n, layout, k === 3 ? Object.assign({}, F, { ZD: 0.9 }) : k > 3 ? HS_FIT : F);
+    var st = { pallets: 0, floor: 1, space: 2, '': 3 };
+    if (!best || st[r.fail] > st[best.fail] || (r.fail === best.fail && r.consumed < best.consumed - 1e-9)) best = r;
+  }
+  return best;
+}
+function hsFitLayout(load, L, n, layout, F) {
+  var lanes = [], c, i;
+  for (c = 0; c < n; c++) {
+    if (layout === 3) {
+      var rows = Math.floor(L / F.ZD + 1e-9);
+      for (i = 0; i < rows; i++) lanes.push({ c: c, k: 'X' + i, len: F.W, ov: 0, pal: true });
+    } else if (layout === 1) {
+      lanes.push({ c: c, k: 'A', len: L, ov: F.OV_ONE, pal: true });
+      lanes.push({ c: c, k: 'B', len: L, ov: F.OV_BOTH, pal: true });
+      if (F.BAY) lanes.push({ c: c, k: 'E', len: F.BAY, ov: 0, pal: false });
+    } else {
+      lanes.push({ c: c, k: 'A', len: L - F.ZD, ov: F.OV_ONE, pal: true });
+      lanes.push({ c: c, k: 'B', len: L - F.ZD, ov: F.OV_BOTH, pal: true });
+      lanes.push({ c: c, k: 'R', len: F.W, ov: F.OV_ONE, pal: false });
+    }
+  }
+  lanes.forEach(function (ln) { ln.rem = ln.len; });
+  var cap = lanes.reduce(function (s, ln) { return s + ln.len; }, 0) * F.ZD * F.H;
+  var res = { ok: true, layout: layout, n: n, cap: cap, capOne: cap / n, narrows: false, fail: '', placed: [] };
+  var pools = { any: 0, light: 0 }, colVol = 0, goods = 0;
+  function eps(x) { return x + 1e-9; }
+  var gaps = []; // space left in front of shallow floor items (towards the walkway), usable by another floor item
+  function place(it, l, d, h, top, palKind) {
+    var ov = Math.max(0, d - F.ZD), cand = null;
+    if (!palKind) { // try to tuck it in front of a shallow item first (e.g. a cooker in front of a bookcase)
+      var g = null;
+      gaps.forEach(function (x) { if (x.d >= d - 1e-9 && x.l >= l - 1e-9 && (!g || x.l * x.d < g.l * g.d)) g = x; });
+      if (g) {
+        gaps.splice(gaps.indexOf(g), 1);
+        if (top !== 'none' && h < F.H) pools[top === 'light' ? 'light' : 'any'] += (F.H - h) * l * d;
+        if (g.l - l > 0.3) gaps.push({ l: g.l - l, d: g.d });
+        res.placed.push({ id: it ? it.id : 'slabs', lane: 'front', c: -1 });
+        return true;
+      }
+    }
+    lanes.forEach(function (ln) {
+      if (palKind && !ln.pal) return;
+      if (palKind === 'U' && ln.k !== 'A') return;
+      if (ov > eps(ln.ov) || ln.rem < l - 1e-9) return;
+      if (!cand || ln.rem < cand.rem) cand = ln;   // best fit
+    });
+    if (!cand) return false;
+    cand.rem -= l; colVol += l * F.ZD * F.H; if (ov > 0) res.narrows = true;
+    if (top !== 'none' && h < F.H) pools[top === 'light' ? 'light' : 'any'] += (F.H - h) * l * F.ZD;
+    if (!palKind && d < F.ZD - 0.25) gaps.push({ l: l, d: F.ZD - d });
+    res.placed.push({ id: it ? it.id : 'slabs', lane: cand.k, c: cand.c });
+    return true;
+  }
+  // 1. pallets: UK (one side only), then Euro, then half
+  var pal = { U: [1.2, 1.0], E: [1.2, 0.8], H: [0.8, 0.6] };
+  ['U', 'E', 'H'].forEach(function (k) {
+    load.forEach(function (x) {
+      if (x.item.pal !== k) return;
+      for (var j = 0; j < x.n && res.ok; j++) if (!place(x.item, pal[k][0], pal[k][1], F.H, 'none', k)) { res.ok = false; res.fail = 'pallets'; }
+    });
+  });
+  if (!res.ok) return finish();
+  // 2. floor items + slab blocks, largest footprint first
+  var floor = [], slabs = [], sofas = [];
+  load.forEach(function (x) {
+    var it = x.item; if (!it.d) return;
+    for (var j = 0; j < x.n; j++) {
+      if (it.sofa) { sofas.push(it); continue; }
+      if (it.mode === 'floor') {
+        var l = it.d[0], d = it.d[1];
+        if (d > F.ZD && l < d) { l = it.d[1]; d = it.d[0]; }   // rotate if that keeps it out of the walkway
+        floor.push({ it: it, l: l, d: d, h: it.d[2], top: it.top || 'none', inner: it.inner || 0 });
+      } else if (it.mode === 'edge') slabs.push({ it: it, l: it.d[0], d: it.d[1], h: it.d[2] });
+    }
+  });
+  // sofas: seat-to-seat in pairs (2 high max, within 2.0 m), longest together; an odd one stands on end
+  sofas.sort(function (a, b) { return b.d[0] - a.d[0]; });
+  for (var si = 0; si < sofas.length; si++) {
+    var s1 = sofas[si], s2 = sofas[si + 1];
+    if (s2 && s1.d[2] + s2.d[2] <= F.H + 1e-9) {
+      floor.push({ it: s1, l: s1.d[0], d: Math.max(s1.d[1], s2.d[1]), h: s1.d[2] + s2.d[2], top: 'light' }); si++;
+    } else if (s1.d[0] <= F.H + 1e-9) floor.push({ it: s1, l: s1.d[2], d: s1.d[1], h: s1.d[0], top: 'none' });
+    else floor.push({ it: s1, l: s1.d[0], d: s1.d[1], h: s1.d[2], top: 'light' });
+  }
+  slabs.sort(function (a, b) { return b.l - a.l; });
+  var blocks = [];
+  slabs.forEach(function (s) {
+    var b = null;
+    for (var q = 0; q < blocks.length; q++) if (blocks[q].d + s.d <= F.ZD + 1e-9) { b = blocks[q]; break; }
+    if (!b) { b = { it: null, l: s.l, d: 0, h: 0, top: 'none', slab: true }; blocks.push(b); }
+    b.d += s.d; b.h = Math.max(b.h, s.h);
+  });
+  blocks.forEach(function (b) { floor.push(b); });  // slab strip against the wall; space in front of it stays usable
+  floor.sort(function (a, b) { return b.l * Math.min(b.d, F.ZD) - a.l * Math.min(a.d, F.ZD) || b.l - a.l; });
+  for (i = 0; i < floor.length; i++) {
+    var f = floor[i];
+    if (!place(f.it, f.l, f.d, f.h, f.top)) { res.ok = false; res.fail = 'floor'; return finish(); }
+    if (f.inner) pools.any += f.l * f.d * f.h * f.inner;   // shelves inside bookcases / shelving bays take boxes
+  }
+  gaps.forEach(function (x) { pools.any += x.l * x.d * F.H * F.GAP_EFF; }); // unused gaps take boxes (part-usable)
+  // 3. boxes & stackable items: heavy ones need an 'any' surface or the floor; light ones can also go on 'light' surfaces
+  var heavy = 0, lightV = 0;
+  load.forEach(function (x) {
+    var it = x.item; if (it.mode !== 'stack') return;
+    var v = it.d[0] * it.d[1] * it.d[2] / (it.box ? F.BOX_EFF : F.IRR_EFF) * x.n;
+    if (it.light) lightV += v; else heavy += v;
+  });
+  var free = lanes.reduce(function (s, ln) { return s + ln.rem; }, 0) * F.ZD * F.H;
+  var useAny = Math.min(heavy, pools.any); heavy -= useAny; pools.any -= useAny;
+  var useLight = Math.min(lightV, pools.light); lightV -= useLight; pools.light -= useLight;
+  var useAny2 = Math.min(lightV, pools.any); lightV -= useAny2; pools.any -= useAny2;
+  var fromFree = heavy + lightV;
+  res.freeUsed = fromFree;
+  if (fromFree > free + 1e-9) { res.ok = false; res.fail = 'space'; }
+  res.freeLeft = Math.max(0, free - fromFree);
+  return finish();
+  function finish() {
+    var unusedAbove = pools.any + pools.light;
+    res.consumed = colVol - unusedAbove + (res.freeUsed || 0);
+    if (res.consumed < 0) res.consumed = 0;
+    var laneLen = lanes.reduce(function (s, ln) { return s + ln.len; }, 0), usedLen = lanes.reduce(function (s, ln) { return s + (ln.len - ln.rem); }, 0);
+    res.floorUsed = usedLen * F.ZD + (res.freeUsed || 0) / F.H;
+    res.floorTotal = laneLen * F.ZD;
+    res.floorPct = Math.min(100, res.floorUsed / res.floorTotal * 100);
+    res.volPct = res.consumed / cap * 100;
+    return res;
+  }
+}
+/* ======================= END OF ENGINE ======================= */
+
+(function () {
+  'use strict';
+  var C = CALC_CONFIG;
+
+  /* ---------- Icons (48x48, drawn for Hewitt Storage) ---------- */
+  function r(x, y, w, h, cls, rx) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"' + (rx ? ' rx="' + rx + '"' : '') + ' class="' + cls + '"/>'; }
+  function box(x, y, w, h) { // kraft cardboard box
+    return r(x, y, w, h, 'k', 1) + r(x, y, w, Math.max(3, h * 0.22), 'k2', 1) + r(x + w / 2 - w * 0.09, y, w * 0.18, h, 't');
+  }
+  function bed(x, w, pillows) {
+    var s = r(x, 4, w, 40, 'a', 2) + r(x + 2, 10, w - 4, 32, 'c', 1.5);
+    var pw = (w - 6 - (pillows - 1) * 2) / pillows;
+    for (var i = 0; i < pillows; i++) s += r(x + 3 + i * (pw + 2), 5.5, pw, 6, 'd', 2);
+    return s + r(x + 2, 20, w - 4, 22, 'b', 1.5);
+  }
+  var ICONS = {
+    chair: r(15, 7, 18, 19, 'b', 4) + r(12, 25, 24, 5, 'a', 1.5) + r(14, 30, 3, 12, 'a') + r(31, 30, 3, 12, 'a'),
+    armchair: r(12, 11, 24, 17, 'b', 4) + r(6, 19, 8, 17, 'a', 3) + r(34, 19, 8, 17, 'a', 3) + r(12, 26, 24, 10, 'c', 2) + r(8, 36, 3, 5, 'a') + r(37, 36, 3, 5, 'a'),
+    sofa2: r(9, 13, 30, 15, 'b', 4) + r(4, 21, 8, 15, 'a', 3) + r(36, 21, 8, 15, 'a', 3) + r(11.5, 26, 12, 10, 'c', 2) + r(24.5, 26, 12, 10, 'c', 2) + r(6, 36, 3, 4, 'a') + r(39, 36, 3, 4, 'a'),
+    sofa3: r(6, 13, 36, 15, 'b', 4) + r(1.5, 21, 7, 15, 'a', 3) + r(39.5, 21, 7, 15, 'a', 3) + r(9, 26, 9.6, 10, 'c', 2) + r(19.2, 26, 9.6, 10, 'c', 2) + r(29.4, 26, 9.6, 10, 'c', 2) + r(3, 36, 3, 4, 'a') + r(42, 36, 3, 4, 'a'),
+    coffeetable: r(5, 22, 38, 5, 'b', 1.5) + r(9, 27, 30, 3, 'd') + r(9, 27, 3, 12, 'a') + r(36, 27, 3, 12, 'a'),
+    tvunit: r(9, 5, 30, 20, 'a', 2) + r(11, 7, 26, 16, 'c', 1) + r(22, 25, 4, 4, 'a') + r(5, 29, 38, 12, 'b', 1.5) + r(7.5, 31.5, 15.5, 7, 'c', 1) + r(25, 31.5, 15.5, 7, 'c', 1),
+    bookcase: r(11, 4, 26, 40, 'a', 1.5) + r(14, 7, 20, 34, 'c') + r(14, 17, 20, 2, 'a') + r(14, 29, 20, 2, 'a') +
+      r(15, 9, 3, 8, 'b') + r(18.5, 10, 3, 7, 'd') + r(22, 9, 2.5, 8, 'b') + r(16, 21, 3, 8, 'd') + r(25, 22, 3, 7, 'b') + r(28.5, 21, 3, 8, 'b') + r(15.5, 33, 7, 8, 'b') + r(27, 34, 5, 7, 'd'),
+    dtable46: r(13, 9, 8, 11, 'd', 2) + r(27, 9, 8, 11, 'd', 2) + r(5, 18, 38, 5, 'b', 1.5) + r(11, 23, 26, 2.5, 'c') + r(8, 23, 3, 18, 'a') + r(37, 23, 3, 18, 'a'),
+    dtable8: r(4, 9, 7, 11, 'd', 2) + r(15, 9, 7, 11, 'd', 2) + r(26, 9, 7, 11, 'd', 2) + r(37, 9, 7, 11, 'd', 2) + r(1.5, 18, 45, 5, 'b', 1.5) + r(6, 23, 36, 2.5, 'c') + r(4, 23, 3, 18, 'a') + r(22.5, 23, 3, 18, 'a') + r(41, 23, 3, 18, 'a'),
+    dchair: r(15, 6, 18, 20, 'a', 2) + r(18, 9, 3, 14, 'c') + r(22.5, 9, 3, 14, 'c') + r(27, 9, 3, 14, 'c') + r(13, 25, 22, 5, 'b', 1.5) + r(15, 30, 3, 12, 'a') + r(30, 30, 3, 12, 'a'),
+    bedsingle: bed(15, 18, 1),
+    beddouble: bed(9, 30, 2),
+    bedking: bed(4, 40, 2),
+    wardrobe: r(10, 3, 28, 39, 'a', 1.5) + r(12.5, 5.5, 11, 34, 'b') + r(24.5, 5.5, 11, 34, 'b') + r(21, 20, 1.5, 6, 'c') + r(25.5, 20, 1.5, 6, 'c') + r(12, 42, 3, 3, 'a') + r(33, 42, 3, 3, 'a'),
+    drawers: r(8, 9, 32, 31, 'a', 1.5) + r(10.5, 11.5, 27, 7.5, 'b', 1) + r(10.5, 21, 27, 7.5, 'b', 1) + r(10.5, 30.5, 27, 7.5, 'b', 1) + r(21, 14.5, 6, 1.6, 'c') + r(21, 24, 6, 1.6, 'c') + r(21, 33.5, 6, 1.6, 'c') + r(10, 40, 3, 3, 'a') + r(35, 40, 3, 3, 'a'),
+    bedside: r(12, 15, 24, 25, 'a', 1.5) + r(14.5, 17.5, 19, 9, 'b', 1) + r(14.5, 28.5, 19, 9, 'b', 1) + r(21, 21.2, 6, 1.6, 'c') + r(21, 32.2, 6, 1.6, 'c') + r(14, 40, 3, 3, 'a') + r(31, 40, 3, 3, 'a'),
+    mattress: '<path d="M4 25 14 15h30L34 25z" class="d"/><path d="M4 25h30v9H4z" class="b"/><path d="M34 25l10-10v9l-10 10z" class="a"/>' +
+      '<circle cx="11" cy="29.5" r="1.2" class="c"/><circle cx="19" cy="29.5" r="1.2" class="c"/><circle cx="27" cy="29.5" r="1.2" class="c"/>',
+    fridge: r(13, 3, 22, 42, 'a', 2.5) + r(15, 5, 18, 15, 'c', 1) + r(15, 22, 18, 21, 'c', 1) + r(29, 8, 2, 8, 'b', 1) + r(29, 25, 2, 10, 'b', 1),
+    washer: r(8, 6, 32, 36, 'a', 2.5) + r(10, 8, 28, 6, 'b', 1) + '<circle cx="24" cy="28" r="10" class="c"/><circle cx="24" cy="28" r="6.5" class="b"/><circle cx="33" cy="11" r="1.6" class="c"/><circle cx="28" cy="11" r="1.2" class="d"/>',
+    dishwasher: r(8, 6, 32, 36, 'a', 2.5) + r(10, 8, 28, 5, 'b', 1) + r(10, 15, 28, 25, 'c', 1) + r(16, 18, 16, 2.5, 'a', 1.2) + '<circle cx="31" cy="10.5" r="1.2" class="c"/><circle cx="35" cy="10.5" r="1.2" class="d"/>',
+    cooker: r(8, 4, 32, 6, 'b', 1.5) + '<ellipse cx="16" cy="5.5" rx="4" ry="1" class="a"/><ellipse cx="32" cy="5.5" rx="4" ry="1" class="a"/>' + r(8, 10, 32, 34, 'a', 2) +
+      '<circle cx="13" cy="14" r="1.6" class="c"/><circle cx="19" cy="14" r="1.6" class="c"/><circle cx="29" cy="14" r="1.6" class="c"/><circle cx="35" cy="14" r="1.6" class="c"/>' + r(12, 19, 24, 2, 'd', 1) + r(12, 23, 24, 17, 'c', 1.5),
+    boxs: box(16, 23, 16, 14),
+    boxm: box(12, 17, 24, 20),
+    boxl: box(7, 10, 34, 28),
+    pallet: box(7, 10, 16.5, 11.5) + box(24.5, 10, 16.5, 11.5) + box(7, 22, 16.5, 11.5) + box(24.5, 22, 16.5, 11.5) +
+      r(4, 34, 40, 3, 'w') + r(5, 37, 5, 4, 'w') + r(21.5, 37, 5, 4, 'w') + r(38, 37, 5, 4, 'w') + r(4, 41, 40, 2.5, 'w'),
+    filing: r(14, 3, 20, 42, 'a', 1.5) + r(16, 5.5, 16, 8.5, 'b', 1) + r(16, 15.5, 16, 8.5, 'b', 1) + r(16, 25.5, 16, 8.5, 'b', 1) + r(16, 35.5, 16, 7.5, 'b', 1) +
+      r(21, 8.5, 6, 1.6, 'c') + r(21, 18.5, 6, 1.6, 'c') + r(21, 28.5, 6, 1.6, 'c') + r(21, 38.5, 6, 1.6, 'c'),
+    desk: r(10, 4, 15, 10, 'a', 1) + r(12, 6, 11, 6, 'c') + r(16.5, 14, 2, 2.5, 'a') + r(3, 16, 42, 4, 'b', 1) + r(5, 20, 3, 22, 'a') + r(28, 20, 15, 22, 'a') +
+      r(30, 22.5, 11, 5.5, 'b') + r(30, 29.5, 11, 5.5, 'b') + r(30, 36.5, 11, 4.5, 'b') + r(33, 24.5, 5, 1.4, 'c') + r(33, 31.5, 5, 1.4, 'c'),
+    officechair: r(15, 3, 18, 18, 'b', 5) + r(10, 17, 3, 9, 'a', 1.5) + r(35, 17, 3, 9, 'a', 1.5) + r(12, 22, 24, 5, 'a', 2.5) + r(22.5, 27, 3, 9, 'a') + r(11, 36, 26, 2.5, 'a', 1.2) +
+      '<circle cx="12" cy="41" r="2.4" class="b"/><circle cx="24" cy="41" r="2.4" class="b"/><circle cx="36" cy="41" r="2.4" class="b"/>',
+    shelving: r(8, 3, 3, 42, 'a') + r(37, 3, 3, 42, 'a') + r(8, 15, 32, 2.5, 'b') + r(8, 28, 32, 2.5, 'b') + r(8, 41, 32, 2.5, 'b') +
+      box(12, 6, 10, 9) + box(24, 8, 9, 7) + box(13, 20, 8, 8) + box(23, 19, 12, 9) + box(12, 33, 12, 8),
+    bike: '<circle cx="12" cy="31" r="8" class="sa" stroke-width="3"/><circle cx="36" cy="31" r="8" class="sa" stroke-width="3"/>' +
+      '<path d="M12 31 19 19h13l4 12M19 19l5 12 8-12M24 31H12" class="sb" stroke-width="3"/><path d="M16 15h6M30 14l2 5M28 13h5" class="sa" stroke-width="3"/>',
+    mower: '<path d="M32 21 41 6" class="sa" stroke-width="3"/>' + r(37, 3.5, 9, 3.5, 'a', 1.7) + '<path d="M7 29c0-6 3-9 9-9h14c5 0 7 3 7 9z" class="b"/>' + r(5, 28, 34, 4, 'a', 1.5) +
+      '<circle cx="11" cy="36" r="5" class="a"/><circle cx="11" cy="36" r="1.8" class="c"/><circle cx="33" cy="36" r="5" class="a"/><circle cx="33" cy="36" r="1.8" class="c"/>' + r(14, 23, 10, 2, 'c', 1),
+    gardenset: '<path d="M7 16Q24 1 41 16z" class="b"/>' + r(23, 15, 2, 26, 'a') + r(12, 27, 24, 3, 'd', 1.5) + r(15, 30, 2, 11, 'a') + r(31, 30, 2, 11, 'a') +
+      r(2, 22, 2.5, 19, 'a', 1) + r(2, 31, 8, 2.5, 'a', 1) + r(8, 33, 2, 8, 'a') + r(43.5, 22, 2.5, 19, 'a', 1) + r(38, 31, 8, 2.5, 'a', 1) + r(38, 33, 2, 8, 'a'),
+    toolchest: r(18, 4, 12, 3, 'a', 1.5) + r(9, 7, 30, 8, 'b', 2) + r(9, 15, 30, 24, 'a', 1.5) + r(11.5, 17.5, 25, 4.5, 'b', 1) + r(11.5, 24, 25, 4.5, 'b', 1) + r(11.5, 30.5, 25, 6, 'b', 1) +
+      r(21, 19, 6, 1.4, 'c') + r(21, 25.5, 6, 1.4, 'c') + r(21, 32.8, 6, 1.4, 'c') + '<circle cx="13" cy="41.5" r="2.5" class="d"/><circle cx="35" cy="41.5" r="2.5" class="d"/>'
+  };
+  function iconSvg(key) { return '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">' + (ICONS[key] || ICONS.boxm) + '</svg>'; }
+
+  /* ---------- State ---------- */
+  var counts = {}, itemsById = {}, activeCat = C.categories[0].id;
+  C.categories.forEach(function (cat) { cat.items.forEach(function (it) { counts[it.id] = 0; itemsById[it.id] = it; it.cat = cat.id; }); });
+  // Usable space with the walkway (for reference): 12.45 m of 0.85 m deep zone × 2.0 m high ≈ 21.2 m³ ≈ 747 cu ft (20ft); 6.25 m → 375 cu ft (10ft).
+  var usable = Math.round(hsFit([], 5.9, 1, 'room').cap * 35.3147);
+  var usable10 = Math.round(hsFit([], 2.8, 1, 'room').cap * 35.3147);
+
+  var $ = function (id) { return document.getElementById(id); };
+  function fmt(n, dp) { return Number(n).toLocaleString('en-GB', { minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0 }); }
+  function money(n) { return C.pricing.currency + fmt(n, n % 1 ? 2 : 0); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function calc() {
+    var total = 0, lines = [], itemCount = 0, load = [];
+    C.categories.forEach(function (cat) {
+      cat.items.forEach(function (it) {
+        var n = counts[it.id];
+        if (n > 0) { total += n * it.cuft; itemCount += n; lines.push({ item: it, n: n, vol: n * it.cuft }); load.push({ item: it, n: n }); }
+      });
+    });
+    total = Math.round(total * 100) / 100;
+    var L20 = 5.9, L10 = 2.8;
+    if (!load.length) return { total: 0, ratio: 0, pct: 0, containers: 0, lines: lines, itemCount: 0, fits10: false, palLine: '', floorPct: 0, volPct: 0, narrows: false };
+    // Floor-plan fit (see FIT ENGINE above): smallest number of 20ft containers that holds everything.
+    var n = 1, r20 = hsFit(load, L20, 1), one = r20;
+    while (!r20.ok && n < 99) { n++; r20 = hsFit(load, L20, n); }
+    var r10 = (C.container10 && C.pricing.small10) ? hsFit(load, L10, 1) : { ok: false };
+    // "How full": the larger of floor used and overall space used (a floor full of sofas is full even with air above).
+    var ratio = Math.max(r20.consumed / r20.capOne, n === 1 ? r20.floorPct / 100 : 0);
+    if (n > 1) ratio = Math.max(ratio, n - 1 + 0.01);      // multi-container: always reads as more than n-1
+    else ratio = Math.min(ratio, 1);
+    var containers = n, fits10 = !!r10.ok;
+    // Compare with the other packing mode and mention it if it needs a smaller size.
+    var other = HS_MODE === 'room' ? 'max' : 'room', on = 1;
+    while (!hsFit(load, L20, on, other).ok && on < 99) on++;
+    var o10 = (C.container10 && C.pricing.small10) ? hsFit(load, L10, 1, other).ok : false;
+    var sz = function (k, t) { return t ? 1 : 1 + k; };   // size rank: 10ft=1, one 20ft=2, two 20ft=3…
+    var altLine = '';
+    if (sz(on, o10) < sz(n, fits10)) altLine = (other === 'max' ? 'Packed to the max' : 'With room to get in and organise') + ' this would fit in ' + (o10 ? 'a 10ft' : on === 1 ? 'one 20ft' : on + ' × 20ft') + '.';
+    else if (HS_MODE === 'max' && sz(on, o10) > sz(n, fits10)) altLine = 'With room to get in and organise you’d need ' + (on === 1 ? 'one 20ft' : on + ' × 20ft') + '.';
+    altLine = ''; // mode toggle removed 14/10/2026
+    // Pallet summary in Euro-size floor spaces (8 per 20ft with a walkway).
+    var P = { E: counts.palleteuro || 0, H: counts.pallethalf || 0, U: counts.palletuk || 0 }, nPal = P.E + P.H + P.U;
+    var slots20 = 2 * Math.floor(L20 / 1.2);
+    var palShare = P.E / slots20 + P.H / (2 * Math.floor(L20 / 0.8)) + P.U / Math.floor(L20 / 1.2);
+    var palFits1 = hsFit(load.filter(function (x) { return x.item.mode === 'pallet'; }), L20, 1).ok;
+    var palUsed = Math.round(palShare * slots20 * 10) / 10;
+    var palLine = nPal ? (palFits1 ? 'Pallets: ' + fmt(palUsed, palUsed % 1 ? 1 : 0) + ' of ' + slots20 + ' Euro-size floor spaces in one 20ft (pallets aren\u2019t stacked)'
+      : 'Pallets: ' + nPal + ' pallets need more floor space than one 20ft has (max 8 Euro, 14 half or 4 UK pallets with a walkway) \u2013 more than one container needed')
+      + (P.U ? '. UK pallets go along one side only and narrow the walkway.' : '') : '';
+    var floorPct = n > 1 ? one.floorPct : r20.floorPct;
+    var fitLine = (n > 1 && !palFits1) ? '' : (n > 1 ? 'Floor space: more than one 20ft is needed' + (one.fail === 'floor' || one.fail === 'pallets' ? ' \u2013 items that can\u2019t be stacked take up all the floor' : '') + '.'
+      : 'Floor space used: ' + Math.round(floorPct) + '% \u00b7 overall space used: ' + Math.round(r20.consumed / r20.capOne * 100) + '% ' + (HS_MODE === 'max' ? '(packed to the max, no walkway).' : '(a 0.65m walkway is kept clear).'))
+      + (((n > 1 ? one : r20).narrows && !P.U) ? ' Some items are deeper than the side space and narrow the walkway a little.' : '');
+    return { total: total, ratio: ratio, pct: ratio * 100, containers: containers, lines: lines, itemCount: itemCount, fits10: fits10,
+      palLine: palLine, fitLine: fitLine, altLine: altLine, mode: HS_MODE, floorPct: floorPct, volPct: r20.consumed / r20.capOne * 100, narrows: r20.narrows, fit20: r20, fit10: r10 };
+  }
+
+  /* ---------- Static text from config ---------- */
+  $('hsc-title').textContent = C.businessName;
+  $('hsc-subtitle').textContent = C.location ? ('Storage calculator · ' + C.location) : 'Storage calculator';
+  $('hsc-tag').textContent = '';
+  $('hsc-g-lab').textContent = C.pricing.ground.label;
+  $('hsc-g-note').textContent = C.pricing.ground.note;
+  $('hsc-u-lab').textContent = C.pricing.upstairs.label;
+  $('hsc-u-note').textContent = C.pricing.upstairs.note;
+  if (C.pricing.small10) {
+    $('hsc-s-lab').textContent = C.pricing.small10.label;
+    $('hsc-s-note').textContent = C.pricing.small10.note;
+    $('hsc-s-tag').textContent = (C.container10 ? C.container10.lengthFt : 10) + 'ft fits this';
+  }
+  $('hsc-enquire').href = C.contact.enquireUrl;
+  $('hsc-call').href = 'tel:' + C.contact.phoneTel;
+  $('hsc-call-txt').textContent = 'Call ' + C.contact.phoneDisplay;
+  $('hsc-disclaimer').textContent = '';
+  $('hsc-footbrand').textContent = '\u00a9 2026 Hewitt Storage. All rights reserved.';
+
+  /* ---------- Tabs & items ---------- */
+  function renderTabs() {
+    $('hsc-tabs').innerHTML = C.categories.map(function (cat) {
+      var n = cat.items.reduce(function (s, it) { return s + counts[it.id]; }, 0);
+      return '<button type="button" role="tab" class="hsc-tab" data-cat="' + cat.id + '" aria-selected="' + (cat.id === activeCat) + '">' + esc(cat.label) +
+        (n ? '<span class="n">' + n + '</span>' : '') + '</button>';
+    }).join('');
+  }
+  function renderItems() {
+    var cat = C.categories.filter(function (c) { return c.id === activeCat; })[0];
+    $('hsc-strip').innerHTML = cat.items.map(function (it) {
+      var n = counts[it.id];
+      return '<div class="hsc-item' + (n ? ' on' : '') + '" data-id="' + it.id + '">' +
+        '<button type="button" class="hsc-ico" data-act="add" aria-label="Add ' + esc(it.name) + '">' + iconSvg(it.icon) + '<span class="hsc-badge">' + n + '</span></button>' +
+        '<div class="hsc-name">' + esc(it.name) + '</div>' + (it.dims ? '<div class="hsc-vol">' + esc(it.dims) + '</div>' : '') + '<div class="hsc-vol">≈ ' + fmt(it.cuft, it.cuft % 1 ? 1 : 0) + ' cu ft</div>' +
+        '<div class="hsc-step"><button type="button" data-act="dec" aria-label="Remove one ' + esc(it.name) + '"' + (n ? '' : ' disabled') + '>−</button>' +
+        '<span aria-live="polite">' + n + '</span><button type="button" data-act="inc" aria-label="Add one ' + esc(it.name) + '">+</button></div></div>';
+    }).join('');
+    $('hsc-strip').scrollLeft = 0;
+    updateArrows();
+  }
+  function refreshItem(id) {
+    var el = $('hsc-strip').querySelector('[data-id="' + id + '"]');
+    if (!el) return;
+    var n = counts[id];
+    el.classList.toggle('on', n > 0);
+    el.querySelector('.hsc-badge').textContent = n;
+    el.querySelector('.hsc-step span').textContent = n;
+    el.querySelector('[data-act="dec"]').disabled = n === 0;
+  }
+  function updateArrows() {
+    var s = $('hsc-strip');
+    $('hsc-prev').disabled = s.scrollLeft <= 2;
+    $('hsc-next').disabled = s.scrollLeft + s.clientWidth >= s.scrollWidth - 2;
+  }
+
+  $('hsc-tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('.hsc-tab'); if (!b) return;
+    activeCat = b.getAttribute('data-cat'); renderTabs(); renderItems();
+  });
+  $('hsc-strip').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act]'); if (!b) return;
+    var id = b.closest('.hsc-item').getAttribute('data-id'), act = b.getAttribute('data-act');
+    if (act === 'dec') counts[id] = Math.max(0, counts[id] - 1);
+    else counts[id] = Math.min(C.maxPerItem, counts[id] + 1);
+    refreshItem(id); renderTabs(); update();
+  });
+  $('hsc-strip').addEventListener('scroll', updateArrows, { passive: true });
+  $('hsc-prev').addEventListener('click', function () { var s = $('hsc-strip'); s.scrollLeft -= s.clientWidth * 0.8; });
+  $('hsc-next').addEventListener('click', function () { var s = $('hsc-strip'); s.scrollLeft += s.clientWidth * 0.8; });
+  window.addEventListener('resize', updateArrows);
+  $('hsc-reset').addEventListener('click', function () {
+    Object.keys(counts).forEach(function (k) { counts[k] = 0; });
+    renderTabs(); renderItems(); update();
+  });
+
+  /* ---------- Isometric container ---------- */
+  var SVGNS = 'http://www.w3.org/2000/svg', K = 13.2, CS = 0.8660254, SN = 0.5, OX = 250, OY = 128;
+  var LX = 8, LY = 20, LZ = 8.6; // x = width, y = length, z = height (ft, visual)
+  function P(x, y, z) { return ((x - y) * CS * K + OX).toFixed(1) + ',' + ((x + y) * SN * K - z * K + OY).toFixed(1); }
+  function poly(pts, fill, extra) { return '<polygon points="' + pts.map(function (p) { return P(p[0], p[1], p[2]); }).join(' ') + '" fill="' + fill + '"' + (extra || '') + '/>'; }
+  function line(a, b, stroke, w, extra) { var p = P.apply(null, a).split(','), q = P.apply(null, b).split(','); return '<line x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '" stroke="' + stroke + '" stroke-width="' + w + '"' + (extra || '') + ' stroke-linecap="round"/>'; }
+
+  function buildContainer() {
+    var s = '';
+    // ground shadow
+    s += poly([[-0.6, -0.6, 0], [LX + 1.4, -0.6, 0], [LX + 1.4, LY + 1.2, 0], [-0.6, LY + 1.2, 0]], 'rgba(15,42,82,0.12)');
+    // interior (seen in x-ray mode)
+    s += poly([[0, 0, 0], [LX, 0, 0], [LX, LY, 0], [0, LY, 0]], '#a07b4f');               // plywood floor
+    for (var f = 1; f < 10; f++) s += line([0, f * 2, 0], [LX, f * 2, 0], '#8a6840', 0.6);
+    s += poly([[0, 0, 0], [0, LY, 0], [0, LY, LZ], [0, 0, LZ]], '#1b3f86');                // back long wall
+    s += poly([[0, 0, 0], [LX, 0, 0], [LX, 0, LZ], [0, 0, LZ]], '#163672');                // far end wall
+    s += '<g id="hsc-cargo"></g>';
+    // front walls (become translucent when items are added)
+    var w = '<g class="walls">';
+    w += poly([[LX, 0, 0], [LX, LY, 0], [LX, LY, LZ], [LX, 0, LZ]], '#1e4796');           // long side
+    for (var y = 0.6; y < LY - 0.3; y += 0.62) w += line([LX, y, 0.35], [LX, y, LZ - 0.35], (Math.round(y / 0.62) % 2) ? '#2a58ad' : '#163a7e', 1.1);
+    w += line([LX, 0.2, 0.3], [LX, LY - 0.2, 0.3], '#173f8f', 2) + line([LX, 0.2, LZ - 0.3], [LX, LY - 0.2, LZ - 0.3], '#173f8f', 2);
+    w += poly([[0, LY, 0], [LX, LY, 0], [LX, LY, LZ], [0, LY, LZ]], '#1a4290');           // door end
+    w += line([LX / 2, LY, 0.25], [LX / 2, LY, LZ - 0.25], '#0f2c6b', 1.6);
+    [1.2, 2.8, 5.2, 6.8].forEach(function (x) {
+      w += line([x, LY, 0.5], [x, LY, LZ - 0.5], '#c9d6ea', 1.6);
+      w += line([x, LY, 3.4], [x + (x < LX / 2 ? 0.55 : -0.55), LY, 3.4], '#c9d6ea', 2.2);
+      w += line([x - 0.18, LY, 1.4], [x + 0.18, LY, 1.4], '#c9d6ea', 2) + line([x - 0.18, LY, LZ - 1.4], [x + 0.18, LY, LZ - 1.4], '#c9d6ea', 2);
+    });
+    // Hewitt Storage yellow ref plate, upper-left door (decorative)
+    w += '<g class="hs-plate" aria-hidden="true">' + poly([[1.45, LY, 7.75], [2.6, LY, 7.75], [2.6, LY, 6.85], [1.45, LY, 6.85]], '#f5c400', ' stroke="#111" stroke-width="0.6"');
+    var pc = P(2.025, LY, 7.12).split(',');
+    w += '<text transform="matrix(' + CS + ',' + SN + ',0,1,' + pc[0] + ',' + pc[1] + ')" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="9" fill="#111">HS</text></g>';
+    w += '</g><g class="walls roof">' + poly([[0, 0, LZ], [LX, 0, LZ], [LX, LY, LZ], [0, LY, LZ]], '#2856ab');
+    for (var ry = 1; ry < LY; ry += 1) w += line([0.3, ry, LZ], [LX - 0.3, ry, LZ], '#3363b8', 0.8);
+    w += '</g>';
+    s += w;
+    // frame edges
+    var E = '#0b2257';
+    s += '<g class="hidden-edge">' + line([0, 0, 0], [0, 0, LZ], E, 1.4, ' stroke-dasharray="3 3"') + line([0, 0, 0], [LX, 0, 0], E, 1.4, ' stroke-dasharray="3 3"') + line([0, 0, 0], [0, LY, 0], E, 1.4, ' stroke-dasharray="3 3"') + '</g>';
+    s += line([0, 0, LZ], [LX, 0, LZ], E, 2.4) + line([LX, 0, LZ], [LX, LY, LZ], E, 2.4) + line([LX, LY, LZ], [0, LY, LZ], E, 2.4) + line([0, LY, LZ], [0, 0, LZ], E, 2.4);
+    s += line([LX, 0, 0], [LX, 0, LZ], E, 2.4) + line([LX, LY, 0], [LX, LY, LZ], E, 2.4) + line([0, LY, 0], [0, LY, LZ], E, 2.4);
+    s += line([LX, 0, 0], [LX, LY, 0], E, 2.4) + line([LX, LY, 0], [0, LY, 0], E, 2.4);
+    $('hsc-svg').innerHTML = s;
+  }
+
+  function drawCargo(fill) {
+    var g = $('hsc-cargo');
+    if (fill <= 0.0005) { g.innerHTML = ''; return; }
+    var x0 = 0.25, x1 = LX - 0.25, y0 = 0.25, h = 7.2, maxLen = LY - 0.5;
+    var len = Math.max(0.7, fill * maxLen), y1 = y0 + len;
+    var s = '';
+    s += poly([[x0, y0, h], [x1, y0, h], [x1, y1, h], [x0, y1, h]], '#e6bd7f');   // top
+    s += poly([[x1, y0, 0], [x1, y1, 0], [x1, y1, h], [x1, y0, h]], '#cf9a55');   // side
+    s += poly([[x0, y1, 0], [x1, y1, 0], [x1, y1, h], [x0, y1, h]], '#b9853f');   // end
+    var L = 'rgba(110,70,25,0.55)';
+    for (var y = y0 + 2.4; y < y1 - 0.2; y += 2.4) { s += line([x1, y, 0], [x1, y, h], L, 1) + line([x0, y, h], [x1, y, h], L, 1); }
+    s += line([x1, y0, h / 2], [x1, y1, h / 2], L, 1) + line([x0 + (x1 - x0) / 2, y0, h], [x0 + (x1 - x0) / 2, y1, h], L, 1);
+    s += line([x0 + (x1 - x0) / 2, y1, 0], [x0 + (x1 - x0) / 2, y1, h], L, 1) + line([x0, y1, h / 2], [x1, y1, h / 2], L, 1);
+    g.innerHTML = s;
+  }
+  var shownFill = 0, animId = null;
+  function animateFill(target) {
+    if (animId) cancelAnimationFrame(animId);
+    var from = shownFill, start = null, dur = 380;
+    if (!window.requestAnimationFrame || Math.abs(target - from) < 0.0001) { shownFill = target; drawCargo(target); return; }
+    function step(ts) {
+      if (start === null) start = ts;
+      var t = Math.min(1, (ts - start) / dur), e = 1 - Math.pow(1 - t, 3);
+      shownFill = from + (target - from) * e; drawCargo(shownFill);
+      if (t < 1) animId = requestAnimationFrame(step); else animId = null;
+    }
+    animId = requestAnimationFrame(step);
+  }
+
+  /* ---------- Results ---------- */
+  function recommendation(r) {
+    var n = r.containers;
+    if (r.fits10) return 'A ' + (C.container10.lengthFt) + 'ft unit fits this \u2014 ' + money(C.pricing.small10.monthly) + ' + VAT/month. Want room to grow? A Upper level 20ft is ' + money(C.pricing.upstairs.monthly) + ' + VAT.';
+    if (n > 1) return 'You\u2019ll need ' + n + ' \u00d7 ' + C.container.label + 's. Ask us about side-by-side units so everything stays together.';
+    if (r.pct <= 35) return 'Plenty of room \u2013 one ' + C.container.label + ' with space to spare. An upper level unit is great value if you don\u2019t need drive-up access.';
+    if (r.pct <= 75) return 'One ' + C.container.label + ' fits this comfortably, with room for extra boxes later.';
+    return 'One ' + C.container.label + ' \u2013 a snug fit. Stack boxes high and pack furniture tightly.';
+  }
+
+  function update() {
+    var r = calc(), has = r.total > 0, n = r.containers;
+    $('hsc-svg').classList.toggle('xray', has);
+    $('hsc-empty').hidden = has;
+    $('hsc-filled').hidden = !has;
+    var pill = $('hsc-pill');
+    pill.textContent = !has ? 'Empty' : (n > 1 ? n + ' \u00d7 20ft needed' : Math.round(r.pct) + '% full' + (r.fits10 ? ' \u00b7 fits a ' + C.container10.lengthFt + 'ft' : ''));
+    pill.classList.toggle('multi', n > 1);
+    pill.classList.toggle('ten', !!r.fits10);
+    animateFill(Math.min(1, r.ratio));
+
+    var u = $('hsc-units');
+    if (n > 1) {
+      var h = '';
+      for (var i = 0; i < n; i++) { var f = Math.max(0, Math.min(1, r.ratio - i)); h += '<span class="hsc-unit">Unit ' + (i + 1) + '<i><b style="width:' + (f * 100).toFixed(0) + '%"></b></i>' + Math.round(f * 100) + '%</span>'; }
+      u.innerHTML = h;
+    } else u.innerHTML = '';
+
+    $('hsc-ten').hidden = !r.fits10;
+    if (has) {
+      $('hsc-vol').textContent = fmt(r.total, r.total % 1 ? 1 : 0);
+      $('hsc-pct').textContent = Math.round(r.pct) + '%';
+      $('hsc-pct-lab').textContent = 'of one ' + C.container.lengthFt + 'ft (usable)';
+      $('hsc-n').textContent = n;
+      $('hsc-n-lab').textContent = (n === 1 ? 'container' : 'containers') + ' needed';
+      $('hsc-bar').classList.toggle('over', r.pct > 100);
+      $('hsc-bar-fill').style.width = Math.min(100, r.pct).toFixed(1) + '%';
+      $('hsc-bar-txt').textContent = r.pct > 100 ? 'Over one container \u2013 ' + n + ' needed' : 'One ' + C.container.label;
+      $('hsc-rec').textContent = recommendation(r);
+      $('hsc-alt').hidden = !r.altLine; $('hsc-alt').textContent = r.altLine || '';
+      var pl = [r.palLine, r.fitLine].filter(Boolean).join(' ');
+      $('hsc-pal').hidden = !pl; $('hsc-pal').textContent = pl;
+      var g = C.pricing.ground.monthly, up = C.pricing.upstairs.monthly, vat = 1 + C.pricing.vatRate;
+      $('hsc-g-p').textContent = money(g * n);
+      $('hsc-u-p').textContent = money(up * n);
+      $('hsc-g-x').textContent = n + ' \u00d7 ' + money(g) + ' + VAT \u00b7 ' + money(Math.round(g * n * vat * 100) / 100) + ' inc VAT';
+      $('hsc-u-x').textContent = n + ' \u00d7 ' + money(up) + ' + VAT \u00b7 ' + money(Math.round(up * n * vat * 100) / 100) + ' inc VAT';
+      if (r.fits10) {
+        var sm = C.pricing.small10.monthly;
+        $('hsc-s-p').textContent = money(sm);
+        $('hsc-s-x').textContent = money(Math.round(sm * vat * 100) / 100) + ' inc VAT';
+      }
+      $('hsc-list-sum').textContent = 'Your items (' + r.itemCount + ')';
+      $('hsc-list').innerHTML = r.lines.map(function (l) { return '<li>' + l.n + ' \u00d7 ' + esc(l.item.name) + ' \u2013 ' + fmt(l.vol, l.vol % 1 ? 1 : 0) + ' cu ft</li>'; }).join('');
+    }
+    $('hsc-email').href = mailto(r);
+    $('hsc-enquire').href = enquireHref(r);
+    reportHeight();
+    window.HSC_LAST = r; // exposed for testing/debugging
+  }
+
+  // Passes a short summary to the reservation page so the form is pre-filled.
+  function enquireHref(r) {
+    var base = C.contact.enquireUrl;
+    if (!(r.total > 0)) return base;
+    var unit = r.fits10 ? '10ft' : 'unsure';
+    var items = r.lines.map(function (l) { return l.n + ' x ' + l.item.name; }).join(', ');
+    if (items.length > 400) items = items.slice(0, 397) + '...';
+    var summary = 'From the storage calculator: approx. ' + fmt(r.total, 0) + ' cu ft (' + Math.round(r.pct) + '% of one 20ft), ' +
+      r.containers + ' x 20ft needed' + (r.fits10 ? ' - a 10ft would fit' : '') + '. Items: ' + items;
+    return base + (base.indexOf('?') < 0 ? '?' : '&') + 'unit=' + unit + '&calc=' + encodeURIComponent(summary);
+  }
+
+  function mailto(r) {
+    var c = C.contact, n = r.containers, body;
+    if (r.total > 0) {
+      body = 'Hi,\n\nI\u2019ve used the storage calculator on your website and would like to enquire about storage.\n\nItems:\n' +
+        r.lines.map(function (l) { return '- ' + l.n + ' x ' + l.item.name; }).join('\n') +
+        '\n\nEstimated volume: ' + fmt(r.total, r.total % 1 ? 1 : 0) + ' cu ft' +
+        '\nSpace used: approx. ' + Math.round(r.pct) + '% of one ' + C.container.label + ' (usable space)' +
+        '\nContainers needed: ' + n +
+        '\nEstimate: ground level 20ft ' + money(C.pricing.ground.monthly * n) + ' + VAT/month, or Upper level 20ft ' + money(C.pricing.upstairs.monthly * n) + ' + VAT/month' +
+        (r.fits10 ? '\n10ft option: the calculator suggests a ' + C.container10.label + ' would fit this \u2013 ' + money(C.pricing.small10.monthly) + ' + VAT/month' : '') +
+        '\n\nPreferred option (' + (r.fits10 ? '10ft / ' : '') + 'ground level / upper level):\nPreferred start date:\nName:\nPhone:\n\nThanks';
+    } else {
+      body = 'Hi,\n\nI\u2019d like to enquire about container storage.\n\nWhat I need to store:\nPreferred start date:\nName:\nPhone:\n\nThanks';
+    }
+    return 'mailto:' + c.email + '?subject=' + encodeURIComponent(c.emailSubject) + '&body=' + encodeURIComponent(body);
+  }
+
+  /* ---------- iframe auto-height (optional, see EMBED.md) ---------- */
+  var lastH = 0;
+  function reportHeight() {
+    if (window.parent === window) return;
+    var h = Math.ceil(document.body.getBoundingClientRect().height);
+    if (h !== lastH) { lastH = h; try { window.parent.postMessage({ type: 'hewitt-calc-height', height: h }, '*'); } catch (e) {} }
+  }
+  if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.body);
+  window.addEventListener('load', reportHeight);
+
+  /* ---------- Init ---------- */
+  buildContainer();
+  renderTabs();
+  renderItems();
+  update();
+  function setMode(m) {
+    HS_MODE = m === 'max' ? 'max' : 'room';
+    [].forEach.call($('hsc-mode').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === HS_MODE)); });
+    $('hsc-modenote').textContent = HS_MODE === 'max' ? 'Packed wall to wall, floor to 2.2m – the most it will hold, but you won’t be able to walk in.' : 'A clear walkway down the middle so you can get in to load, find things and organise.';
+    update();
+  }
+  $('hsc-mode').addEventListener('click', function (e) { var b = e.target.closest('button[data-mode]'); if (b) setMode(b.getAttribute('data-mode')); });
+  setMode('room');
+  window.HSC = { setMode: setMode, mode: function () { return HS_MODE; }, config: C, counts: counts, calc: calc, usable: usable, usable10: usable10 };
+})();
+</script>
+</body>
+</html>
