@@ -266,26 +266,26 @@ var CALC_CONFIG = {
   //   cuft: approximate volume shown to the customer (UK removal-company charts)
   categories: [
     { id: 'living', label: 'Living', items: [
-      { id: 'chair',        name: 'Chair',            cuft: 10, icon: 'chair',      d: [0.45, 0.50, 0.90], mode: 'stack', light: true },
+      { id: 'chair',        name: 'Chair',            cuft: 10, icon: 'chair',      d: [0.45, 0.55, 0.95], mode: 'stack', light: true, maxStack: 2 },   // 2 high seat-to-seat
       { id: 'armchair',     name: 'Armchair',         cuft: 30, icon: 'armchair',   d: [0.90, 0.85, 0.95], mode: 'floor', top: 'light' },
       { id: 'sofa2',        name: '2 seat sofa',      cuft: 40, icon: 'sofa2',      d: [1.60, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true },
       { id: 'sofa3',        name: '3 seat sofa',      cuft: 55, icon: 'sofa3',      d: [2.00, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true },
-      { id: 'coffeetable',  name: 'Coffee table',     cuft: 10, icon: 'coffeetable', d: [1.10, 0.55, 0.45], mode: 'stack' },
-      { id: 'tvunit',       name: 'TV / TV unit',     cuft: 15, icon: 'tvunit',     d: [1.20, 0.45, 0.60], mode: 'stack' },
+      { id: 'coffeetable',  name: 'Coffee table',     cuft: 10, icon: 'coffeetable', d: [1.10, 0.55, 0.45], mode: 'stack', maxStack: 2, top: 'any' },
+      { id: 'tvunit',       name: 'TV / TV unit',     cuft: 15, icon: 'tvunit',     d: [1.20, 0.45, 0.60], mode: 'stack', maxStack: 1, top: 'light' },
       { id: 'bookcase',     name: 'Bookcase',         cuft: 20, icon: 'bookcase',   d: [0.80, 0.30, 1.80], mode: 'floor', top: 'any', inner: 0.75 }   // shelves hold boxes/books
     ]},
     { id: 'dining', label: 'Dining', items: [
-      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 30, icon: 'dtable46', d: [1.50, 0.15, 0.90], mode: 'edge' },   // legs off, top on edge,
-      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 50, icon: 'dtable8',  d: [2.00, 0.15, 1.00], mode: 'edge' },   // legs off, top on edge,
-      { id: 'dchair',       name: 'Dining chair',       cuft: 6,  icon: 'dchair',   d: [0.45, 0.50, 0.90], mode: 'stack', light: true }
+      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 30, icon: 'dtable46', d: [1.50, 0.25, 0.90], mode: 'edge' },   // legs off, top on edge,
+      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 50, icon: 'dtable8',  d: [2.00, 0.25, 1.00], mode: 'edge' },   // legs off, top on edge,
+      { id: 'dchair',       name: 'Dining chair',       cuft: 6,  icon: 'dchair',   d: [0.45, 0.55, 0.95], mode: 'stack', light: true, maxStack: 2 }
     ]},
     { id: 'bedroom', label: 'Bedroom', items: [
-      { id: 'bedsingle',    name: 'Single bed',       cuft: 30, icon: 'bedsingle', d: [1.90, 0.30, 0.90], mode: 'edge' },   // dismantled: divan/frame on edge
-      { id: 'beddouble',    name: 'Double bed',       cuft: 60, icon: 'beddouble', d: [1.90, 0.60, 0.70], mode: 'edge' },   // 2-piece divan (2 × 68 cm) on edge
-      { id: 'bedking',      name: 'King bed',         cuft: 70, icon: 'bedking',   d: [2.00, 0.60, 0.76], mode: 'edge' },   // 2-piece divan (2 × 76 cm) on edge
+      { id: 'bedsingle',    name: 'Single bed',       cuft: 30, icon: 'bedsingle', d: [1.90, 0.30, 0.90], mode: 'edge', firm: true },   // dismantled: divan/frame on edge
+      { id: 'beddouble',    name: 'Double bed',       cuft: 60, icon: 'beddouble', d: [1.90, 0.60, 0.70], mode: 'edge', firm: true },   // 2-piece divan (2 × 68 cm) on edge
+      { id: 'bedking',      name: 'King bed',         cuft: 70, icon: 'bedking',   d: [2.00, 0.60, 0.76], mode: 'edge', firm: true },   // 2-piece divan (2 × 76 cm) on edge
       { id: 'wardrobe',     name: 'Wardrobe',         cuft: 45, icon: 'wardrobe',  d: [1.00, 0.60, 1.85], mode: 'floor', top: 'any' },
-      { id: 'drawers',      name: 'Chest of drawers', cuft: 20, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack' },
-      { id: 'bedside',      name: 'Bedside table',    cuft: 5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack' },
+      { id: 'drawers',      name: 'Chest of drawers', cuft: 20, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack', maxStack: 1, top: 'any' },
+      { id: 'bedside',      name: 'Bedside table',    cuft: 5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack', maxStack: 2, top: 'any' },
       { id: 'mattress',     name: 'Mattress',         cuft: 25, icon: 'mattress',  d: [1.90, 0.25, 1.35], mode: 'edge' }    // double, stood on its long edge
     ]},
     { id: 'kitchen', label: 'Kitchen & appliances', items: [
@@ -297,22 +297,22 @@ var CALC_CONFIG = {
     { id: 'boxes', label: 'Boxes', items: [
       { id: 'boxs',         name: 'Small box',        cuft: 1.4, dims: 'approx. 45×30×30 cm', icon: 'boxs', d: [0.45, 0.30, 0.30], mode: 'stack', light: true, box: true },
       { id: 'boxm',         name: 'Medium box',       cuft: 2.8, dims: 'approx. 50×40×40 cm', icon: 'boxm', d: [0.50, 0.40, 0.40], mode: 'stack', light: true, box: true },
-      { id: 'boxl',         name: 'Large box',        cuft: 4.3, dims: 'approx. 60×45×45 cm', icon: 'boxl', d: [0.60, 0.45, 0.45], mode: 'stack', box: true }
+      { id: 'boxl',         name: 'Large box',        cuft: 4.3, dims: 'approx. 60×45×45 cm', icon: 'boxl', d: [0.60, 0.45, 0.45], mode: 'stack', light: true, box: true }   // large boxes = bedding/linen; books go in small boxes
     ]},
     { id: 'business', label: 'Business', items: [
       { id: 'palleteuro',   name: 'Euro pallet', cuft: 68, dims: 'approx. 120×80 cm footprint · not stacked', icon: 'pallet', mode: 'pallet', pal: 'E' },
       { id: 'palletuk',     name: 'UK pallet',   cuft: 85, dims: 'approx. 120×100 cm footprint · not stacked · narrows the walkway', icon: 'pallet', mode: 'pallet', pal: 'U' },
       { id: 'pallethalf',   name: 'Half pallet', cuft: 34, dims: 'approx. 80×60 cm footprint · not stacked', icon: 'pallet', mode: 'pallet', pal: 'H' },
       { id: 'filing',       name: 'Filing cabinet',   cuft: 10, icon: 'filing',      d: [0.47, 0.62, 1.32], mode: 'floor', top: 'any' },
-      { id: 'desk',         name: 'Desk',             cuft: 30, icon: 'desk',        d: [1.40, 0.15, 0.75], mode: 'edge' },   // legs/frame off, top on edge,
-      { id: 'officechair',  name: 'Office chair',     cuft: 10, icon: 'officechair', d: [0.60, 0.60, 1.00], mode: 'stack', light: true },
+      { id: 'desk',         name: 'Desk',             cuft: 30, icon: 'desk',        d: [1.40, 0.70, 0.75], mode: 'floor', top: 'any' },   // stored assembled, not stacked; boxes/chairs on top
+      { id: 'officechair',  name: 'Office chair',     cuft: 10, icon: 'officechair', d: [0.65, 0.65, 1.05], mode: 'stack', light: true, maxStack: 1 },
       { id: 'shelving',     name: 'Shelving bay',     cuft: 25, icon: 'shelving',    d: [0.90, 0.45, 1.80], mode: 'floor', top: 'any', inner: 0.8 }   // shelf bays hold boxes
     ]},
     { id: 'garden', label: 'Garden & garage', items: [
-      { id: 'bike',         name: 'Bike',             cuft: 15, icon: 'bike',      d: [1.75, 0.60, 1.05], mode: 'stack', light: true },  // can go on top of boxes / against the load
-      { id: 'mower',        name: 'Lawnmower',        cuft: 12, icon: 'mower',     d: [0.80, 0.50, 0.50], mode: 'stack' },  // handle folded
+      { id: 'bike',         name: 'Bike',             cuft: 15, icon: 'bike',      d: [1.75, 0.60, 1.05], mode: 'stack', light: true, maxStack: 1 },  // can go on top of boxes / against the load
+      { id: 'mower',        name: 'Lawnmower',        cuft: 12, icon: 'mower',     d: [0.80, 0.50, 0.50], mode: 'stack', maxStack: 1, top: 'light' },  // handle folded
       { id: 'gardenset',    name: 'Garden table set', cuft: 40, icon: 'gardenset', d: [1.20, 0.85, 1.10], mode: 'floor', top: 'light' },  // table + 4 folded/stacked chairs
-      { id: 'toolchest',    name: 'Tool chest',       cuft: 15, icon: 'toolchest', d: [0.70, 0.45, 1.00], mode: 'stack' }
+      { id: 'toolchest',    name: 'Tool chest',       cuft: 15, icon: 'toolchest', d: [0.70, 0.45, 1.00], mode: 'stack', maxStack: 1, top: 'any' }
     ]}
   ]
 };
@@ -332,7 +332,7 @@ var CALC_CONFIG = {
    Items deeper than 0.85 m stick into the walkway: up to 0.10 m on either side, up to 0.20 m on
    one side only (one side + back row) – reported as "narrows the walkway".
    ===================================================================== */
-var HS_FIT = { W: 2.35, ZD: 0.85, H: 2.2, BAY: 0.65, OV_BOTH: 0.10, OV_ONE: 0.20, BOX_EFF: 0.85, IRR_EFF: 0.80, GAP_EFF: 0.5, SHELF: 0.45 };
+var HS_FIT = { REACH: 1.5, GRID: 0.03, W: 2.35, ZD: 0.85, H: 2.0, BAY: 0.65, OV_BOTH: 0.10, OV_ONE: 0.20, BOX_EFF: 0.85, IRR_EFF: 0.75, GAP_EFF: 0.75, SHELF: 0.45 };
 var HS_MODE = 'room';   // 'room' = 0.65 m walkway kept clear; 'max' = no walkway, full 2.35 m width packed (still sensible stacking)
 function hsFit(load, L, n, mode) {
   var F = HS_FIT, best = null;
@@ -393,9 +393,9 @@ function hsFitLayout(load, L, n, layout, F) {
       if (!cand || ln.rem < cand.rem) cand = ln;   // best fit
     });
     if (!cand) return false;
-    cand.rem -= l; colVol += l * F.ZD * F.H; if (ov > 0) res.narrows = true;
+    cand.rem -= l; colVol += l * F.ZD * F.H * (it === null ? Math.min(1, 0.5 + d / F.ZD / 2) : 1); if (ov > 0) res.narrows = true;
     if (top !== 'none' && h < F.H) addPool(top === 'light' ? 'light' : 'any', F.H - h, (F.H - h) * l * F.ZD);
-    if (!palKind && d < F.ZD - 0.25) gaps.push({ l: l, d: F.ZD - d });
+    if (!palKind && !(it === null) && d < F.ZD - 0.25) gaps.push({ l: l, d: F.ZD - d });
     res.placed.push({ id: it ? it.id : 'slabs', lane: cand.k, c: cand.c });
     return true;
   }
@@ -418,7 +418,7 @@ function hsFitLayout(load, L, n, layout, F) {
         var l = it.d[0], d = it.d[1];
         if (d > F.ZD && l < d) { l = it.d[1]; d = it.d[0]; }   // rotate if that keeps it out of the walkway
         floor.push({ it: it, l: l, d: d, h: it.d[2], top: it.top || 'none', inner: it.inner || 0 });
-      } else if (it.mode === 'edge') slabs.push({ it: it, l: it.d[0], d: it.d[1], h: it.d[2] });
+      } else if (it.mode === 'edge') slabs.push({ it: it, l: it.d[0], d: it.d[1], h: it.d[2], firm: !!it.firm });
     }
   });
   // sofas: seat-to-seat in pairs (2 high max, within 2.0 m), longest together; an odd one stands on end
@@ -434,9 +434,9 @@ function hsFitLayout(load, L, n, layout, F) {
   var blocks = [];
   slabs.forEach(function (s) {
     var b = null;
-    for (var q = 0; q < blocks.length; q++) if (blocks[q].d + s.d <= F.ZD + 1e-9) { b = blocks[q]; break; }
-    if (!b) { b = { it: null, l: s.l, d: 0, h: 0, top: 'none', slab: true }; blocks.push(b); }
-    b.d += s.d; b.h = Math.max(b.h, s.h);
+    for (var q = 0; q < blocks.length; q++) if (blocks[q].d + s.d <= F.ZD + 1e-9 && blocks[q].firm === !!s.firm) { b = blocks[q]; break; }
+    if (!b) { b = { it: null, l: s.l, d: 0, h: 0, top: 'any', slab: true, firm: !!s.firm }; blocks.push(b); }
+    b.d += s.d; b.h = Math.max(b.h, s.h); if (!s.firm) b.top = 'none';   // divan bases on edge take boxes on top; mattresses/table tops don't
   });
   blocks.forEach(function (b) { floor.push(b); });  // slab strip against the wall; space in front of it stays usable
   floor.sort(function (a, b) { return b.l * Math.min(b.d, F.ZD) - a.l * Math.min(a.d, F.ZD) || b.l - a.l; });
@@ -446,40 +446,65 @@ function hsFitLayout(load, L, n, layout, F) {
     if (f.inner) addPool('any', F.SHELF, f.l * f.d * f.h * f.inner);   // shelves inside bookcases / shelving bays take boxes (~0.45 m between shelves)
   }
   gaps.forEach(function (x) { addPool('any', F.H, x.l * x.d * F.H * F.GAP_EFF); }); // unused gaps take boxes (part-usable)
-  // 3. boxes & stackable items: heavy ones need an 'any' surface or the floor; light ones can also go on 'light' surfaces
-  // Each stackable item needs its own height of clearance (boxes can be turned to their shortest side) and is
-  // stacked in whole layers: e.g. 0.9 m chairs go 2 high in 2.2 m, using 1.8 m of it.
+  // 3. stackable items – REALISM RULES (15/10/2026 audit):
+  //  • each item has maxStack (dining chairs 2 seat-to-seat, desks/office chairs/tool chests 1 …); boxes stack by height
+  //  • heavy (non-light) things are never placed with their top above ~1.5 m (F.REACH) – they must be lifted by hand
+  //  • on the floor they are laid out on a real grid in the 0.85 m deep side zones (no "fluid volume"), with a few cm
+  //    handling space each; the walkway stays clear
+  //  • what's left above a stack (if its top can take weight) is available to smaller things, e.g. boxes on drawers
   var dem = [];
   load.forEach(function (x) {
     var it = x.item; if (it.mode !== 'stack' || !it.d) return;
-    var need = it.box ? Math.min(it.d[0], it.d[1], it.d[2]) : it.d[2];
-    dem.push({ need: need, light: !!it.light, v: it.d[0] * it.d[1] * it.d[2] / (it.box ? F.BOX_EFF : F.IRR_EFF) * x.n });
+    var s = it.box ? it.d.slice().sort(function (a, b) { return a - b; }) : null;
+    var need = it.box ? s[0] : it.d[2], a = it.box ? s[2] : it.d[0], b = it.box ? s[1] : it.d[1];
+    var ms = it.box ? 99 : (it.maxStack || 1), lim = it.light ? F.H : F.REACH;
+    dem.push({ it: it, need: need, a: a, b: b, light: !!it.light, n: x.n, ms: ms, top: it.top || 'none',
+      layers: Math.max(1, Math.min(ms, Math.floor(lim / need + 1e-9))), eff: it.box ? F.BOX_EFF : F.IRR_EFF });
   });
-  dem.sort(function (a, b) { return b.need - a.need; });
-  function layers(c, need) { return Math.floor(c / need + 1e-9) * need; }   // usable height in whole layers
-  var freeArea = lanes.reduce(function (s, ln) { return s + ln.rem; }, 0) * F.ZD, freeAreaUsed = 0;
+  dem.sort(function (p, q) { return q.need - p.need; });
   dem.forEach(function (q) {
+    var fp = q.a * q.b / q.eff;
     pools.filter(function (pl) { return pl.a > 1e-12 && pl.c >= q.need - 1e-9 && (pl.k === 'any' || q.light); })
       .sort(function (x, y) { return (q.light ? (x.k === 'light' ? 0 : 1) - (y.k === 'light' ? 0 : 1) : 0) || x.c - y.c; })
       .forEach(function (pl) {
-        if (q.v <= 1e-12) return;
-        var hv = layers(pl.c, q.need), take = Math.min(pl.a, q.v / hv);
-        pl.a -= take; q.v -= take * hv;
+        if (q.n <= 0) return;
+        var base = F.H - pl.c, room = q.light ? pl.c : Math.min(pl.c, F.REACH - base);
+        var L = Math.min(q.ms, Math.floor(room / q.need + 1e-9)); if (L < 1) return;
+        var take = Math.min(q.n, Math.floor(pl.a / fp + 1e-9) * L); if (take < 1) return;
+        pl.a -= take / L * fp; q.n -= take;
+        if (pl.ns) colVol += take * q.a * q.b * q.need;   // tops of stacks are already counted as used; goods on them still add
       });
-    if (q.v > 1e-12) freeAreaUsed += q.need <= F.H ? q.v / layers(F.H, q.need) : Infinity;
+    if (q.n <= 0) return;
+    // floor grid: best orientation across the 0.85 m depth
+    var g = F.GRID, o = [[q.a + g, q.b + g], [q.b + g, q.a + g]].map(function (v) { return { u: v[0], rows: Math.floor((F.ZD + g) / v[1] + 1e-9) }; })
+      .filter(function (v) { return v.rows > 0; }).sort(function (x, y) { return x.u / x.rows - y.u / y.rows; })[0] || { u: Math.max(q.a, q.b) + g, rows: 1 };
+    var stacks = Math.ceil(q.n / q.layers), placedStacks = 0, lenTot = 0, usedLanes = [];
+    lanes.slice().sort(function (x, y) { return y.rem - x.rem; }).forEach(function (ln) {
+      if (stacks <= 0) return;
+      var use = Math.min(stacks, Math.floor(ln.rem / o.u + 1e-9) * o.rows); if (use < 1) return;
+      var len = Math.ceil(use / o.rows) * o.u; ln.rem -= len; stacks -= use; placedStacks += use; lenTot += len; usedLanes.push(Math.ceil(use / o.rows));
+      var spare = F.ZD - o.rows * (o.u === q.a + g ? q.b + g : q.a + g) + g;   // depth left in front of the row
+      if (spare >= 0.25) addPool('any', F.H, len * spare * F.H * F.GAP_EFF);
+    });
+    // space counted in proportion to how full the stacks are, so every extra item shows (a 2nd chair on a 1st)
+    var slots = 0; usedLanes.forEach(function (u) { slots += u * o.rows * q.layers; });
+    if (slots) colVol += lenTot * F.ZD * F.H * Math.min(1, q.n / slots);
+    var clr = F.H - q.layers * q.need;
+    if (q.top !== 'none' && clr >= 0.3 && placedStacks) pools.push({ k: q.top, c: clr, a: placedStacks * q.a * q.b, ns: true });
+    if (stacks > 0) { res.ok = false; res.fail = 'space'; }
   });
-  var free = freeArea * F.H, fromFree = freeAreaUsed * F.H;   // floor space taken by stacks, counted full height
-  res.freeUsed = fromFree;
-  if (freeAreaUsed > freeArea + 1e-9) { res.ok = false; res.fail = 'space'; }
+  res.freeUsed = 0;
+  var free = 0, fromFree = 0;
   res.freeLeft = Math.max(0, free - fromFree);
   return finish();
   function finish() {
-    var unusedAbove = pools.reduce(function (s, pl) { return s + pl.a * pl.c; }, 0);
-    res.dead = pools.reduce(function (s, pl) { return s + (pl.c < 0.3 ? pl.a * pl.c : 0); }, 0);   // too low for even a small box
+    var unusedAbove = pools.reduce(function (s, pl) { return s + (pl.ns ? 0 : pl.a * pl.c); }, 0);
+    res.pools = pools; res.lanes = lanes;   // for testing
+    res.dead = pools.reduce(function (s, pl) { return s + (pl.c < 0.3 && !pl.ns ? pl.a * pl.c : 0); }, 0);   // too low for even a small box
     res.consumed = colVol - unusedAbove + (res.freeUsed || 0);
     if (res.consumed < 0) res.consumed = 0;
     var laneLen = lanes.reduce(function (s, ln) { return s + ln.len; }, 0), usedLen = lanes.reduce(function (s, ln) { return s + (ln.len - ln.rem); }, 0);
-    res.floorUsed = usedLen * F.ZD + (res.freeUsed || 0) / F.H;
+    res.floorUsed = usedLen * F.ZD;
     res.floorTotal = laneLen * F.ZD;
     res.floorPct = Math.min(100, res.floorUsed / res.floorTotal * 100);
     res.volPct = res.consumed / cap * 100;
@@ -583,7 +608,7 @@ function hsFitLayout(load, L, n, layout, F) {
     // 15/10/2026: "how full" = space taken + gaps too low to use. Floor % is shown separately; it no longer masks
     // items stacked on top (previously anything placed on top of furniture showed as taking no space).
     var ratio = (r20.consumed + (r20.dead || 0)) / r20.capOne;
-    if (n > 1) ratio = Math.max(ratio, r20.floorUsed / (r20.floorTotal / n));   // several units: also reflect floor taken
+    if (n > 1) ratio = n - 1 + Math.max(0.01, Math.min(0.99, ratio / n));   // several units: last one shown part-full, rises with every item
     if (n > 1) ratio = Math.max(ratio, n - 1 + 0.01);      // multi-container: always reads as more than n-1
     else ratio = Math.min(ratio, 1);
     var containers = n, fits10 = !!r10.ok;
