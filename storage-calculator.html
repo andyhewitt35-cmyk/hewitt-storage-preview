@@ -330,11 +330,36 @@ function hsFit(load, L, n, mode) {
   var maxMode = (mode || HS_MODE) === 'max', best = null, st = { pallets: 0, floor: 1, space: 2, '': 3 };
   var cands = [[1, Object.assign({}, HS_FIT, { ZD: (HS_FIT.W - HS_FIT.LANE) / 2 })], [2, Object.assign({}, HS_FIT, { ZD: HS_FIT.W - HS_FIT.LANE })]];
   if (maxMode) cands.push([3, Object.assign({}, HS_FIT, { ZD: 0.9 })]);   // packed to the max: rows across the full width
+  var singleType = load.length === 1;
   cands.forEach(function (cd) {
     var r = hsFitLayout(load, L, n, cd[0], cd[1]);
-    if (!best || st[r.fail] > st[best.fail] || (r.fail === best.fail && r.consumed < best.consumed - 1e-9)) best = r;
+    r._F = cd[1];
+    r._hr = (singleType && r.ok) ? hsHeadroom(load, L, r) : 0;
+    if (!best) { best = r; return; }
+    if (st[r.fail] > st[best.fail]) { best = r; return; }
+    if (st[r.fail] < st[best.fail]) return;
+    // Single item type: prefer more headroom (coffee tables etc. must not pack into the side zone until it is
+    // full, read ~half full, then jump to 2 containers while the middle layout still had room).
+    // Mixed loads: prefer lower committed volume so adding a small item does not thrash the layout.
+    if (singleType && r.ok && r._hr > best._hr) { best = r; return; }
+    if (singleType && r.ok && r._hr < best._hr) return;
+    if (r.consumed < best.consumed - 1e-9) best = r;
   });
   return best;
+}
+// Extra copies of the busiest item that still fit in this layout. Used to pick middle vs side (single-type
+// loads) and to detect "effectively full" for the % reading.
+function hsHeadroom(load, L, r) {
+  if (!r.ok || !load.length || !r._F) return -1;
+  if (r._hrCached !== undefined) return r._hrCached;
+  var main = load[0], i;
+  for (i = 1; i < load.length; i++) if (load[i].n > main.n) main = load[i];
+  var lo = 0, hi = 30;
+  while (lo < hi) {
+    var mid = (lo + hi + 1) >> 1, scaled = load.map(function (x) { return x.item.id === main.item.id ? { item: x.item, n: x.n + mid } : x; });
+    if (hsFitLayout(scaled, L, r.n, r.layout, r._F).ok) lo = mid; else hi = mid - 1;
+  }
+  return (r._hrCached = lo);
 }
 /* Physical model (15/10/2026 rework). Every item is a real box (L×D×H, turned on the floor if that helps).
    Each floor zone ("lane") starts as one empty surface. Placing an item on a surface uses a rectangle of it
@@ -598,7 +623,11 @@ function hsFitLayout(load, L, n, layout, F) {
     // n-1 containers plus the overall fill: every item counts, wherever it ends up
     // % full = space committed by the actual layout ÷ practical capacity (usable floor × 2.1 m). Containers fill in turn.
     // several containers: n-1 plus how full the n containers are overall (every item counts, wherever it goes)
+    // Space committed ÷ capacity. For a single item type, if no more of that item can fit, treat as
+    // effectively full (≥99%): stops coffee tables / TV units reading ~half full then jumping to 2 containers.
+    // (Mixed loads skip this — another item type may still fill the leftover scraps.)
     var ratio = n === 1 ? r20.consumed / r20.capOne : n - 1 + Math.max(0.01, r20.consumed / r20.cap);
+    if (n === 1 && r20.ok && load.length === 1 && hsHeadroom(load, L20, r20) === 0) ratio = Math.max(ratio, 0.99);
     if (n > 1) ratio = Math.max(ratio, n - 1 + 0.01);      // multi-container: always reads as more than n-1
     else ratio = Math.min(ratio, 1);
     var containers = n, fits10 = !!r10.ok;
