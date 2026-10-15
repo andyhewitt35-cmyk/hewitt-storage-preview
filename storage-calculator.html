@@ -284,7 +284,7 @@ var CALC_CONFIG = {
       { id: 'beddouble',    name: 'Double bed',       cuft: 60, icon: 'beddouble', d: [1.90, 0.60, 0.70], mode: 'edge' },   // 2-piece divan (2 × 68 cm) on edge
       { id: 'bedking',      name: 'King bed',         cuft: 70, icon: 'bedking',   d: [2.00, 0.60, 0.76], mode: 'edge' },   // 2-piece divan (2 × 76 cm) on edge
       { id: 'wardrobe',     name: 'Wardrobe',         cuft: 45, icon: 'wardrobe',  d: [1.00, 0.60, 1.85], mode: 'floor', top: 'any' },
-      { id: 'drawers',      name: 'Chest of drawers', cuft: 20, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack' },,
+      { id: 'drawers',      name: 'Chest of drawers', cuft: 20, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack' },
       { id: 'bedside',      name: 'Bedside table',    cuft: 5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack' },
       { id: 'mattress',     name: 'Mattress',         cuft: 25, icon: 'mattress',  d: [1.90, 0.25, 1.35], mode: 'edge' }    // double, stood on its long edge
     ]},
@@ -332,7 +332,7 @@ var CALC_CONFIG = {
    Items deeper than 0.85 m stick into the walkway: up to 0.10 m on either side, up to 0.20 m on
    one side only (one side + back row) – reported as "narrows the walkway".
    ===================================================================== */
-var HS_FIT = { W: 2.35, ZD: 0.85, H: 2.2, BAY: 0.65, OV_BOTH: 0.10, OV_ONE: 0.20, BOX_EFF: 0.85, IRR_EFF: 0.80, GAP_EFF: 0.5 };
+var HS_FIT = { W: 2.35, ZD: 0.85, H: 2.2, BAY: 0.65, OV_BOTH: 0.10, OV_ONE: 0.20, BOX_EFF: 0.85, IRR_EFF: 0.80, GAP_EFF: 0.5, SHELF: 0.45 };
 var HS_MODE = 'room';   // 'room' = 0.65 m walkway kept clear; 'max' = no walkway, full 2.35 m width packed (still sensible stacking)
 function hsFit(load, L, n, mode) {
   var F = HS_FIT, best = null;
@@ -367,7 +367,10 @@ function hsFitLayout(load, L, n, layout, F) {
   lanes.forEach(function (ln) { ln.rem = ln.len; });
   var cap = lanes.reduce(function (s, ln) { return s + ln.len; }, 0) * F.ZD * F.H;
   var res = { ok: true, layout: layout, n: n, cap: cap, capOne: cap / n, narrows: false, fail: '', placed: [] };
-  var pools = { any: 0, light: 0 }, colVol = 0, goods = 0;
+  // Space above / inside floor items, tracked with its clearance height (15/10/2026 fix: an item only goes
+  // into space it is short enough for – e.g. a 0.9 m chair can't sit in the 0.5 m left above a pair of sofas).
+  var pools = [], colVol = 0, goods = 0;
+  function addPool(k, c, v) { if (c > 0.05 && v > 1e-9) pools.push({ k: k, c: c, a: v / c }); }   // a = footprint area
   function eps(x) { return x + 1e-9; }
   var gaps = []; // space left in front of shallow floor items (towards the walkway), usable by another floor item
   function place(it, l, d, h, top, palKind) {
@@ -377,7 +380,7 @@ function hsFitLayout(load, L, n, layout, F) {
       gaps.forEach(function (x) { if (x.d >= d - 1e-9 && x.l >= l - 1e-9 && (!g || x.l * x.d < g.l * g.d)) g = x; });
       if (g) {
         gaps.splice(gaps.indexOf(g), 1);
-        if (top !== 'none' && h < F.H) pools[top === 'light' ? 'light' : 'any'] += (F.H - h) * l * d;
+        if (top !== 'none' && h < F.H) addPool(top === 'light' ? 'light' : 'any', F.H - h, (F.H - h) * l * d);
         if (g.l - l > 0.3) gaps.push({ l: g.l - l, d: g.d });
         res.placed.push({ id: it ? it.id : 'slabs', lane: 'front', c: -1 });
         return true;
@@ -391,7 +394,7 @@ function hsFitLayout(load, L, n, layout, F) {
     });
     if (!cand) return false;
     cand.rem -= l; colVol += l * F.ZD * F.H; if (ov > 0) res.narrows = true;
-    if (top !== 'none' && h < F.H) pools[top === 'light' ? 'light' : 'any'] += (F.H - h) * l * F.ZD;
+    if (top !== 'none' && h < F.H) addPool(top === 'light' ? 'light' : 'any', F.H - h, (F.H - h) * l * F.ZD);
     if (!palKind && d < F.ZD - 0.25) gaps.push({ l: l, d: F.ZD - d });
     res.placed.push({ id: it ? it.id : 'slabs', lane: cand.k, c: cand.c });
     return true;
@@ -440,27 +443,39 @@ function hsFitLayout(load, L, n, layout, F) {
   for (i = 0; i < floor.length; i++) {
     var f = floor[i];
     if (!place(f.it, f.l, f.d, f.h, f.top)) { res.ok = false; res.fail = 'floor'; return finish(); }
-    if (f.inner) pools.any += f.l * f.d * f.h * f.inner;   // shelves inside bookcases / shelving bays take boxes
+    if (f.inner) addPool('any', F.SHELF, f.l * f.d * f.h * f.inner);   // shelves inside bookcases / shelving bays take boxes (~0.45 m between shelves)
   }
-  gaps.forEach(function (x) { pools.any += x.l * x.d * F.H * F.GAP_EFF; }); // unused gaps take boxes (part-usable)
+  gaps.forEach(function (x) { addPool('any', F.H, x.l * x.d * F.H * F.GAP_EFF); }); // unused gaps take boxes (part-usable)
   // 3. boxes & stackable items: heavy ones need an 'any' surface or the floor; light ones can also go on 'light' surfaces
-  var heavy = 0, lightV = 0;
+  // Each stackable item needs its own height of clearance (boxes can be turned to their shortest side) and is
+  // stacked in whole layers: e.g. 0.9 m chairs go 2 high in 2.2 m, using 1.8 m of it.
+  var dem = [];
   load.forEach(function (x) {
-    var it = x.item; if (it.mode !== 'stack') return;
-    var v = it.d[0] * it.d[1] * it.d[2] / (it.box ? F.BOX_EFF : F.IRR_EFF) * x.n;
-    if (it.light) lightV += v; else heavy += v;
+    var it = x.item; if (it.mode !== 'stack' || !it.d) return;
+    var need = it.box ? Math.min(it.d[0], it.d[1], it.d[2]) : it.d[2];
+    dem.push({ need: need, light: !!it.light, v: it.d[0] * it.d[1] * it.d[2] / (it.box ? F.BOX_EFF : F.IRR_EFF) * x.n });
   });
-  var free = lanes.reduce(function (s, ln) { return s + ln.rem; }, 0) * F.ZD * F.H;
-  var useAny = Math.min(heavy, pools.any); heavy -= useAny; pools.any -= useAny;
-  var useLight = Math.min(lightV, pools.light); lightV -= useLight; pools.light -= useLight;
-  var useAny2 = Math.min(lightV, pools.any); lightV -= useAny2; pools.any -= useAny2;
-  var fromFree = heavy + lightV;
+  dem.sort(function (a, b) { return b.need - a.need; });
+  function layers(c, need) { return Math.floor(c / need + 1e-9) * need; }   // usable height in whole layers
+  var freeArea = lanes.reduce(function (s, ln) { return s + ln.rem; }, 0) * F.ZD, freeAreaUsed = 0;
+  dem.forEach(function (q) {
+    pools.filter(function (pl) { return pl.a > 1e-12 && pl.c >= q.need - 1e-9 && (pl.k === 'any' || q.light); })
+      .sort(function (x, y) { return (q.light ? (x.k === 'light' ? 0 : 1) - (y.k === 'light' ? 0 : 1) : 0) || x.c - y.c; })
+      .forEach(function (pl) {
+        if (q.v <= 1e-12) return;
+        var hv = layers(pl.c, q.need), take = Math.min(pl.a, q.v / hv);
+        pl.a -= take; q.v -= take * hv;
+      });
+    if (q.v > 1e-12) freeAreaUsed += q.need <= F.H ? q.v / layers(F.H, q.need) : Infinity;
+  });
+  var free = freeArea * F.H, fromFree = freeAreaUsed * F.H;   // floor space taken by stacks, counted full height
   res.freeUsed = fromFree;
-  if (fromFree > free + 1e-9) { res.ok = false; res.fail = 'space'; }
+  if (freeAreaUsed > freeArea + 1e-9) { res.ok = false; res.fail = 'space'; }
   res.freeLeft = Math.max(0, free - fromFree);
   return finish();
   function finish() {
-    var unusedAbove = pools.any + pools.light;
+    var unusedAbove = pools.reduce(function (s, pl) { return s + pl.a * pl.c; }, 0);
+    res.dead = pools.reduce(function (s, pl) { return s + (pl.c < 0.3 ? pl.a * pl.c : 0); }, 0);   // too low for even a small box
     res.consumed = colVol - unusedAbove + (res.freeUsed || 0);
     if (res.consumed < 0) res.consumed = 0;
     var laneLen = lanes.reduce(function (s, ln) { return s + ln.len; }, 0), usedLen = lanes.reduce(function (s, ln) { return s + (ln.len - ln.rem); }, 0);
@@ -562,16 +577,19 @@ function hsFitLayout(load, L, n, layout, F) {
     if (!load.length) return { total: 0, ratio: 0, pct: 0, containers: 0, lines: lines, itemCount: 0, fits10: false, palLine: '', floorPct: 0, volPct: 0, narrows: false };
     // Floor-plan fit (see FIT ENGINE above): smallest number of 20ft containers that holds everything.
     var n = 1, r20 = hsFit(load, L20, 1), one = r20;
-    while (!r20.ok && n < 99) { n++; r20 = hsFit(load, L20, n); }
+    while (!r20.ok && n < 999) { n++; r20 = hsFit(load, L20, n); }   // was capped at 99 (15/10/2026)
     var r10 = (C.container10 && C.pricing.small10) ? hsFit(load, L10, 1) : { ok: false };
     // "How full": the larger of floor used and overall space used (a floor full of sofas is full even with air above).
-    var ratio = Math.max(r20.consumed / r20.capOne, n === 1 ? r20.floorPct / 100 : 0);
+    // 15/10/2026: "how full" = space taken + gaps too low to use. Floor % is shown separately; it no longer masks
+    // items stacked on top (previously anything placed on top of furniture showed as taking no space).
+    var ratio = (r20.consumed + (r20.dead || 0)) / r20.capOne;
+    if (n > 1) ratio = Math.max(ratio, r20.floorUsed / (r20.floorTotal / n));   // several units: also reflect floor taken
     if (n > 1) ratio = Math.max(ratio, n - 1 + 0.01);      // multi-container: always reads as more than n-1
     else ratio = Math.min(ratio, 1);
     var containers = n, fits10 = !!r10.ok;
     // Compare with the other packing mode and mention it if it needs a smaller size.
     var other = HS_MODE === 'room' ? 'max' : 'room', on = 1;
-    while (!hsFit(load, L20, on, other).ok && on < 99) on++;
+    while (!hsFit(load, L20, on, other).ok && on < 999) on++;
     var o10 = (C.container10 && C.pricing.small10) ? hsFit(load, L10, 1, other).ok : false;
     var sz = function (k, t) { return t ? 1 : 1 + k; };   // size rank: 10ft=1, one 20ft=2, two 20ft=3…
     var altLine = '';
