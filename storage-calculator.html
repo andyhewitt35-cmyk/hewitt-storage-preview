@@ -611,7 +611,7 @@ function hsEval(load, L, mode, lane) {
       'Furniture assumed assembled. Your items: ' + fmt(r20.cu) + ' cu ft. Items go on the floor first, largest first; once the floor is full, boxes, chairs and bedside tables go on top of flat-topped furniture, beds, seats and appliances, and under tables and desks (tops no higher than ' + fmt(F.H, 1) + 'm; boxes to ' + fmt(F.BOX_H, 1) + 'm). Nothing goes on pallets. When nothing more can go in, the leftover space counts as used.';
     var floorNote = n !== 1 ? '' : r20.noStack ? 'Container full: the floor is full and no stacking is possible for these items, so the next item needs another container.' : r20.full ? 'Container full: nothing more fits on the floor or on top, so the next item needs another container.' : r20.floorFull ? 'Floor space full: further items will need to be stacked on top of others.' : '';
     var P = { E: counts.palleteuro || 0, H: counts.pallethalf || 0, U: counts.palletuk || 0 }, nPal = P.E + P.H + P.U;
-    var palLine = nPal ? 'Pallets: ' + nPal + ' on the floor, not stacked (one 20ft takes ' + hsItemMax(itemsById.palleteuro, L20, lay) + ' Euro, ' + hsItemMax(itemsById.palletuk, L20, lay) + ' UK or ' + hsItemMax(itemsById.pallethalf, L20, lay) + ' half pallets on their own).' : '';
+    var palLine = nPal ? 'Pallets are loaded on the available floor space only, not stacked.' : '';
     return { total: total, ratio: ratio, pct: ratio * 100, containers: n, lines: lines, itemCount: itemCount, fits10: fits10, share10: r10.ratio, eval20: r20, eval10: r10,
       palLine: palLine, floorNote: floorNote, fitLine: fitLine, altLine: '', mode: HS_MODE, lane: HS_LANE, layout: lay, units: units, floorPct: 0, volPct: r20.V * 100 };
   }
