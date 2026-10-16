@@ -217,7 +217,7 @@ var CALC_CONFIG = {
   container: {
     label: '20ft container',
     lengthFt: 20, widthFt: 8, heightFt: 8,
-    internalCuFt: 1170,        // internal volume of a 20ft steel container (~5.9 × 2.35 × 2.39 m ≈ 33 m³)
+    internalCuFt: 1172,        // internal volume of a 20ft steel container (~5.9 × 2.35 × 2.39 m ≈ 33 m³)
     packingEfficiency: 0.70    // share of gross volume realistically usable for a mixed load once you allow
                                // for gaps, uneven stacking and a loading lane to reach things (UK guides: ~60–75%)
   },
@@ -300,9 +300,9 @@ var CALC_CONFIG = {
       { id: 'boxl',         name: 'Large box',        cuft: 4.3, dims: 'approx. 60×45×45 cm', icon: 'boxl', d: [0.60, 0.45, 0.45], mode: 'stack', light: true, box: true }   // large boxes = bedding/linen; books go in small boxes
     ]},
     { id: 'business', label: 'Business', items: [
-      { id: 'palleteuro',   name: 'Euro pallet', cuft: 68, dims: 'approx. 120×80 cm footprint · not stacked', icon: 'pallet', mode: 'pallet', pal: 'E' },
-      { id: 'palletuk',     name: 'UK pallet',   cuft: 85, dims: 'approx. 120×100 cm footprint · not stacked', icon: 'pallet', mode: 'pallet', pal: 'U' },
-      { id: 'pallethalf',   name: 'Half pallet', cuft: 34, dims: 'approx. 80×60 cm footprint · not stacked', icon: 'pallet', mode: 'pallet', pal: 'H' },
+      { id: 'palleteuro',   name: 'Euro pallet', cuft: 40.7, dims: 'approx. 120×80 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'E' },
+      { id: 'palletuk',     name: 'UK pallet',   cuft: 50.9, dims: 'approx. 120×100 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'U' },
+      { id: 'pallethalf',   name: 'Half pallet', cuft: 20.3, dims: 'approx. 80×60 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'H' },
       { id: 'filing',       name: 'Filing cabinet',   cuft: 10, icon: 'filing',      d: [0.47, 0.62, 1.32], mode: 'floor', top: 'any' },
       { id: 'desk',         name: 'Desk',             cuft: 30, icon: 'desk',        d: [1.40, 0.70, 0.75], mode: 'floor', top: 'any' },   // stored assembled, not stacked; boxes/chairs on top
       { id: 'officechair',  name: 'Office chair',     cuft: 10, icon: 'officechair', d: [0.65, 0.65, 1.05], mode: 'stack', light: true, maxStack: 1 },
@@ -313,8 +313,8 @@ var CALC_CONFIG = {
 /* ======================= END OF CONFIG ======================= */
 
 /* =====================================================================
-   STORAGE CALCULATOR ENGINE v2 (rebuilt from scratch 15/10/2026)
-   Internal size: 20ft 5.90 m long x 2.35 m wide x 2.39 m high; 10ft 2.80 m long, same width/height.
+   STORAGE CALCULATOR ENGINE v3 (16/10/2026, Andy's spec: volume-based %)
+   Internal size: 20ft 5.90 m long x 2.35 m wide x 2.39 m high; 10ft 2.82 m long, same width/height.
    Organise mode keeps a 0.65 m loading lane clear for the full length, along one side (one 1.70 m strip)
    or down the middle (two 0.85 m strips). Packed mode uses the full 2.35 m width.
    Practical packing height 2.1 m (internal 2.39 m, room to lift and clear the door). Boxes stack to 1.8 m.
@@ -326,7 +326,7 @@ var CALC_CONFIG = {
    adds the shares, so adding anything always raises the reading, one item type alone rises in equal
    steps and reads 100% when no more fit. Containers are filled largest items first.
    ===================================================================== */
-var HS_FIT = { W: 2.35, LANE: 0.65, H: 2.1, INT_H: 2.39, BOX_H: 1.8, L20: 5.9, L10: 2.8, NEST_STEP: 0.32, NEST_MAX: 4 };
+var HS_FIT = { W: 2.35, LANE: 0.65, H: 2.1, INT_H: 2.39, BOX_H: 1.8, L20: 5.9, L10: 2.82, CU20: 1172, CU10: 560, PAL_H: 1.2, M3_CUFT: 35.3147, NEST_STEP: 0.32, NEST_MAX: 4 };
 var HS_MODE = 'room';     // 'room' = organise (lane kept clear), 'max' = packed (no lane)
 var HS_LANE = 'auto';     // 'auto' | 'side' | 'middle'
 var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1 };
@@ -341,6 +341,7 @@ function hsOrients(it) {
     [[d[0], d[1], d[2]], [d[0], d[2], d[1]], [d[1], d[2], d[0]]];   // (footprint pair, height); footprint is also turned 90 deg below
   perms.forEach(function (q) {
     var h = q[2]; if (h > F.H + 1e-9) return;
+    if (it.mode === 'edge' && h === d[1] && d[1] !== d[0] && d[1] !== d[2]) return;   // beds, tables, mattresses stay on edge
     var layers = 1;
     if (it.box) layers = Math.max(1, hsFl(F.BOX_H, h));
     else if (it.id === 'dchair' && q[2] === d[2]) { layers = 1; while (layers < F.NEST_MAX && d[2] + layers * F.NEST_STEP <= F.H + 1e-9) layers++; }
@@ -388,6 +389,24 @@ function hsLayout(load, L, mode, lane) {
 }
 function hsContainers(share) { return share <= 0 ? 0 : Math.max(1, Math.ceil(share - 1e-9)); }
 var HS_LAYOUT_NAME = { side: 'along one side', middle: 'down the middle', packed: 'no lane (packed)' };
+function hsCatalog() { var a = []; CALC_CONFIG.categories.forEach(function (c) { c.items.forEach(function (it) { a.push(it); }); }); return a; }
+// ---- v3 volume model -------------------------------------------------------------
+// Usable cu ft: organise = full volume x (2.35 - 0.65) / 2.35 (lane taken off first); packed = full volume.
+function hsUsable(L, mode) { var F = HS_FIT, full = L === F.L10 ? F.CU10 : F.CU20; return (mode || HS_MODE) === 'max' ? full : full * (F.W - F.LANE) / F.W; }
+// Pallet cu ft (Andy gave footprint only): footprint x assumed 1.2 m load height.
+function hsCuft(it) { return it.pal ? Math.round(HS_PAL[it.pal][0] * HS_PAL[it.pal][1] * HS_FIT.PAL_H * HS_FIT.M3_CUFT * 10) / 10 : it.cuft; }
+// V = volume share (sum cu ft / usable cu ft); P = physical share (sum n / most that physically fit).
+// Containers = max(ceil V, ceil P). In one container the reading is V, or 100% once P reaches 1 (leftover counts as used).
+function hsEval(load, L, mode, lane) {
+  var lay = hsLayout(load, L, mode, lane), U = hsUsable(L, mode), cu = load.reduce(function (s, x) { return s + x.n * hsCuft(x.item); }, 0);
+  var V = cu / U, P = lay.share, n = Math.max(hsContainers(V), hsContainers(P));
+  // Full = nothing from the whole item list could still go in (by volume or physically). Then the leftover counts as used.
+  var full = n === 1 && hsCatalog().every(function (it) {
+    var m = hsItemMax(it, L, lay.layout); return m <= 0 || V + hsCuft(it) / U > 1 + 1e-9 || P + 1 / m > 1 + 1e-9; });
+  var ratio = n <= 1 ? (full || P >= 1 - 1e-9 ? 1 : Math.min(1, V)) : n - 1 + Math.max(1e-6, Math.min(1, Math.max(V, P) - (n - 1)));
+  return { full: full, layout: lay.layout, forced: lay.forced, usable: U, cu: cu, V: V, P: P, containers: n, ratio: ratio,
+    limit: P >= V ? 'physical' : 'volume' };
+}
 /* ======================= END OF ENGINE ======================= */
 
 (function () {
@@ -457,8 +476,8 @@ var HS_LAYOUT_NAME = { side: 'along one side', middle: 'down the middle', packed
   /* ---------- State ---------- */
   var counts = {}, itemsById = {}, activeCat = C.categories[0].id;
   C.categories.forEach(function (cat) { cat.items.forEach(function (it) { counts[it.id] = 0; itemsById[it.id] = it; it.cat = cat.id; }); });
-  var usable = Math.round(HS_FIT.L20 * (HS_FIT.W - HS_FIT.LANE) * HS_FIT.H * 35.3147);
-  var usable10 = Math.round(HS_FIT.L10 * (HS_FIT.W - HS_FIT.LANE) * HS_FIT.H * 35.3147);
+  var usable = Math.round(hsUsable(HS_FIT.L20, 'room'));
+  var usable10 = Math.round(hsUsable(HS_FIT.L10, 'room'));
 
   var $ = function (id) { return document.getElementById(id); };
   function fmt(n, dp) { return Number(n).toLocaleString('en-GB', { minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0 }); }
@@ -477,31 +496,19 @@ var HS_LAYOUT_NAME = { side: 'along one side', middle: 'down the middle', packed
     total = Math.round(total * 100) / 100;
     var F = HS_FIT, L20 = F.L20, L10 = F.L10;
     if (!load.length) return { total: 0, ratio: 0, pct: 0, containers: 0, lines: lines, itemCount: 0, fits10: false, palLine: '', fitLine: '', floorPct: 0, volPct: 0, units: [], layout: '' };
-    var r20 = hsLayout(load, L20), ratio = r20.share, n = hsContainers(ratio);
-    var r10 = (C.container10 && C.pricing.small10) ? hsLayout(load, L10) : { share: Infinity };
-    var fits10 = r10.share <= 1 + 1e-9;
-    // Largest items first: fill container 1, then 2, ... (a type may continue into the next container)
-    var order = load.slice().sort(function (p, q) { return hsItemVol(q.item) - hsItemVol(p.item); }), units = [], cur = 0, k = 0;
-    for (var i = 0; i < n; i++) units.push({ fill: 0, items: [] });
-    order.forEach(function (x) {
-      var m = hsItemMax(x.item, L20, r20.layout), left = x.n;
-      while (left > 0 && k < n) {
-        var room = Math.max(0, Math.round((1 - units[k].fill) * m + 1e-6)), put = Math.min(left, room);
-        if (put > 0) { units[k].items.push({ item: x.item, n: put }); units[k].fill += put / m; left -= put; }
-        if (left > 0) k++;
-      }
-      if (left > 0 && n > 0) { units[n - 1].items.push({ item: x.item, n: left }); units[n - 1].fill += left / m; }
-    });
+    var r20 = hsEval(load, L20), ratio = r20.ratio, n = r20.containers;
+    var r10 = (C.container10 && C.pricing.small10) ? hsEval(load, L10) : { containers: 99 };
+    var fits10 = r10.containers === 1;
+    var units = [];
     var laneNote = r20.forced ? 'A middle lane leaves only ' + fmt((F.W - F.LANE) / 2, 2) + 'm each side, too narrow for some of your items, so the lane goes along one side. ' : '';
     var lay = r20.layout, usableW = lay === 'packed' ? F.W : F.W - F.LANE;
-    var fitLine = laneNote + 'How this is worked out: 20ft internal ' + fmt(L20, 2) + ' \u00d7 ' + fmt(F.W, 2) + ' \u00d7 ' + fmt(F.INT_H, 2) + 'm (10ft ' + fmt(L10, 2) + 'm long). ' +
-      (lay === 'packed' ? 'Packed wall to wall, no lane' : fmt(F.LANE, 2) + 'm loading lane ' + HS_LAYOUT_NAME[lay] + ' kept clear the full length') +
-      ', leaving ' + fmt(usableW, 2) + 'm usable width, packed to ' + fmt(F.H, 1) + 'm high (boxes stacked to ' + fmt(F.BOX_H, 1) + 'm). ' +
-      'Each item takes 1 \u00f7 (the most of it one container holds) of the space, including gaps nothing more of it can use; mixed loads add these shares, largest items first.';
+    var fitLine = laneNote + 'How this is worked out: 20ft internal ' + fmt(L20, 2) + ' \u00d7 ' + fmt(F.W, 2) + ' \u00d7 ' + fmt(F.INT_H, 2) + 'm = ' + fmt(F.CU20) + ' cu ft (10ft ' + fmt(L10, 2) + 'm long = ' + fmt(F.CU10) + ' cu ft). ' +
+      (lay === 'packed' ? 'Packed wall to wall, no lane: all ' + fmt(r20.usable) + ' cu ft usable. ' : 'The ' + fmt(F.LANE, 2) + 'm loading lane (' + HS_LAYOUT_NAME[lay] + ', full length) is taken off first, leaving ' + fmt(r20.usable) + ' cu ft usable. ') +
+      'Your items: ' + fmt(r20.cu) + ' cu ft. Each item also has to physically fit (boxes stacked to ' + fmt(F.BOX_H, 1) + 'm, pallets and furniture not stacked, largest items first); when the floor is full, the leftover space counts as used.';
     var P = { E: counts.palleteuro || 0, H: counts.pallethalf || 0, U: counts.palletuk || 0 }, nPal = P.E + P.H + P.U;
-    var palLine = nPal ? 'Pallets: ' + nPal + ' on the floor, not stacked (one 20ft holds ' + hsItemMax(itemsById.palleteuro, L20, lay) + ' Euro, ' + hsItemMax(itemsById.palletuk, L20, lay) + ' UK or ' + hsItemMax(itemsById.pallethalf, L20, lay) + ' half pallets on their own).' : '';
-    return { total: total, ratio: ratio, pct: ratio * 100, containers: n, lines: lines, itemCount: itemCount, fits10: fits10, share10: r10.share,
-      palLine: palLine, fitLine: fitLine, altLine: '', mode: HS_MODE, lane: HS_LANE, layout: lay, units: units, floorPct: 0, volPct: ratio * 100 };
+    var palLine = nPal ? 'Pallets: ' + nPal + ' on the floor, not stacked (one 20ft takes ' + hsItemMax(itemsById.palleteuro, L20, lay) + ' Euro, ' + hsItemMax(itemsById.palletuk, L20, lay) + ' UK or ' + hsItemMax(itemsById.pallethalf, L20, lay) + ' half pallets on their own).' : '';
+    return { total: total, ratio: ratio, pct: ratio * 100, containers: n, lines: lines, itemCount: itemCount, fits10: fits10, share10: r10.ratio, eval20: r20, eval10: r10,
+      palLine: palLine, fitLine: fitLine, altLine: '', mode: HS_MODE, lane: HS_LANE, layout: lay, units: units, floorPct: 0, volPct: r20.V * 100 };
   }
 
   /* ---------- Static text from config ---------- */
@@ -775,7 +782,7 @@ var HS_LAYOUT_NAME = { side: 'along one side', middle: 'down the middle', packed
   $('hsc-mode').addEventListener('click', function (e) { var b = e.target.closest('button[data-mode]'); if (b) setMode(b.getAttribute('data-mode')); });
   $('hsc-lane').addEventListener('click', function (e) { var b = e.target.closest('button[data-lane]'); if (b) setLane(b.getAttribute('data-lane')); });
   setMode('room');
-  window.HSC = { setMode: setMode, setLane: setLane, itemMax: hsItemMax, mode: function () { return HS_MODE; }, config: C, counts: counts, calc: calc, usable: usable, usable10: usable10 };
+  window.HSC = { setMode: setMode, setLane: setLane, itemMax: hsItemMax, evalLoad: hsEval, usableCu: hsUsable, cuft: hsCuft, mode: function () { return HS_MODE; }, config: C, counts: counts, calc: calc, usable: usable, usable10: usable10 };
 })();
 </script>
 </body>
