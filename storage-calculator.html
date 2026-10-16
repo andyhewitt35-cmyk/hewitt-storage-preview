@@ -491,10 +491,13 @@ function hsLayoutFor(load, L, mode, lane) {   // lane choice: Auto = side unless
 }
 // Reading: V = item cu ft / usable cu ft (equal steps). Containers = smallest k that holds the load (floor, then stacking)
 // with V <= k. In one container it shows V; 100% only when nothing on the item list could still go in (leftover = used).
+function hsStepT(it, U) { return Math.round(hsCuft(it) / U * 1000); }   // step in tenths of a %
 function hsEval(load, L, mode, lane) {
   var lay = hsLayoutFor(load, L, mode, lane), U = hsUsable(L, mode), cu = load.reduce(function (s, x) { return s + x.n * hsCuft(x.item); }, 0);
-  var V = cu / U, n = 1, pl;
-  while (n < 999) { pl = hsPlace(load, L, lay.layout, n); if (pl.ok && V <= n + 1e-9) break; n++; }
+  // Strictly additive (16/10): each item has a fixed step in tenths of a percent = round(cu ft / usable x 1000).
+  // Total = sum of steps, so no rounding drift and no gap/floor contributions. Fit only decides notices / containers.
+  var T = load.reduce(function (s, x) { return s + x.n * hsStepT(x.item, U); }, 0), V = T / 1000, n = 1, pl;
+  while (n < 999) { pl = hsPlace(load, L, lay.layout, n); if (pl.ok && T <= n * 1000) break; n++; }
   if (lay.forced) {   // middle lane asked for but some items too wide: never fewer containers than the middle needs for the rest
     var rest = load.filter(function (x) { return hsItemMax(x.item, L, lay.forced) > 0; }), nm = 1;
     var extra = load.reduce(function (s, x) { return hsItemMax(x.item, L, lay.forced) > 0 ? s : s + x.n / hsItemMax(x.item, L, 'side'); }, 0);
@@ -503,12 +506,12 @@ function hsEval(load, L, mode, lane) {
   }
   var full = false;
   if (n === 1) full = hsCatalog().every(function (it) {
-    if (V + hsCuft(it) / U > 1 + 1e-9) return true;
+    if (T + hsStepT(it, U) > 1000) return true;
     return !hsPlace(load.concat([{ item: it, n: 1 }]), L, lay.layout, 1).ok;
   });
-  var ratio = n === 1 ? (full ? 1 : Math.min(1, V)) : n - 1 + Math.max(1e-6, Math.min(1, V - (n - 1)));
+  var ratio = n === 1 ? Math.min(1, V) : n - 1 + Math.max(1e-6, Math.min(1, V - (n - 1)));
   var anyTop = load.some(function (x) { return HS_BASE[x.item.id]; });
-  return { full: full, layout: lay.layout, forced: lay.forced, usable: U, cu: cu, V: V, P: pl.P, stacked: pl.stacked,
+  return { T: T, full: full, layout: lay.layout, forced: lay.forced, usable: U, cu: cu, V: V, P: pl.P, stacked: pl.stacked,
     floorFull: n === 1 && pl.P >= 1 - 1e-9, noStack: full && pl.P >= 1 - 1e-9 && !(pl.stacked > 0) && !anyTop, containers: n, ratio: ratio };
 }
 /* ======================= END OF ENGINE ======================= */
