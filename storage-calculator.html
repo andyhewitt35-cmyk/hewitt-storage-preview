@@ -317,7 +317,8 @@ var CALC_CONFIG = {
       { id: 'stepladder',   name: 'Step ladder',      cuft: 3.4, icon: 'stepladder',  d: [1.60, 0.50, 0.12], mode: 'floor' },   // 6-tread, folded, lies flat lengthwise
       { id: 'sitebox',      name: 'Site box',         cuft: 20.3, icon: 'sitebox',     d: [1.28, 0.67, 0.67], mode: 'floor' },   // steel site box, flat top
       { id: 'scaffold',     name: 'Scaffold tower (folded)', cuft: 13.4, icon: 'scaffold', d: [1.90, 0.80, 0.25], mode: 'floor' },   // folding tower, lies flat lengthwise
-      { id: 'plasterboard', name: 'Plasterboard bundle', cuft: 25.4, icon: 'plasterboard', d: [2.40, 1.20, 0.25], mode: 'floor' }   // ~20 sheets 12.5 mm, lies flat
+      { id: 'plasterboard', name: 'Plasterboard bundle', cuft: 25.4, icon: 'plasterboard', d: [2.40, 1.20, 0.25], mode: 'floor' },   // 20 sheets x 12.5 mm, flat or on edge
+      { id: 'pbsheet',      name: 'Plasterboard sheet', cuft: 1.3, icon: 'plasterboard', d: [2.40, 1.20, 0.0125], mode: 'floor' }   // one 12.5 mm sheet, flat or on edge, stacks with sheets and bundles
     ]}
   ]
 };
@@ -337,14 +338,14 @@ var CALC_CONFIG = {
    adds the shares, so adding anything always raises the reading, one item type alone rises in equal
    steps and reads 100% when no more fit. Containers are filled largest items first.
    ===================================================================== */
-var HS_FIT = { W: 2.35, LANE: 0.65, H: 2.1, INT_H: 2.39, BOX_H: 1.8, L20: 5.9, L10: 2.82, CU20: 1172, CU10: 560, PAL_H: 1.2, M3_CUFT: 35.3147, NEST_STEP: 0.32, NEST_MAX: 4 };
+var HS_FIT = { W: 2.35, LANE: 0.65, H: 2.1, INT_H: 2.39, BOX_H: 1.8, L20: 5.9, L10: 2.82, CU20: 1172, CU10: 560, PAL_H: 1.2, M3_CUFT: 35.3147, NEST_STEP: 0.32, NEST_MAX: 4, SHEET: 0.0125 };
 var HS_MODE = 'room';     // 'room' = organise (lane kept clear), 'max' = packed (no lane)
 var HS_LANE = 'auto';     // 'auto' | 'side' | 'middle'
 var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1, chair: 1,
   bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, desk: 1, wardrobe: 1,
-  mixer: 1, wheelbarrow: 1, sitebox: 1, plasterboard: 1, ladder2: 1, stepladder: 1, scaffold: 1 };   // trades: ladders/tower lie flat lengthwise only, mixer never tipped
-var HS_EDGEOK = { plasterboard: 1 };   // plasterboard: flat OR on its long edge (2.4 long x 1.2 high); whichever fits more (Andy 16/10)
-var HS_FLATSTACK = { ladder2: 1, stepladder: 1, plasterboard: 1, scaffold: 1 };   // stack flat on each other up to 1.8 m (ladders: assumption; plasterboard + folded scaffold: Andy 16/10)   // assembled furniture stays upright (footprint may turn)
+  mixer: 1, wheelbarrow: 1, sitebox: 1, plasterboard: 1, pbsheet: 1, ladder2: 1, stepladder: 1, scaffold: 1 };   // trades: ladders/tower lie flat lengthwise only, mixer never tipped
+var HS_EDGEOK = { plasterboard: 1, pbsheet: 1 };   // plasterboard: flat OR on its long edge (2.4 long x 1.2 high); whichever fits more (Andy 16/10)
+var HS_FLATSTACK = { ladder2: 1, stepladder: 1, plasterboard: 1, pbsheet: 1, scaffold: 1 };   // stack flat on each other up to 1.8 m (ladders: assumption; plasterboard + folded scaffold: Andy 16/10)   // assembled furniture stays upright (footprint may turn)
 var HS_UNDER = { dtable46: 0.70, dtable8: 0.70, desk: 0.70 };   // clear height underneath (beds assumed divan / low frame: none)   // stay upright (sofas/armchairs/chairs seat up)
 var HS_SEAT = { chair: 0.45 };   // living chairs go seat-to-seat 2 high: each extra chair adds 0.45 m
 var HS_PAL = { F: [1.22, 1.02], E: [1.2, 0.8], U: [1.2, 1.0], H: [0.8, 0.6] };
@@ -378,10 +379,14 @@ function hsStripCount(L, W, a, b) {
 }
 var hsMaxCache = {};
 var hsOriCache = {};
+// Whole-load orientation (Andy 16/10): hsPlace may pin an item to one of its orientations (index into hsOrients) for a trial.
+var HS_OV = null;
+function hsK(it, L, layout) { return it.id + '|' + L + '|' + layout + (HS_OV && HS_OV[it.id] !== undefined ? '#' + HS_OV[it.id] : ''); }
+function hsOri(it, L, layout) { var k = hsK(it, L, layout); hsItemMax(it, L, layout); return hsOriCache[k]; }
 function hsItemMax(it, L, layout) {   // most of this item ONE container holds in this layout (on the floor, own stacking only)
-  var k = it.id + '|' + L + '|' + layout; if (hsMaxCache[k] !== undefined) return hsMaxCache[k];
-  var best = 0, bo = null;
-  hsOrients(it).forEach(function (o) {
+  var k = hsK(it, L, layout); if (hsMaxCache[k] !== undefined) return hsMaxCache[k];
+  var best = 0, bo = null, os = hsOrients(it), pin = HS_OV && HS_OV[it.id] !== undefined ? HS_OV[it.id] : -1;
+  os.forEach(function (o, i) { if (pin >= 0 && i !== pin) return;
     var n = hsStrips(layout).reduce(function (s, W) { return s + hsStripCount(L, W, o.a, o.b); }, 0) * o.layers;
     if (n > best) { best = n; bo = o; }
   });
@@ -421,7 +426,7 @@ function hsCuft(it) { return it.pal ? Math.round(HS_PAL[it.pal][0] * HS_PAL[it.p
 var HS_TOPPER = { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1, boxs: 1, boxm: 1, boxl: 1, chair: 1, dchair: 1, officechair: 1, bedside: 1 };
 // Things with a flat top (or a sofa / armchair seat, light items only, which all toppers are) that can take toppers.
 // Not bases: pallets, beds / tables / mattresses on edge, wardrobes, bookcases and shelving (already 1.8 m+), toppers.
-var HS_BASE = { sitebox: 1, plasterboard: 1, bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, chair: 1, wardrobe: 1, bookcase: 1, shelving: 1, sofa2: 1, sofa3: 1, armchair: 1, coffeetable: 1, tvunit: 1, drawers: 1, fridge: 1, washer: 1, dishwasher: 1, cooker: 1, filing: 1, desk: 1 };
+var HS_BASE = { sitebox: 1, plasterboard: 1, pbsheet: 1, bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, chair: 1, wardrobe: 1, bookcase: 1, shelving: 1, sofa2: 1, sofa3: 1, armchair: 1, coffeetable: 1, tvunit: 1, drawers: 1, fridge: 1, washer: 1, dishwasher: 1, cooker: 1, filing: 1, desk: 1 };
 var hsTopCache = {};
 // Light furniture goes only on beds, tables and desks (a mattress lies flat only on a bed frame).
 var HS_LIGHTFURN = { mattress: { bedsingle: 1, beddouble: 1, bedking: 1 }, drawers: 1, tvunit: 1, coffeetable: 1, bedside: 1, chair: 1, dchair: 1, officechair: 1 };
@@ -429,8 +434,8 @@ var HS_FLATBASE = { bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8
 // How many of topper s fit on ONE base b (as b stands on the floor): footprint rows x layers up to 1.8 m (boxes) / 2.1 m.
 // Capped so a base never gives more room than the floor it stands on would (keeps "adding never lowers %").
 function hsTopCap(b, s, L, layout) {
-  var k = b.id + '>' + s.id + '|' + L + '|' + layout; if (hsTopCache[k] !== undefined) return hsTopCache[k];
-  var F = HS_FIT, bo = (hsItemMax(b, L, layout), hsOriCache[b.id + '|' + L + '|' + layout]), best = 0;
+  var k = hsK(b, L, layout) + '>' + hsK(s, L, layout); if (hsTopCache[k] !== undefined) return hsTopCache[k];
+  var F = HS_FIT, bo = hsOri(b, L, layout), best = 0;
   var lf = HS_LIGHTFURN[s.id], allowed = !lf || (lf === 1 ? (HS_FLATBASE[b.id] || !(s.id in { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1 })) : lf[b.id]);
   if (bo && HS_EDGEOK[b.id] && bo.h !== b.d[2]) bo = null;   // on edge: nothing goes on top
   if (bo && allowed) {
@@ -454,12 +459,12 @@ function hsTopCap(b, s, L, layout) {
 // Floor share of one unit: its real footprint (as it stands, per stacked column) / usable floor area. Mixed loads add
 // footprints, so a gap beside a sofa can take a chair. One item type alone is also limited to its own row count M.
 function hsArea(it, L, layout) {
-  hsItemMax(it, L, layout); var o = hsOriCache[it.id + '|' + L + '|' + layout]; if (!o) return Infinity;
+  var o = hsOri(it, L, layout); if (!o) return Infinity;
   var A = L * hsStrips(layout).reduce(function (s, W) { return s + W; }, 0);
   return o.a * o.b / o.layers / A;
 }
 // Does the load fit in k containers? Largest items first onto the floor; toppers that find no floor go on top of bases.
-function hsPlace(load, L, layout, k) {
+function hsPlace1(load, L, layout, k) {
   // Floor-only items first (largest first), then items that can also go on top (largest first).
   var sorted = load.slice().sort(function (p, q) { return (HS_TOPPER[p.item.id] ? 1 : 0) - (HS_TOPPER[q.item.id] ? 1 : 0) || hsCuft(q.item) - hsCuft(p.item); });
   // Gaps: one item type packed in rows leaves gaps (n x (1/M - footprint share)). The biggest such gap in the load counts as
@@ -470,7 +475,7 @@ function hsPlace(load, L, layout, k) {
   for (var i = 0; i < sorted.length; i++) {
     var x = sorted[i], m = hsItemMax(x.item, L, layout), a = hsArea(x.item, L, layout);
     if (m <= 0) return { ok: false, P: Infinity, stacked: 0 };
-    var lb = (hsOriCache[x.item.id + '|' + L + '|' + layout] || {}).layers || 1;
+    var lb = (hsOri(x.item, L, layout) || {}).layers || 1;
     if (!HS_TOPPER[x.item.id]) {
       if (x.n > k * m + 1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
       R -= x.n * a; if (HS_BASE[x.item.id]) bases.push({ it: x.item, u: x.n / lb }); continue;
@@ -490,6 +495,46 @@ function hsPlace(load, L, layout, k) {
     if (s.r > 1e-9) return { ok: false, P: P, stacked: stacked, floorFull: true, fail: s.it.id, left: s.r };
   }
   return { ok: true, P: P, stacked: stacked, floorFull: P >= 1 - 1e-9 };
+}
+// Orientation options worth trying for an item in a mixed load: the one that fits most of it on the floor, plus (if
+// different) the best one that can still take things on top (e.g. plasterboard flat rather than on edge).
+function hsAlts(it, L, layout) {
+  if (it.pal || HS_TOPPER[it.id]) return null;
+  var F = HS_FIT, os = hsOrients(it), cnt = function (o) { return hsStrips(layout).reduce(function (s, W) { return s + hsStripCount(L, W, o.a, o.b); }, 0) * o.layers; };
+  var b0 = -1, b1 = -1;
+  os.forEach(function (o, i) {
+    var n = cnt(o); if (n <= 0) return;
+    if (b0 < 0 || n > cnt(os[b0])) b0 = i;
+    var baseOK = HS_BASE[it.id] && !(HS_EDGEOK[it.id] && o.h !== it.d[2]) && (o.top !== undefined ? o.top : o.h) < F.H - 0.1;
+    if (baseOK && (b1 < 0 || n > cnt(os[b1]))) b1 = i;
+  });
+  return b1 >= 0 && b1 !== b0 && b0 >= 0 ? [b0, b1] : null;
+}
+// Plasterboard sheets and bundles share columns: with any bundle in the load, sheets count as 1/20 of a bundle
+// (20 x 12.5 mm = 0.25 m) and stand the way the bundles do.
+function hsPool(load) {
+  var b = null, sh = 0;
+  load.forEach(function (x) { if (x.item.id === 'plasterboard') b = x; if (x.item.id === 'pbsheet') sh += x.n; });
+  if (!b || !sh) return load;
+  var out = load.filter(function (x) { return x.item.id !== 'pbsheet' && x.item.id !== 'plasterboard'; });
+  out.push({ item: b.item, n: b.n + sh * HS_FIT.SHEET / b.item.d[2] }); return out;
+}
+// Does the load fit in k containers? Tries every combination of the items' orientation options against the WHOLE load
+// and keeps the best (fits; then least floor used). Same items in a bigger load can still use any option, so adding never lowers containers.
+function hsPlace(load, L, layout, k) {
+  load = hsPool(load);
+  var alts = [];
+  load.forEach(function (x) { var a = hsAlts(x.item, L, layout); if (a) alts.push({ id: x.item.id, a: a }); });
+  if (!alts.length) return hsPlace1(load, L, layout, k);
+  var best = null, combos = 1 << Math.min(alts.length, 8);
+  for (var c = 0; c < combos; c++) {
+    var ov = {}, tag = [];
+    alts.forEach(function (al, i) { var oi = al.a[(c >> i) & 1]; ov[al.id] = oi; tag.push(al.id + ':' + oi); });
+    HS_OV = ov; var r = hsPlace1(load, L, layout, k); HS_OV = null;
+    r.ori = ov;
+    if (!best || (r.ok && !best.ok) || (r.ok === best.ok && (r.P < best.P - 1e-9 || (Math.abs(r.P - best.P) < 1e-9 && r.stacked < best.stacked)))) best = r;
+  }
+  return best;
 }
 function hsLayoutFor(load, L, mode, lane) {   // lane choice: Auto = side unless middle needs fewer containers / less floor
   mode = mode || HS_MODE; lane = lane || HS_LANE;
