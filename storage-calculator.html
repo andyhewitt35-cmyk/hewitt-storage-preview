@@ -276,14 +276,14 @@ var CALC_CONFIG = {
       { id: 'bookcase',     name: 'Bookcase',         cuft: 20, icon: 'bookcase',   d: [0.80, 0.30, 1.80], mode: 'floor', top: 'any', inner: 0.75 }   // shelves hold boxes/books
     ]},
     { id: 'dining', label: 'Dining', items: [
-      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 30, icon: 'dtable46', d: [1.50, 0.25, 0.90], mode: 'edge' },   // legs off, top on edge,
-      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 50, icon: 'dtable8',  d: [2.00, 0.25, 1.00], mode: 'edge' },   // legs off, top on edge,
+      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 30, icon: 'dtable46', d: [1.50, 0.90, 0.75], mode: 'floor' },   // legs off, top on edge,
+      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 50, icon: 'dtable8',  d: [2.00, 1.00, 0.75], mode: 'floor' },   // legs off, top on edge,
       { id: 'dchair',       name: 'Dining chair',       cuft: 6,  icon: 'dchair',   d: [0.55, 0.70, 0.95], mode: 'stack', light: true, maxStack: 2, stackH: 0.45 }   // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm with legs/backs offset
     ]},
     { id: 'bedroom', label: 'Bedroom', items: [
-      { id: 'bedsingle',    name: 'Single bed',       cuft: 30, icon: 'bedsingle', d: [1.90, 0.30, 0.90], mode: 'edge', firm: true },   // dismantled: divan/frame on edge
-      { id: 'beddouble',    name: 'Double bed',       cuft: 60, icon: 'beddouble', d: [1.90, 0.60, 0.70], mode: 'edge', firm: true },   // 2-piece divan (2 × 68 cm) on edge
-      { id: 'bedking',      name: 'King bed',         cuft: 70, icon: 'bedking',   d: [2.00, 0.60, 0.76], mode: 'edge', firm: true },   // 2-piece divan (2 × 76 cm) on edge
+      { id: 'bedsingle',    name: 'Single bed',       cuft: 30, icon: 'bedsingle', d: [1.90, 0.90, 0.90], mode: 'floor', firm: true },   // dismantled: divan/frame on edge
+      { id: 'beddouble',    name: 'Double bed',       cuft: 60, icon: 'beddouble', d: [1.90, 1.35, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 68 cm) on edge
+      { id: 'bedking',      name: 'King bed',         cuft: 70, icon: 'bedking',   d: [2.00, 1.50, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 76 cm) on edge
       { id: 'wardrobe',     name: 'Wardrobe',         cuft: 45, icon: 'wardrobe',  d: [1.00, 0.60, 1.85], mode: 'floor', top: 'any' },
       { id: 'drawers',      name: 'Chest of drawers', cuft: 20, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack', maxStack: 1, top: 'any' },
       { id: 'bedside',      name: 'Bedside table',    cuft: 5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack', maxStack: 2, top: 'any' },
@@ -319,7 +319,7 @@ var CALC_CONFIG = {
    Organise mode keeps a 0.65 m loading lane clear for the full length, along one side (one 1.70 m strip)
    or down the middle (two 0.85 m strips). Packed mode uses the full 2.35 m width.
    Practical packing height 2.1 m (internal 2.39 m, room to lift and clear the door). Boxes stack to 1.8 m.
-   Rules: pallets never stacked; furniture never stacked except dining chairs (nest up to 4 high);
+   Furniture assumed assembled (beds, tables, desks, wardrobes). Rules: pallets never stacked; furniture never stacked except dining chairs (nest up to 4 high);
    appliances and wardrobes never stacked; fridge / washer / dishwasher / cooker stay upright;
    everything else may be turned any way if that fits more.
    How full: each item takes 1 / (most of that item one container holds) of the container. That share
@@ -330,23 +330,28 @@ var CALC_CONFIG = {
 var HS_FIT = { W: 2.35, LANE: 0.65, H: 2.1, INT_H: 2.39, BOX_H: 1.8, L20: 5.9, L10: 2.82, CU20: 1172, CU10: 560, PAL_H: 1.2, M3_CUFT: 35.3147, NEST_STEP: 0.32, NEST_MAX: 4 };
 var HS_MODE = 'room';     // 'room' = organise (lane kept clear), 'max' = packed (no lane)
 var HS_LANE = 'auto';     // 'auto' | 'side' | 'middle'
-var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1 };
+var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1, chair: 1,
+  bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, desk: 1, wardrobe: 1 };   // assembled furniture stays upright (footprint may turn)
+var HS_UNDER = { dtable46: 0.70, dtable8: 0.70, desk: 0.70 };   // clear height underneath (beds assumed divan / low frame: none)   // stay upright (sofas/armchairs/chairs seat up)
+var HS_SEAT = { chair: 0.45 };   // living chairs go seat-to-seat 2 high: each extra chair adds 0.45 m
 var HS_PAL = { E: [1.2, 0.8], U: [1.2, 1.0], H: [0.8, 0.6] };
 function hsStrips(layout) { var F = HS_FIT; return layout === 'packed' ? [F.W] : layout === 'middle' ? [(F.W - F.LANE) / 2, (F.W - F.LANE) / 2] : [F.W - F.LANE]; }
 function hsFl(x, a) { return a > 0 ? Math.floor(x / a + 1e-9) : 0; }
 // Every way the item may stand: footprint a x b and how many high.
-function hsOrients(it) {
+function hsOrients(it, asTopper) {
   var F = HS_FIT, out = [];
   if (it.pal) { var p = HS_PAL[it.pal]; return [{ a: p[0], b: p[1], layers: 1, h: 0 }]; }
   var d = it.d, perms = HS_FIXED[it.id] ? [[d[0], d[1], d[2]]] :
     [[d[0], d[1], d[2]], [d[0], d[2], d[1]], [d[1], d[2], d[0]]];   // (footprint pair, height); footprint is also turned 90 deg below
   perms.forEach(function (q) {
     var h = q[2]; if (h > F.H + 1e-9) return;
-    if (it.mode === 'edge' && h === d[1] && d[1] !== d[0] && d[1] !== d[2]) return;   // beds, tables, mattresses stay on edge
+    if (!asTopper && it.mode === 'edge' && h === d[1] && d[1] !== d[0] && d[1] !== d[2]) return;   // beds, tables, mattresses stay on edge
     var layers = 1;
     if (it.box) layers = Math.max(1, hsFl(F.BOX_H, h));
+    else if (HS_SEAT[it.id]) { layers = 1; while (layers < 2 && d[2] + layers * HS_SEAT[it.id] <= F.H + 1e-9) layers++; }
     else if (it.id === 'dchair' && q[2] === d[2]) { layers = 1; while (layers < F.NEST_MAX && d[2] + layers * F.NEST_STEP <= F.H + 1e-9) layers++; }
-    out.push({ a: q[0], b: q[1], layers: layers, h: h });
+    var top = HS_SEAT[it.id] ? h + (layers - 1) * HS_SEAT[it.id] : it.id === 'dchair' ? h + (layers - 1) * F.NEST_STEP : it.box ? layers * h : h;
+    out.push({ a: q[0], b: q[1], layers: layers, h: h, top: top });
   });
   return out;
 }
@@ -400,41 +405,67 @@ function hsUsable(L, mode) { var F = HS_FIT, full = L === F.L10 ? F.CU10 : F.CU2
 function hsCuft(it) { return it.pal ? Math.round(HS_PAL[it.pal][0] * HS_PAL[it.pal][1] * HS_FIT.PAL_H * HS_FIT.M3_CUFT * 10) / 10 : it.cuft; }
 // ---- Phase 2: stacking on top (16/10/2026) ------------------------------------------
 // Light items that may go ON TOP of other things: boxes, chairs, dining chairs (nest to 4), office chairs, bedside tables.
-var HS_TOPPER = { boxs: 1, boxm: 1, boxl: 1, chair: 1, dchair: 1, officechair: 1, bedside: 1 };
+var HS_TOPPER = { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1, boxs: 1, boxm: 1, boxl: 1, chair: 1, dchair: 1, officechair: 1, bedside: 1 };
 // Things with a flat top (or a sofa / armchair seat, light items only, which all toppers are) that can take toppers.
 // Not bases: pallets, beds / tables / mattresses on edge, wardrobes, bookcases and shelving (already 1.8 m+), toppers.
-var HS_BASE = { sofa2: 1, sofa3: 1, armchair: 1, coffeetable: 1, tvunit: 1, drawers: 1, fridge: 1, washer: 1, dishwasher: 1, cooker: 1, filing: 1, desk: 1 };
+var HS_BASE = { bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, chair: 1, wardrobe: 1, bookcase: 1, shelving: 1, sofa2: 1, sofa3: 1, armchair: 1, coffeetable: 1, tvunit: 1, drawers: 1, fridge: 1, washer: 1, dishwasher: 1, cooker: 1, filing: 1, desk: 1 };
 var hsTopCache = {};
+// Light furniture goes only on beds, tables and desks (a mattress lies flat only on a bed frame).
+var HS_LIGHTFURN = { mattress: { bedsingle: 1, beddouble: 1, bedking: 1 }, drawers: 1, tvunit: 1, coffeetable: 1, bedside: 1, chair: 1, dchair: 1, officechair: 1 };
+var HS_FLATBASE = { bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, desk: 1 };
 // How many of topper s fit on ONE base b (as b stands on the floor): footprint rows x layers up to 1.8 m (boxes) / 2.1 m.
 // Capped so a base never gives more room than the floor it stands on would (keeps "adding never lowers %").
 function hsTopCap(b, s, L, layout) {
   var k = b.id + '>' + s.id + '|' + L + '|' + layout; if (hsTopCache[k] !== undefined) return hsTopCache[k];
   var F = HS_FIT, bo = (hsItemMax(b, L, layout), hsOriCache[b.id + '|' + L + '|' + layout]), best = 0;
-  if (bo) {
-    var lim = s.box ? F.BOX_H : F.H;
-    hsOrients(s).forEach(function (o) {
-      var room = lim - bo.h; if (o.h > room + 1e-9) return;
-      var layers = s.box ? hsFl(room, o.h) : (s.id === 'dchair' && o.layers > 1 ? Math.max(1, Math.min(o.layers, 1 + hsFl(room - o.h, F.NEST_STEP))) : 1);
-      var n = hsStripCount(bo.a, bo.b, o.a, o.b) * layers; if (n > best) best = n;
-    });
+  var lf = HS_LIGHTFURN[s.id], allowed = !lf || (lf === 1 ? (HS_FLATBASE[b.id] || !(s.id in { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1 })) : lf[b.id]);
+  if (bo && allowed) {
+    var top = bo.top !== undefined ? bo.top : bo.h;
+    var fit = function (room) {   // most of s in one space of the base's footprint with this headroom
+      var best1 = 0;
+      hsOrients(s, true).forEach(function (o) {
+        if (o.h > room + 1e-9) return;
+        var layers = s.box ? hsFl(Math.min(room, F.BOX_H), o.h) : HS_SEAT[s.id] ? Math.max(1, Math.min(o.layers, 1 + hsFl(room - o.h, HS_SEAT[s.id]))) : (s.id === 'dchair' && o.layers > 1 ? Math.max(1, Math.min(o.layers, 1 + hsFl(room - o.h, F.NEST_STEP))) : 1);
+        var n = hsStripCount(bo.a, bo.b, o.a, o.b) * layers; if (n > best1) best1 = n;
+      });
+      return best1;
+    };
+    best = fit(F.H - top) + (HS_UNDER[b.id] ? fit(HS_UNDER[b.id]) : 0);   // on top (to 2.1 m) + underneath (tables, desks)
     var Mb = hsItemMax(b, L, layout), Ms = hsItemMax(s, L, layout);
-    best = Math.min(best, Math.floor(Ms / Mb + 1e-9));   // never more than the same floor would hold
+    best = Math.min(best, Math.floor(Ms * bo.layers / Mb + 1e-9));   // per floor column of the base   // never more than the same floor would hold
   }
   return (hsTopCache[k] = best);
 }
 // Does the load fit in k containers? Largest items first onto the floor; toppers that find no floor go on top of bases.
+// Floor share of one unit: its real footprint (as it stands, per stacked column) / usable floor area. Mixed loads add
+// footprints, so a gap beside a sofa can take a chair. One item type alone is also limited to its own row count M.
+function hsArea(it, L, layout) {
+  hsItemMax(it, L, layout); var o = hsOriCache[it.id + '|' + L + '|' + layout]; if (!o) return Infinity;
+  var A = L * hsStrips(layout).reduce(function (s, W) { return s + W; }, 0);
+  return o.a * o.b / o.layers / A;
+}
+// Does the load fit in k containers? Largest items first onto the floor; toppers that find no floor go on top of bases.
 function hsPlace(load, L, layout, k) {
-  var F = HS_FIT, sorted = load.slice().sort(function (p, q) { return hsCuft(q.item) - hsCuft(p.item); });
-  var floor = k, need = [], bases = [], P = 0, stacked = 0;
-  sorted.forEach(function (x) { var m = hsItemMax(x.item, L, layout); P += m > 0 ? x.n / m : Infinity; });
+  // Floor-only items first (largest first), then items that can also go on top (largest first).
+  var sorted = load.slice().sort(function (p, q) { return (HS_TOPPER[p.item.id] ? 1 : 0) - (HS_TOPPER[q.item.id] ? 1 : 0) || hsCuft(q.item) - hsCuft(p.item); });
+  // Gaps: one item type packed in rows leaves gaps (n x (1/M - footprint share)). The biggest such gap in the load counts as
+  // used (rule 6) - other items can't be assumed to fill it. So one item alone is exactly n/M, as before.
+  var need = [], bases = [], Pa = 0, G = 0, stacked = 0;
+  sorted.forEach(function (x) { var m = hsItemMax(x.item, L, layout), a = hsArea(x.item, L, layout); Pa += x.n * a; G = Math.max(G, m > 0 ? x.n * Math.max(0, 1 / m - a) : Infinity); });
+  var P = Pa + G, R = k - G;
   for (var i = 0; i < sorted.length; i++) {
-    var x = sorted[i], m = hsItemMax(x.item, L, layout);
+    var x = sorted[i], m = hsItemMax(x.item, L, layout), a = hsArea(x.item, L, layout);
     if (m <= 0) return { ok: false, P: Infinity, stacked: 0 };
-    if (!HS_TOPPER[x.item.id]) { floor -= x.n / m; if (HS_BASE[x.item.id]) bases.push({ it: x.item, u: x.n }); continue; }
-    var onFloor = Math.min(x.n, Math.max(0, floor) * m + 1e-9); if (onFloor > x.n) onFloor = x.n;
-    floor -= onFloor / m; if (x.n - onFloor > 1e-9) need.push({ it: x.item, r: x.n - onFloor });
+    var lb = (hsOriCache[x.item.id + '|' + L + '|' + layout] || {}).layers || 1;
+    if (!HS_TOPPER[x.item.id]) {
+      if (x.n > k * m + 1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
+      R -= x.n * a; if (HS_BASE[x.item.id]) bases.push({ it: x.item, u: x.n / lb }); continue;
+    }
+    var onFloor = Math.min(x.n, Math.max(0, R) / a + 1e-9, k * m);
+    R -= onFloor * a; if (HS_BASE[x.item.id] && onFloor > 0) bases.push({ it: x.item, u: onFloor / lb });
+    if (x.n - onFloor > 1e-9) need.push({ it: x.item, r: x.n - onFloor });
   }
-  if (floor < -1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
+  if (R < -1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
   bases.sort(function (p, q) { return hsCuft(q.it) - hsCuft(p.it); });
   for (var j = 0; j < need.length; j++) {
     var s = need[j];
@@ -442,7 +473,7 @@ function hsPlace(load, L, layout, k) {
       var c = hsTopCap(bases[b].it, s.it, L, layout); if (c <= 0 || bases[b].u <= 1e-9) continue;
       var q = Math.min(s.r, bases[b].u * c); s.r -= q; bases[b].u -= q / c; stacked += q;
     }
-    if (s.r > 1e-9) return { ok: false, P: P, stacked: stacked, floorFull: true };
+    if (s.r > 1e-9) return { ok: false, P: P, stacked: stacked, floorFull: true, fail: s.it.id, left: s.r };
   }
   return { ok: true, P: P, stacked: stacked, floorFull: P >= 1 - 1e-9 };
 }
@@ -577,7 +608,7 @@ function hsEval(load, L, mode, lane) {
     var lay = r20.layout, usableW = lay === 'packed' ? F.W : F.W - F.LANE;
     var fitLine = laneNote + 'How this is worked out: 20ft internal ' + fmt(L20, 2) + ' \u00d7 ' + fmt(F.W, 2) + ' \u00d7 ' + fmt(F.INT_H, 2) + 'm = ' + fmt(F.CU20) + ' cu ft (10ft ' + fmt(L10, 2) + 'm long = ' + fmt(F.CU10) + ' cu ft). ' +
       (lay === 'packed' ? 'Packed wall to wall, no lane: all ' + fmt(r20.usable) + ' cu ft usable. ' : 'The ' + fmt(F.LANE, 2) + 'm loading lane (' + HS_LAYOUT_NAME[lay] + ', full length) is taken off first, leaving ' + fmt(r20.usable) + ' cu ft usable. ') +
-      'Your items: ' + fmt(r20.cu) + ' cu ft. Items go on the floor first, largest first; once the floor is full, boxes, chairs and bedside tables go on top of flat-topped furniture and appliances (to ' + fmt(F.H, 1) + 'm; boxes to ' + fmt(F.BOX_H, 1) + 'm). Pallets, beds, wardrobes and shelving take nothing on top. When nothing more can go in, the leftover space counts as used.';
+      'Furniture assumed assembled. Your items: ' + fmt(r20.cu) + ' cu ft. Items go on the floor first, largest first; once the floor is full, boxes, chairs and bedside tables go on top of flat-topped furniture, beds, seats and appliances, and under tables and desks (tops no higher than ' + fmt(F.H, 1) + 'm; boxes to ' + fmt(F.BOX_H, 1) + 'm). Nothing goes on pallets. When nothing more can go in, the leftover space counts as used.';
     var floorNote = n !== 1 ? '' : r20.noStack ? 'Container full: the floor is full and no stacking is possible for these items, so the next item needs another container.' : r20.full ? 'Container full: nothing more fits on the floor or on top, so the next item needs another container.' : r20.floorFull ? 'Floor space full: further items will need to be stacked on top of others.' : '';
     var P = { E: counts.palleteuro || 0, H: counts.pallethalf || 0, U: counts.palletuk || 0 }, nPal = P.E + P.H + P.U;
     var palLine = nPal ? 'Pallets: ' + nPal + ' on the floor, not stacked (one 20ft takes ' + hsItemMax(itemsById.palleteuro, L20, lay) + ' Euro, ' + hsItemMax(itemsById.palletuk, L20, lay) + ' UK or ' + hsItemMax(itemsById.pallethalf, L20, lay) + ' half pallets on their own).' : '';
@@ -706,19 +737,17 @@ function hsEval(load, L, mode, lane) {
     $('hsc-svg').innerHTML = s;
   }
 
-  function drawCargo(fill) {
+  var cargoHt = 1;
+  function drawCargo(fill) {   // fill = share of the floor really used; cargoHt = how high it is loaded
     var g = $('hsc-cargo');
     if (fill <= 0.0005) { g.innerHTML = ''; return; }
-    var x0 = 0.25, x1 = LX - 0.25, y0 = 0.25, h = 7.2, maxLen = LY - 0.5;
-    var len = Math.max(0.7, fill * maxLen), y1 = y0 + len;
-    var s = '';
-    s += poly([[x0, y0, h], [x1, y0, h], [x1, y1, h], [x0, y1, h]], '#e6bd7f');   // top
-    s += poly([[x1, y0, 0], [x1, y1, 0], [x1, y1, h], [x1, y0, h]], '#cf9a55');   // side
-    s += poly([[x0, y1, 0], [x1, y1, 0], [x1, y1, h], [x0, y1, h]], '#b9853f');   // end
+    var x0 = 0.25, x1 = LX - 0.25, y0 = 0.25, h = Math.max(0.8, 7.2 * cargoHt), maxLen = LY - 0.5;
+    var len = Math.max(0.7, fill * maxLen), y1 = y0 + len, s = '';
+    s += poly([[x0, y0, h], [x1, y0, h], [x1, y1, h], [x0, y1, h]], '#e6bd7f');
+    s += poly([[x1, y0, 0], [x1, y1, 0], [x1, y1, h], [x1, y0, h]], '#cf9a55');
+    s += poly([[x0, y1, 0], [x1, y1, 0], [x1, y1, h], [x0, y1, h]], '#b9853f');
     var L = 'rgba(110,70,25,0.55)';
     for (var y = y0 + 2.4; y < y1 - 0.2; y += 2.4) { s += line([x1, y, 0], [x1, y, h], L, 1) + line([x0, y, h], [x1, y, h], L, 1); }
-    s += line([x1, y0, h / 2], [x1, y1, h / 2], L, 1) + line([x0 + (x1 - x0) / 2, y0, h], [x0 + (x1 - x0) / 2, y1, h], L, 1);
-    s += line([x0 + (x1 - x0) / 2, y1, 0], [x0 + (x1 - x0) / 2, y1, h], L, 1) + line([x0, y1, h / 2], [x1, y1, h / 2], L, 1);
     g.innerHTML = s;
   }
   var shownFill = 0, animId = null;
@@ -737,17 +766,21 @@ function hsEval(load, L, mode, lane) {
 
   /* ---------- Results ---------- */
   function recommendation(r) {
-    var n = r.containers;
-    if (r.fits10) return 'A ' + (C.container10.lengthFt) + 'ft unit fits this \u2014 ' + money(C.pricing.small10.monthly) + ' + VAT/month. Want room to grow? A Upper level 20ft is ' + money(C.pricing.upstairs.monthly) + ' + VAT.';
+    var n = r.containers, e = r.eval20 || {};
     if (n > 1) return 'You\u2019ll need ' + n + ' \u00d7 ' + C.container.label + 's. Ask us about side-by-side units so everything stays together.';
-    if (r.pct <= 35) return 'Plenty of room \u2013 one ' + C.container.label + ' with space to spare. An upper level unit is great value if you don\u2019t need drive-up access.';
-    if (r.pct <= 75) return 'One ' + C.container.label + ' fits this comfortably, with room for extra boxes later.';
-    return 'One ' + C.container.label + ' \u2013 a snug fit. Stack boxes high and pack furniture tightly.';
+    if (e.full) return 'One ' + C.container.label + ' \u2013 full. Anything more will need another container.';
+    if (e.floorFull) return 'One ' + C.container.label + ' \u2013 the floor is full, so anything more must be stacked on top' + (e.stacked > 0.5 ? ' (' + Math.round(e.stacked) + ' item' + (Math.round(e.stacked) === 1 ? '' : 's') + ' already stacked)' : '') + '.';
+    if (r.fits10) return 'A ' + C.container10.lengthFt + 'ft unit fits this \u2014 ' + money(C.pricing.small10.monthly) + ' + VAT/month. Want room to grow? An upper level 20ft is ' + money(C.pricing.upstairs.monthly) + ' + VAT.';
+    var busy = Math.max(r.pct, (e.P || 0) * 100);
+    if (busy <= 35) return 'Plenty of room \u2013 one ' + C.container.label + ' with space to spare.';
+    if (busy <= 75) return 'One ' + C.container.label + ' fits this, with some room left.';
+    return 'One ' + C.container.label + ' \u2013 a snug fit, with little floor space left.';
   }
 
   function pctTxt(r) { return r.containers > 1 ? '+' + (r.containers - 1) + ' container' + (r.containers > 2 ? 's' : '') : (r.ratio >= 1 - 1e-9 ? 100 : Math.max(1, Math.min(99, Math.round(r.pct)))) + '%'; }
   function update() {
     var r = calc(), has = r.total > 0, n = r.containers;
+    window.HSC_FLOOR = r.eval20 ? Math.min(1, r.eval20.P) : 0;
     $('hsc-svg').classList.toggle('xray', has);
     $('hsc-empty').hidden = has;
     $('hsc-filled').hidden = !has;
@@ -755,7 +788,9 @@ function hsEval(load, L, mode, lane) {
     pill.textContent = !has ? 'Empty' : (n > 1 ? n + ' \u00d7 20ft needed' : pctTxt(r) + ' full' + (r.fits10 ? ' \u00b7 fits a ' + C.container10.lengthFt + 'ft' : ''));
     pill.classList.toggle('multi', n > 1);
     pill.classList.toggle('ten', !!r.fits10);
-    animateFill(Math.min(1, r.ratio));
+    var ev = r.eval20 || {}, fl = n > 1 ? 1 : Math.min(1, ev.P || 0);   // floor really used, items in their real footprints
+    cargoHt = n > 1 || ev.full ? 1 : Math.max(0.15, Math.min(1, (ev.V || 0) / Math.max(fl, 1e-6)));
+    animateFill(has ? fl : 0);
 
     var u = $('hsc-units');
     if (n > 1) {
