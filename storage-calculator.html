@@ -343,6 +343,7 @@ var HS_LANE = 'auto';     // 'auto' | 'side' | 'middle'
 var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1, chair: 1,
   bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, desk: 1, wardrobe: 1,
   mixer: 1, wheelbarrow: 1, sitebox: 1, plasterboard: 1, ladder2: 1, stepladder: 1, scaffold: 1 };   // trades: ladders/tower lie flat lengthwise only, mixer never tipped
+var HS_EDGEOK = { plasterboard: 1 };   // plasterboard: flat OR on its long edge (2.4 long x 1.2 high); whichever fits more (Andy 16/10)
 var HS_FLATSTACK = { ladder2: 1, stepladder: 1, plasterboard: 1, scaffold: 1 };   // stack flat on each other up to 1.8 m (ladders: assumption; plasterboard + folded scaffold: Andy 16/10)   // assembled furniture stays upright (footprint may turn)
 var HS_UNDER = { dtable46: 0.70, dtable8: 0.70, desk: 0.70 };   // clear height underneath (beds assumed divan / low frame: none)   // stay upright (sofas/armchairs/chairs seat up)
 var HS_SEAT = { chair: 0.45 };   // living chairs go seat-to-seat 2 high: each extra chair adds 0.45 m
@@ -353,13 +354,13 @@ function hsFl(x, a) { return a > 0 ? Math.floor(x / a + 1e-9) : 0; }
 function hsOrients(it, asTopper) {
   var F = HS_FIT, out = [];
   if (it.pal) { var p = HS_PAL[it.pal]; return [{ a: p[0], b: p[1], layers: 1, h: 0 }]; }
-  var d = it.d, perms = HS_FIXED[it.id] ? [[d[0], d[1], d[2]]] :
+  var d = it.d, perms = HS_EDGEOK[it.id] ? [[d[0], d[1], d[2]], [d[0], d[2], d[1]]] : HS_FIXED[it.id] ? [[d[0], d[1], d[2]]] :
     [[d[0], d[1], d[2]], [d[0], d[2], d[1]], [d[1], d[2], d[0]]];   // (footprint pair, height); footprint is also turned 90 deg below
   perms.forEach(function (q) {
     var h = q[2]; if (h > F.H + 1e-9) return;
     if (!asTopper && it.mode === 'edge' && h === d[1] && d[1] !== d[0] && d[1] !== d[2]) return;   // beds, tables, mattresses stay on edge
     var layers = 1;
-    if (it.box || HS_FLATSTACK[it.id]) layers = Math.max(1, hsFl(F.BOX_H, h));
+    if (it.box || (HS_FLATSTACK[it.id] && h === d[2])) layers = Math.max(1, hsFl(F.BOX_H, h));   // on edge: not stacked
     else if (HS_SEAT[it.id]) { layers = 1; while (layers < 2 && d[2] + layers * HS_SEAT[it.id] <= F.H + 1e-9) layers++; }
     else if (it.id === 'dchair' && q[2] === d[2]) { layers = 1; while (layers < F.NEST_MAX && d[2] + layers * F.NEST_STEP <= F.H + 1e-9) layers++; }
     var top = HS_SEAT[it.id] ? h + (layers - 1) * HS_SEAT[it.id] : it.id === 'dchair' ? h + (layers - 1) * F.NEST_STEP : (it.box || HS_FLATSTACK[it.id]) ? layers * h : h;
@@ -431,6 +432,7 @@ function hsTopCap(b, s, L, layout) {
   var k = b.id + '>' + s.id + '|' + L + '|' + layout; if (hsTopCache[k] !== undefined) return hsTopCache[k];
   var F = HS_FIT, bo = (hsItemMax(b, L, layout), hsOriCache[b.id + '|' + L + '|' + layout]), best = 0;
   var lf = HS_LIGHTFURN[s.id], allowed = !lf || (lf === 1 ? (HS_FLATBASE[b.id] || !(s.id in { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1 })) : lf[b.id]);
+  if (bo && HS_EDGEOK[b.id] && bo.h !== b.d[2]) bo = null;   // on edge: nothing goes on top
   if (bo && allowed) {
     var top = bo.top !== undefined ? bo.top : bo.h;
     var fit = function (room) {   // most of s in one space of the base's footprint with this headroom
