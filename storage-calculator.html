@@ -267,33 +267,33 @@ var CALC_CONFIG = {
   //   cuft: approximate volume shown to the customer (UK removal-company charts)
   categories: [
     { id: 'living', label: 'Living', items: [
-      { id: 'chair',        name: 'Chair',            cuft: 10, icon: 'chair',      d: [0.55, 0.70, 0.95], mode: 'stack', light: true, maxStack: 2, stackH: 0.45 },   // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm footprint with legs/backs offset
-      { id: 'armchair',     name: 'Armchair',         cuft: 30, icon: 'armchair',   d: [0.90, 0.85, 0.95], mode: 'floor', top: 'light' },
-      { id: 'sofa2',        name: '2 seat sofa',      cuft: 40, icon: 'sofa2',      d: [1.60, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true, maxStack: 2, stackH: 0.65 },
-      { id: 'sofa3',        name: '3 seat sofa',      cuft: 55, icon: 'sofa3',      d: [2.00, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true, maxStack: 2, stackH: 0.65 },
-      { id: 'coffeetable',  name: 'Coffee table',     cuft: 10, icon: 'coffeetable', d: [1.10, 0.55, 0.45], mode: 'stack', maxStack: 2, top: 'light' },
-      { id: 'tvunit',       name: 'TV / TV unit',     cuft: 15, icon: 'tvunit',     d: [1.20, 0.45, 0.60], mode: 'stack', maxStack: 1, top: 'light' },
-      { id: 'bookcase',     name: 'Bookcase',         cuft: 20, icon: 'bookcase',   d: [0.80, 0.30, 1.80], mode: 'floor', top: 'any', inner: 0.75 }   // shelves hold boxes/books
+      { id: 'chair',        name: 'Chair',            cuft: 12.9, icon: 'chair',      d: [0.55, 0.70, 0.95], mode: 'stack', light: true, maxStack: 2, stackH: 0.45 },   // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm footprint with legs/backs offset
+      { id: 'armchair',     name: 'Armchair',         cuft: 25.7, icon: 'armchair',   d: [0.90, 0.85, 0.95], mode: 'floor', top: 'light' },
+      { id: 'sofa2',        name: '2 seat sofa',      cuft: 43.2, icon: 'sofa2',      d: [1.60, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true, maxStack: 2, stackH: 0.65 },
+      { id: 'sofa3',        name: '3 seat sofa',      cuft: 54.0, icon: 'sofa3',      d: [2.00, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true, maxStack: 2, stackH: 0.65 },
+      { id: 'coffeetable',  name: 'Coffee table',     cuft: 9.6, icon: 'coffeetable', d: [1.10, 0.55, 0.45], mode: 'stack', maxStack: 2, top: 'light' },
+      { id: 'tvunit',       name: 'TV / TV unit',     cuft: 11.4, icon: 'tvunit',     d: [1.20, 0.45, 0.60], mode: 'stack', maxStack: 1, top: 'light' },
+      { id: 'bookcase',     name: 'Bookcase',         cuft: 15.3, icon: 'bookcase',   d: [0.80, 0.30, 1.80], mode: 'floor', top: 'any', inner: 0.75 }   // shelves hold boxes/books
     ]},
     { id: 'dining', label: 'Dining', items: [
-      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 30, icon: 'dtable46', d: [1.50, 0.90, 0.75], mode: 'floor' },   // legs off, top on edge,
-      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 50, icon: 'dtable8',  d: [2.00, 1.00, 0.75], mode: 'floor' },   // legs off, top on edge,
-      { id: 'dchair',       name: 'Dining chair',       cuft: 6,  icon: 'dchair',   d: [0.55, 0.70, 0.95], mode: 'stack', light: true, maxStack: 2, stackH: 0.45 }   // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm with legs/backs offset
+      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 35.8, icon: 'dtable46', d: [1.50, 0.90, 0.75], mode: 'floor' },   // legs off, top on edge,
+      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 53.0, icon: 'dtable8',  d: [2.00, 1.00, 0.75], mode: 'floor' },   // legs off, top on edge,
+      { id: 'dchair',       name: 'Dining chair',       cuft: 12.9,  icon: 'dchair',   d: [0.55, 0.70, 0.95], mode: 'stack', light: true, maxStack: 2, stackH: 0.45 }   // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm with legs/backs offset
     ]},
     { id: 'bedroom', label: 'Bedroom', items: [
-      { id: 'bedsingle',    name: 'Single bed',       cuft: 30, icon: 'bedsingle', d: [1.90, 0.90, 0.90], mode: 'floor', firm: true },   // dismantled: divan/frame on edge
-      { id: 'beddouble',    name: 'Double bed',       cuft: 60, icon: 'beddouble', d: [1.90, 1.35, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 68 cm) on edge
-      { id: 'bedking',      name: 'King bed',         cuft: 70, icon: 'bedking',   d: [2.00, 1.50, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 76 cm) on edge
-      { id: 'wardrobe',     name: 'Wardrobe',         cuft: 45, icon: 'wardrobe',  d: [1.00, 0.60, 1.85], mode: 'floor', top: 'any' },
-      { id: 'drawers',      name: 'Chest of drawers', cuft: 20, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack', maxStack: 1, top: 'any' },
-      { id: 'bedside',      name: 'Bedside table',    cuft: 5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack', maxStack: 2, top: 'any' },
-      { id: 'mattress',     name: 'Mattress',         cuft: 25, icon: 'mattress',  d: [1.90, 0.25, 1.35], mode: 'edge' }    // double, stood on its long edge
+      { id: 'bedsingle',    name: 'Single bed',       cuft: 54.3, icon: 'bedsingle', d: [1.90, 0.90, 0.90], mode: 'floor', firm: true },   // dismantled: divan/frame on edge
+      { id: 'beddouble',    name: 'Double bed',       cuft: 81.5, icon: 'beddouble', d: [1.90, 1.35, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 68 cm) on edge
+      { id: 'bedking',      name: 'King bed',         cuft: 95.4, icon: 'bedking',   d: [2.00, 1.50, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 76 cm) on edge
+      { id: 'wardrobe',     name: 'Wardrobe',         cuft: 39.2, icon: 'wardrobe',  d: [1.00, 0.60, 1.85], mode: 'floor', top: 'any' },
+      { id: 'drawers',      name: 'Chest of drawers', cuft: 10.8, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack', maxStack: 1, top: 'any' },
+      { id: 'bedside',      name: 'Bedside table',    cuft: 3.5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack', maxStack: 2, top: 'any' },
+      { id: 'mattress',     name: 'Mattress',         cuft: 22.6, icon: 'mattress',  d: [1.90, 0.25, 1.35], mode: 'edge' }    // double, stood on its long edge
     ]},
     { id: 'kitchen', label: 'Kitchen & appliances', items: [
-      { id: 'fridge',       name: 'Fridge freezer',   cuft: 40, icon: 'fridge',     d: [0.60, 0.65, 1.80], mode: 'floor', top: 'light' },   // light items on top; white goods never on each other
-      { id: 'washer',       name: 'Washing machine',  cuft: 20, icon: 'washer',     d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
-      { id: 'dishwasher',   name: 'Dishwasher',       cuft: 20, icon: 'dishwasher', d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
-      { id: 'cooker',       name: 'Cooker',           cuft: 20, icon: 'cooker',     d: [0.60, 0.60, 0.90], mode: 'floor', top: 'light' }
+      { id: 'fridge',       name: 'Fridge freezer',   cuft: 24.8, icon: 'fridge',     d: [0.60, 0.65, 1.80], mode: 'floor', top: 'light' },   // light items on top; white goods never on each other
+      { id: 'washer',       name: 'Washing machine',  cuft: 10.8, icon: 'washer',     d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
+      { id: 'dishwasher',   name: 'Dishwasher',       cuft: 10.8, icon: 'dishwasher', d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
+      { id: 'cooker',       name: 'Cooker',           cuft: 11.4, icon: 'cooker',     d: [0.60, 0.60, 0.90], mode: 'floor', top: 'light' }
     ]},
     { id: 'boxes', label: 'Boxes', items: [
       { id: 'boxs',         name: 'Small box',        cuft: 1.4, dims: 'approx. 45×30×30 cm', icon: 'boxs', d: [0.45, 0.30, 0.30], mode: 'stack', light: true, box: true },
@@ -304,10 +304,10 @@ var CALC_CONFIG = {
       { id: 'palleteuro',   name: 'Euro pallet', cuft: 40.7, dims: 'approx. 120×80 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'E' },
       { id: 'palletuk',     name: 'UK pallet',   cuft: 50.9, dims: 'approx. 120×100 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'U' },
       { id: 'pallethalf',   name: 'Half pallet', cuft: 20.3, dims: 'approx. 80×60 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'H' },
-      { id: 'filing',       name: 'Filing cabinet',   cuft: 10, icon: 'filing',      d: [0.47, 0.62, 1.32], mode: 'floor', top: 'any' },
-      { id: 'desk',         name: 'Desk',             cuft: 30, icon: 'desk',        d: [1.40, 0.70, 0.75], mode: 'floor', top: 'any' },   // stored assembled, not stacked; boxes/chairs on top
-      { id: 'officechair',  name: 'Office chair',     cuft: 10, icon: 'officechair', d: [0.65, 0.65, 1.05], mode: 'stack', light: true, maxStack: 1 },
-      { id: 'shelving',     name: 'Shelving bay',     cuft: 25, icon: 'shelving',    d: [0.90, 0.45, 1.80], mode: 'floor', top: 'any', inner: 0.8 }   // shelf bays hold boxes
+      { id: 'filing',       name: 'Filing cabinet',   cuft: 13.6, icon: 'filing',      d: [0.47, 0.62, 1.32], mode: 'floor', top: 'any' },
+      { id: 'desk',         name: 'Desk',             cuft: 26.0, icon: 'desk',        d: [1.40, 0.70, 0.75], mode: 'floor', top: 'any' },   // stored assembled, not stacked; boxes/chairs on top
+      { id: 'officechair',  name: 'Office chair',     cuft: 15.7, icon: 'officechair', d: [0.65, 0.65, 1.05], mode: 'stack', light: true, maxStack: 1 },
+      { id: 'shelving',     name: 'Shelving bay',     cuft: 25.7, icon: 'shelving',    d: [0.90, 0.45, 1.80], mode: 'floor', top: 'any', inner: 0.8 }   // shelf bays hold boxes
     ]}
   ]
 };
