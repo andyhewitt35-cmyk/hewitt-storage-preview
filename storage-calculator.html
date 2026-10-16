@@ -343,7 +343,7 @@ var HS_LANE = 'auto';     // 'auto' | 'side' | 'middle'
 var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1, chair: 1,
   bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, desk: 1, wardrobe: 1,
   mixer: 1, wheelbarrow: 1, sitebox: 1, plasterboard: 1, ladder2: 1, stepladder: 1, scaffold: 1 };   // trades: ladders/tower lie flat lengthwise only, mixer never tipped
-var HS_FLATSTACK = { ladder2: 1, stepladder: 1 };   // ladders stack flat on each other up to 1.8 m (assumption)   // assembled furniture stays upright (footprint may turn)
+var HS_FLATSTACK = { ladder2: 1, stepladder: 1, plasterboard: 1, scaffold: 1 };   // stack flat on each other up to 1.8 m (ladders: assumption; plasterboard + folded scaffold: Andy 16/10)   // assembled furniture stays upright (footprint may turn)
 var HS_UNDER = { dtable46: 0.70, dtable8: 0.70, desk: 0.70 };   // clear height underneath (beds assumed divan / low frame: none)   // stay upright (sofas/armchairs/chairs seat up)
 var HS_SEAT = { chair: 0.45 };   // living chairs go seat-to-seat 2 high: each extra chair adds 0.45 m
 var HS_PAL = { F: [1.22, 1.02], E: [1.2, 0.8], U: [1.2, 1.0], H: [0.8, 0.6] };
