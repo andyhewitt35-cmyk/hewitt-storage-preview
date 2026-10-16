@@ -570,8 +570,11 @@ function hsEval(load, L, mode, lane) {
   });
   var ratio = n === 1 ? Math.min(1, V) : n - 1 + Math.max(1e-6, Math.min(1, V - (n - 1)));
   var anyTop = load.some(function (x) { return HS_BASE[x.item.id]; });
+  // Plasterboard orientation actually used (bundle decides when both are present: sheets share its columns).
+  var pbx = load.filter(function (x) { return x.item.id === 'plasterboard'; })[0] || load.filter(function (x) { return x.item.id === 'pbsheet'; })[0], pbOri = null;
+  if (pbx) { var pit = pbx.item, po = pl.ori && pl.ori[pit.id] !== undefined ? hsOrients(pit)[pl.ori[pit.id]] : hsOri(pit, L, lay.layout); pbOri = po && po.h === pit.d[2] ? 'flat' : 'edge'; }
   return { T: T, full: full, layout: lay.layout, forced: lay.forced, usable: U, cu: cu, V: V, P: pl.P, stacked: pl.stacked,
-    floorFull: n === 1 && pl.P >= 1 - 1e-9, noStack: full && pl.P >= 1 - 1e-9 && !(pl.stacked > 0) && !anyTop, containers: n, ratio: ratio };
+    pbOri: pbOri, floorFull: n === 1 && pl.P >= 1 - 1e-9, noStack: full && pl.P >= 1 - 1e-9 && !(pl.stacked > 0) && !anyTop, containers: n, ratio: ratio };
 }
 /* ======================= END OF ENGINE ======================= */
 
@@ -673,9 +676,10 @@ function hsEval(load, L, mode, lane) {
       'Furniture assumed assembled. Your items: ' + fmt(r20.cu) + ' cu ft.' + (load.every(function (x) { return !!x.item.pal; }) ? '' : ' Items go on the floor first, largest first; once the floor is full, boxes, chairs and bedside tables go on top of flat-topped furniture, beds, seats and appliances, and under tables and desks (tops no higher than ' + fmt(F.H, 1) + 'm; boxes to ' + fmt(F.BOX_H, 1) + 'm). Nothing goes on pallets.');
     var floorNote = n !== 1 ? '' : r20.noStack ? 'Container full: the floor is full and no stacking assumed for these items, so the next item needs another container.' : r20.full ? 'Container full: nothing more fits on the floor or on top, so the next item needs another container.' : r20.floorFull ? 'Floor space full: further items will need to be stacked on top of others.' : '';
     var P = { E: counts.palleteuro || 0, H: counts.pallethalf || 0, U: counts.palletuk || 0, F: counts.pallet4ft || 0 }, nPal = P.E + P.H + P.U + P.F;
+    var pbLine = r20.pbOri === 'edge' ? 'Plasterboard is shown stored on edge.' : r20.pbOri === 'flat' ? 'Plasterboard is shown stacked flat, as this fits the load better.' : '';
     var palLine = nPal ? 'Pallets are loaded on the available floor space only, not stacked.' : '';
     return { total: total, ratio: ratio, pct: ratio * 100, containers: n, lines: lines, itemCount: itemCount, fits10: fits10, share10: r10.ratio, eval20: r20, eval10: r10,
-      palLine: palLine, floorNote: floorNote, fitLine: fitLine, altLine: '', mode: HS_MODE, lane: HS_LANE, layout: lay, units: units, floorPct: 0, volPct: r20.V * 100 };
+      palLine: palLine, pbLine: pbLine, floorNote: floorNote, fitLine: fitLine, altLine: '', mode: HS_MODE, lane: HS_LANE, layout: lay, units: units, floorPct: 0, volPct: r20.V * 100 };
   }
 
   /* ---------- Static text from config ---------- */
@@ -875,7 +879,7 @@ function hsEval(load, L, mode, lane) {
       $('hsc-rec').textContent = recommendation(r);
       $('hsc-floor').hidden = !r.floorNote; $('hsc-floor').textContent = r.floorNote || '';
       $('hsc-alt').hidden = !r.altLine; $('hsc-alt').textContent = r.altLine || '';
-      var pl = [r.palLine, r.fitLine].filter(Boolean).join(' ');
+      var pl = [r.palLine, r.pbLine, r.fitLine].filter(Boolean).join(' ');
       $('hsc-pal').hidden = !pl; $('hsc-pal').textContent = pl;
       var g = C.pricing.ground.monthly, up = C.pricing.upstairs.monthly, vat = 1 + C.pricing.vatRate;
       $('hsc-g-p').textContent = money(g * n);
