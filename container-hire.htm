@@ -45,6 +45,36 @@
 </div>
 <div class="foot-base">© 2026 Hewitt Storage. All rights reserved.</div>
 </div></footer>
+<!-- Storage-calculator nudge (shown after 6s or 40% scroll; hidden 7 days once dismissed/clicked) -->
+<style>
+.calc-nudge{position:fixed;right:20px;bottom:20px;z-index:70;max-width:300px;background:var(--navy,#0f2a52);color:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(15,42,82,.3);padding:16px 44px 16px 18px;transform:translateY(140%);opacity:0;visibility:hidden;transition:transform .45s ease,opacity .45s ease,visibility 0s .45s}
+.calc-nudge.show{transform:none;opacity:1;visibility:visible;transition:transform .45s ease,opacity .45s ease}
+.calc-nudge p{margin:0 0 10px;font-weight:700;font-size:16px;color:#fff}
+.calc-nudge a.nudge-go{display:inline-block;background:#fff;color:var(--navy,#0f2a52);font-weight:700;text-decoration:none;border-radius:999px;padding:9px 16px;font-size:14px}
+.calc-nudge a.nudge-go:hover,.calc-nudge a.nudge-go:focus{background:var(--sky,#e8f0fb)}
+.calc-nudge .nudge-x{position:absolute;top:6px;right:6px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:#fff;font-size:22px;line-height:1;cursor:pointer}
+.calc-nudge .nudge-x:hover,.calc-nudge .nudge-x:focus{background:rgba(255,255,255,.15)}
+@media (max-width:899px){.calc-nudge{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));max-width:none;padding:10px 42px 10px 14px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.calc-nudge p{margin:0;font-size:14px}.calc-nudge a.nudge-go{padding:7px 12px;font-size:13px;white-space:nowrap}}
+@media (prefers-reduced-motion:reduce){.calc-nudge,.calc-nudge.show{transition:none}}
+</style>
+<aside class="calc-nudge" id="calc-nudge" role="complementary" aria-label="Storage calculator suggestion" hidden>
+<p>Unsure what size you need?</p>
+<a class="nudge-go" href="storage-calculator.html?v=pbsheet">Try our storage calculator</a>
+<button type="button" class="nudge-x" aria-label="Close storage calculator suggestion">&times;</button>
+</aside>
+<script>
+(function(){var K='hsCalcNudgeHideUntil',el=document.getElementById('calc-nudge');if(!el)return;
+try{if(+localStorage.getItem(K)>Date.now())return;}catch(e){}
+var shown=false;function hide7(){try{localStorage.setItem(K,String(Date.now()+7*864e5));}catch(e){}}
+function show(){if(shown)return;shown=true;el.hidden=false;requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('show');});});window.removeEventListener('scroll',onS);}
+function onS(){var h=document.documentElement.scrollHeight-innerHeight;if(h>0&&scrollY/h>=0.4)show();}
+setTimeout(show,6000);window.addEventListener('scroll',onS,{passive:true});
+el.querySelector('.nudge-x').addEventListener('click',function(){hide7();el.classList.remove('show');setTimeout(function(){el.hidden=true;},460);});
+el.querySelector('.nudge-go').addEventListener('click',hide7);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&el.classList.contains('show'))el.querySelector('.nudge-x').click();});
+})();
+</script>
 <script src="assets/site.js" defer></script>
 </body>
 </html>
