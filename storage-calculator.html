@@ -777,7 +777,8 @@ function hsEval(load, L, mode, lane) {
     return 'One ' + C.container.label + ' \u2013 a snug fit, with little floor space left.';
   }
 
-  function pctTxt(r) { return r.containers > 1 ? '+' + (r.containers - 1) + ' container' + (r.containers > 2 ? 's' : '') : (r.ratio >= 1 - 1e-9 ? 100 : Math.max(1, Math.min(99, Math.round(r.pct)))) + '%'; }
+  function pctTxt(r) { return r.containers > 1 ? '+' + (r.containers - 1) + ' container' + (r.containers > 2 ? 's' : '') : pct1(r.ratio) + '%'; }
+  function pct1(x) { return x >= 1 - 1e-9 ? '100' : Math.min(99.9, Math.round(x * 1000) / 10).toFixed(1); }   // one decimal, no forced minimum, never shows 100 unless full
   function update() {
     var r = calc(), has = r.total > 0, n = r.containers;
     window.HSC_FLOOR = r.eval20 ? Math.min(1, r.eval20.P) : 0;
@@ -795,7 +796,7 @@ function hsEval(load, L, mode, lane) {
     var u = $('hsc-units');
     if (n > 1) {
       var h = '';
-      for (var i = 0; i < n; i++) { var f = Math.max(0, Math.min(1, r.ratio - i)); h += '<span class="hsc-unit">Unit ' + (i + 1) + '<i><b style="width:' + (f * 100).toFixed(0) + '%"></b></i>' + (f >= 1 - 1e-9 ? 100 : Math.min(99, Math.round(f * 100))) + '%</span>'; }
+      for (var i = 0; i < n; i++) { var f = Math.max(0, Math.min(1, r.ratio - i)); h += '<span class="hsc-unit">Unit ' + (i + 1) + '<i><b style="width:' + (f * 100).toFixed(0) + '%"></b></i>' + pct1(f) + '%</span>'; }
       u.innerHTML = h;
     } else u.innerHTML = '';
 
