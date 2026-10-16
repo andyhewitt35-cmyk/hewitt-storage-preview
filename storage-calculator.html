@@ -393,7 +393,7 @@ function hsCatalog() { var a = []; CALC_CONFIG.categories.forEach(function (c) {
 // ---- v3 volume model -------------------------------------------------------------
 // Usable cu ft: organise = full volume x (2.35 - 0.65) / 2.35 (lane taken off first); packed = full volume.
 function hsUsable(L, mode) { var F = HS_FIT, full = L === F.L10 ? F.CU10 : F.CU20; return (mode || HS_MODE) === 'max' ? full : full * (F.W - F.LANE) / F.W; }
-// Pallet cu ft (Andy gave footprint only): footprint x assumed 1.2 m load height.
+// Pallet cu ft (Andy gave footprint only): footprint x standard loaded height 1.2 m incl. pallet (confirmed by Andy 16/10): Euro 40.7, UK 50.9, Half 20.3 cu ft. Not stacked.
 function hsCuft(it) { return it.pal ? Math.round(HS_PAL[it.pal][0] * HS_PAL[it.pal][1] * HS_FIT.PAL_H * HS_FIT.M3_CUFT * 10) / 10 : it.cuft; }
 // V = volume share (sum cu ft / usable cu ft); P = physical share (sum n / most that physically fit).
 // Containers = max(ceil V, ceil P). In one container the reading is V, or 100% once P reaches 1 (leftover counts as used).
