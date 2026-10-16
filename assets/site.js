@@ -22,6 +22,29 @@
     });
   }
 
+
+  /* ---- Lazy iframes (maps + calculator): load when near viewport ---- */
+  function hydrateLazyFrames() {
+    var frames = document.querySelectorAll('iframe[data-src]');
+    if (!frames.length) return;
+    function load(f) {
+      if (!f.getAttribute('data-src')) return;
+      f.src = f.getAttribute('data-src');
+      f.removeAttribute('data-src');
+    }
+    if (!('IntersectionObserver' in window)) {
+      frames.forEach(load);
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { load(en.target); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '200px 0px' });
+    frames.forEach(function (f) { io.observe(f); });
+  }
+  hydrateLazyFrames();
+
   /* ---- Year in footer ---- */
   var y = document.getElementById('year');
   if (y) y.textContent = new Date().getFullYear();
