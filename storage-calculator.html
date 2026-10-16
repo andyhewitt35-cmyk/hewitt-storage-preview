@@ -1,330 +1,1420 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-GB">
-<head>
+  <head>
 <meta name="robots" content="noindex,nofollow">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Storage Calculator | Hewitt Storage, Orrell, Wigan</title>
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<meta name="description" content="Work out how much container storage you need at Hewitt Storage, Orrell, Wigan. Add your items and get an instant estimate.">
-<style>
-  :root{
-    --navy:#0f2a52; --navy-2:#173a6e; --blue:#2563c9; --blue-2:#3b7be0; --sky:#e8f0fb;
-    --ink:#1a2433; --muted:#5b6b82; --line:#d8e2f0; --bg:#f6f9fd; --white:#fff;
-    --ok:#1f9d6b; --warn:#d98a1c;
-    --i-a:#12305e; --i-b:#2563c9; --i-c:#dbe7f8; --i-d:#8fb0e6;
-    --i-k:#d4a76a; --i-k2:#bf8f50; --i-t:#f1dcb4; --i-w:#9c6b34;
-    --radius:14px;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:transparent}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.4}
-  .hsc{max-width:900px;margin:0 auto;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-  /* Header */
-  .hsc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff}
-  .hsc-brand{display:flex;align-items:center;gap:10px}
-  .hsc-logo{width:34px;height:34px;flex:none}
-  .hsc-brand h1{margin:0;font-size:19px;letter-spacing:.2px;font-weight:700}
-  .hsc-brand p{margin:0;font-size:12px;opacity:.8}
-  .hsc-tag{font-size:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:5px 10px;border-radius:999px;white-space:nowrap}
-  /* Tabs */
-  .hsc-tabs{display:flex;gap:6px;overflow-x:auto;padding:14px 16px 4px;scrollbar-width:none}
-  .hsc-tabs::-webkit-scrollbar{display:none}
-  .hsc-tab{flex:none;border:1px solid var(--line);background:#fff;color:var(--navy);font:inherit;font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,color .15s,border-color .15s}
-  .hsc-tab:hover{border-color:var(--blue-2)}
-  .hsc-tab[aria-selected="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .hsc-tab .n{background:var(--blue);color:#fff;font-size:11px;min-width:18px;height:18px;line-height:18px;border-radius:9px;padding:0 5px;text-align:center}
-  .hsc-tab[aria-selected="true"] .n{background:#fff;color:var(--navy)}
-  /* Item strip */
-  .hsc-strip-wrap{position:relative;padding:4px 8px 10px}
-  .hsc-strip{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:10px 34px 6px;scroll-padding-inline:34px;scrollbar-width:none}
-  .hsc-strip::-webkit-scrollbar{display:none}
-  .hsc-arrow{position:absolute;top:50%;transform:translateY(-60%);width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 2px 6px rgba(15,42,82,.08)}
-  .hsc-arrow:disabled{opacity:.35;cursor:default}
-  .hsc-arrow.l{left:8px}.hsc-arrow.r{right:8px}
-  .hsc-item{flex:none;width:106px;scroll-snap-align:start;text-align:center;display:flex;flex-direction:column;align-items:center}
-  .hsc-ico{position:relative;width:78px;height:78px;border-radius:50%;background:var(--sky);border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:transform .15s,border-color .15s,box-shadow .15s}
-  .hsc-ico:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(15,42,82,.12)}
-  .hsc-item.on .hsc-ico{border-color:var(--blue);background:#fff}
-  .hsc-ico svg{width:50px;height:50px}
-  .hsc-badge{position:absolute;top:-4px;right:-2px;min-width:22px;height:22px;border-radius:11px;background:#fff;color:var(--muted);border:1px solid var(--line);font-size:11px;font-weight:700;line-height:20px;padding:0 5px}
-  .hsc-item.on .hsc-badge{background:var(--blue);color:#fff;border-color:var(--blue)}
-  .hsc-name{margin-top:7px;font-size:13px;font-weight:650;color:var(--navy);line-height:1.2;min-height:32px;display:flex;align-items:center}
-  .hsc-vol{font-size:11px;color:var(--muted);margin-top:1px}
-  .hsc-step{display:flex;align-items:center;gap:4px;margin-top:6px;background:var(--navy);border-radius:999px;padding:3px}
-  .hsc-step button{width:24px;height:24px;border-radius:50%;border:0;background:#fff;color:var(--navy);font-size:16px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
-  .hsc-step button:disabled{opacity:.4;cursor:default}
-  .hsc-step span{min-width:22px;color:#fff;font-size:13px;font-weight:700}
-  /* Stage */
-  .hsc-stage{display:grid;grid-template-columns:1.1fr 1fr;gap:8px;border-top:1px solid var(--line);
-    background-color:var(--bg);
-    background-image:repeating-linear-gradient(30deg,rgba(37,99,201,.06) 0 1px,transparent 1px 26px),repeating-linear-gradient(150deg,rgba(37,99,201,.06) 0 1px,transparent 1px 26px)}
-  .hsc-visual{position:relative;padding:18px 12px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .hsc-visual svg.ctr{width:100%;max-width:400px;height:auto;display:block}
-  .hsc-pill{position:absolute;top:14px;left:14px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;color:var(--navy);box-shadow:0 2px 6px rgba(15,42,82,.06)}
-  .hsc-pill.multi{background:var(--warn);color:#fff;border-color:var(--warn)}
-  .hsc-units{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
-  .hsc-unit{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:11px;color:var(--muted)}
-  .hsc-unit i{display:block;width:40px;height:6px;border-radius:3px;background:var(--sky);overflow:hidden}
-  .hsc-unit i b{display:block;height:100%;background:var(--blue)}
-  .walls{transition:opacity .35s ease}
-  .xray .walls{opacity:.16}
-  .xray .roof{opacity:.08}
-  .hidden-edge{opacity:0;transition:opacity .35s}
-  .xray .hidden-edge{opacity:.55}
-  /* Result */
-  .hsc-result{padding:22px 22px 18px;display:flex;flex-direction:column;justify-content:center}
-  .hsc-result h2{margin:0;font-size:22px;letter-spacing:.6px;color:var(--navy);font-weight:800}
-  .hsc-sub{margin:4px 0 0;font-size:14px;color:var(--muted)}
-  .hsc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-  .hsc-stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px}
-  .hsc-stat b{display:block;font-size:19px;color:var(--navy);line-height:1.15}
-  .hsc-stat small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
-  .hsc-bar{margin-top:12px;height:10px;background:#e3eaf5;border-radius:5px;overflow:hidden}
-  .hsc-bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--blue-2));border-radius:5px;transition:width .35s ease,background .35s}
-  .hsc-bar.over span{background:linear-gradient(90deg,var(--warn),#e9a948)}
-  .hsc-barlab{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px}
-  .hsc-rec{margin:10px 0 0;font-size:14px;color:var(--ink);background:#fff;border-left:3px solid var(--blue);padding:8px 10px;border-radius:0 8px 8px 0}
-  .hsc-mode{display:flex;gap:6px;margin:0 0 12px;background:#eef3fb;border-radius:10px;padding:4px}
-  .hsc-mode button{flex:1;border:0;background:transparent;border-radius:8px;padding:8px 6px;font:inherit;font-size:13px;font-weight:650;color:var(--navy);cursor:pointer}
-  .hsc-mode button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 4px rgba(15,42,82,.12);color:var(--blue)}
-  .hsc-modenote{margin:0 0 10px;font-size:12px;color:var(--muted)}
-  .hsc-guide{margin:12px 0 0;font-size:12px;line-height:1.4;color:var(--muted)}
-  .hsc-prices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-  .hsc-price{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
-  .hsc-price .t{font-size:12px;font-weight:700;color:var(--navy)}
-  .hsc-price .s{font-size:11px;color:var(--muted)}
-  .hsc-price .p{font-size:20px;font-weight:800;color:var(--navy);margin-top:4px}
-  .hsc-price .p em{font-style:normal;font-size:12px;font-weight:600;color:var(--muted)}
-  .hsc-price .x{font-size:11px;color:var(--muted)}
-  .hsc-price.ten{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:2px solid var(--blue);background:linear-gradient(135deg,#f3f7ff,#e6efff)}
-  .hsc-price.ten[hidden]{display:none}
-  .hsc-price.ten .tag{display:inline-block;background:var(--blue);color:#fff;font-size:11px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:999px;margin-bottom:3px}
-  .hsc-price.ten .p{margin-top:0;text-align:right}
-  .hsc-price.ten .x{text-align:right}
-  .hsc-pill.ten{background:var(--blue);color:#fff;border-color:var(--blue)}
-  .hsc-list{margin-top:10px;font-size:13px}
-  .hsc-list summary{cursor:pointer;color:var(--navy);font-weight:650}
-  .hsc-list ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
-  .hsc-filled[hidden],.hsc-sub[hidden]{display:none}
-  .hsc-ctas{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-  .hsc-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;padding:10px 14px;cursor:pointer;border:1px solid var(--navy);transition:background .15s,color .15s}
-  .hsc-btn svg{width:16px;height:16px}
-  .hsc-btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
-  .hsc-btn.pri:hover{background:#1d52ab}
-  .hsc-btn.sec{background:#fff;color:var(--navy)}
-  .hsc-btn.sec:hover{background:var(--sky)}
-  .hsc-btn.ghost{background:transparent;border-color:transparent;color:var(--muted);padding-left:8px;padding-right:8px}
-  .hsc-btn.ghost:hover{color:var(--navy)}
-  .hsc-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);background:#fff}
-  :focus-visible{outline:3px solid #8fb4f0;outline-offset:2px}
-  /* Icon palette */
-  .a{fill:var(--i-a)}.b{fill:var(--i-b)}.c{fill:var(--i-c)}.d{fill:var(--i-d)}
-  .k{fill:var(--i-k)}.k2{fill:var(--i-k2)}.t{fill:var(--i-t)}.w{fill:var(--i-w)}
-  .sa{fill:none;stroke:var(--i-a);stroke-linecap:round;stroke-linejoin:round}
-  .sb{fill:none;stroke:var(--i-b);stroke-linecap:round;stroke-linejoin:round}
-  @media (max-width:680px){
-    .hsc-stage{grid-template-columns:1fr}
-    .hsc-result{padding:16px}
-    .hsc-head{padding:12px 14px}
-    .hsc-tag{display:none}
-  }
-  @media (max-width:420px){
-    .hsc-stats{grid-template-columns:1fr 1fr}
-    .hsc-stats .hsc-stat:last-child{grid-column:1 / -1}
-    .hsc-prices{grid-template-columns:1fr}
-    .hsc-item{width:100px}
-    .hsc-btn{flex:1 1 auto}
-  }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-</style>
-</head>
-<body>
-<div class="hsc" id="hsc">
-  <header class="hsc-head">
-    <div class="hsc-brand">
-      <svg class="hsc-logo" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="#2563c9"/><path d="M8 12.5 17 8l9 4.5v10L17 27l-9-4.5z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M8 12.5 17 17l9-4.5M17 17v10" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
-      <div><h1 id="hsc-title">Hewitt Storage</h1><p id="hsc-subtitle">Storage calculator</p></div>
-    </div>
-    <span class="hsc-tag" id="hsc-tag" hidden style="display:none"></span>
-  </header>
-
-  <nav class="hsc-tabs" id="hsc-tabs" role="tablist" aria-label="Item categories"></nav>
-
-  <div class="hsc-strip-wrap">
-    <button class="hsc-arrow l" id="hsc-prev" type="button" aria-label="Scroll items left"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-    <div class="hsc-strip" id="hsc-strip" role="tabpanel"></div>
-    <button class="hsc-arrow r" id="hsc-next" type="button" aria-label="Scroll items right"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M5 2l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-  </div>
-
-  <section class="hsc-stage">
-    <div class="hsc-visual">
-      <span class="hsc-pill" id="hsc-pill">Empty</span>
-      <svg class="ctr" id="hsc-svg" viewBox="0 0 360 340" role="img" aria-label="20ft container fill level"></svg>
-      <div class="hsc-units" id="hsc-units"></div>
-    </div>
-
-    <div class="hsc-result" aria-live="polite">
-      <h2>GET STORING</h2>
-      <div class="hsc-mode" id="hsc-mode" role="group" aria-label="How should it be packed?"><button type="button" data-mode="room" aria-pressed="true">Room to get in and organise</button><button type="button" data-mode="max" aria-pressed="false">Packed to the max</button></div>
-      <div class="hsc-mode hsc-lane" id="hsc-lane" role="group" aria-label="Loading lane"><button type="button" data-lane="auto" aria-pressed="true">Lane: Auto</button><button type="button" data-lane="side" aria-pressed="false">Side</button><button type="button" data-lane="middle" aria-pressed="false">Middle</button></div>
-      <p class="hsc-modenote" id="hsc-modenote"></p>
-      <p class="hsc-sub" id="hsc-empty">Start by adding items to your storage unit</p>
-      <div class="hsc-filled" id="hsc-filled" hidden>
-        <div class="hsc-stats">
-          <div class="hsc-stat"><b id="hsc-vol">0</b><small>cu ft estimated</small></div>
-          <div class="hsc-stat"><b id="hsc-pct">0%</b><small id="hsc-pct-lab">of one 20ft</small></div>
-          <div class="hsc-stat"><b id="hsc-n">0</b><small id="hsc-n-lab">containers needed</small></div>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Storage Calculator | Hewitt Storage, Orrell, Wigan</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <meta
+      name="description"
+      content="Work out how much container storage you need at Hewitt Storage, Orrell, Wigan. Add your items and get an instant estimate."
+    />
+    <style>
+      :root {
+        --navy: #0f2a52;
+        --navy-2: #173a6e;
+        --blue: #2563c9;
+        --blue-2: #3b7be0;
+        --sky: #e8f0fb;
+        --ink: #1a2433;
+        --muted: #5b6b82;
+        --line: #d8e2f0;
+        --bg: #f6f9fd;
+        --white: #fff;
+        --ok: #1f9d6b;
+        --warn: #d98a1c;
+        --i-a: #12305e;
+        --i-b: #2563c9;
+        --i-c: #dbe7f8;
+        --i-d: #8fb0e6;
+        --i-k: #d4a76a;
+        --i-k2: #bf8f50;
+        --i-t: #f1dcb4;
+        --i-w: #9c6b34;
+        --radius: 14px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.4;
+      }
+      .hsc {
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      /* Header */
+      .hsc-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, var(--navy), var(--navy-2));
+        color: #fff;
+      }
+      .hsc-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .hsc-logo {
+        width: 34px;
+        height: 34px;
+        flex: none;
+      }
+      .hsc-brand h1 {
+        margin: 0;
+        font-size: 19px;
+        letter-spacing: 0.2px;
+        font-weight: 700;
+      }
+      .hsc-brand p {
+        margin: 0;
+        font-size: 12px;
+        opacity: 0.8;
+      }
+      .hsc-tag {
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 5px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      /* Tabs */
+      .hsc-tabs {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 14px 16px 4px;
+        scrollbar-width: none;
+      }
+      .hsc-tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .hsc-tab {
+        flex: none;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--navy);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 7px 13px;
+        border-radius: 999px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .hsc-tab:hover {
+        border-color: var(--blue-2);
+      }
+      .hsc-tab[aria-selected='true'] {
+        background: var(--navy);
+        color: #fff;
+        border-color: var(--navy);
+      }
+      .hsc-tab .n {
+        background: var(--blue);
+        color: #fff;
+        font-size: 11px;
+        min-width: 18px;
+        height: 18px;
+        line-height: 18px;
+        border-radius: 9px;
+        padding: 0 5px;
+        text-align: center;
+      }
+      .hsc-tab[aria-selected='true'] .n {
+        background: #fff;
+        color: var(--navy);
+      }
+      /* Item strip */
+      .hsc-strip-wrap {
+        position: relative;
+        padding: 4px 8px 10px;
+      }
+      .hsc-strip {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding: 10px 34px 6px;
+        scroll-padding-inline: 34px;
+        scrollbar-width: none;
+      }
+      .hsc-strip::-webkit-scrollbar {
+        display: none;
+      }
+      .hsc-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-60%);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--navy);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        box-shadow: 0 2px 6px rgba(15, 42, 82, 0.08);
+      }
+      .hsc-arrow:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+      .hsc-arrow.l {
+        left: 8px;
+      }
+      .hsc-arrow.r {
+        right: 8px;
+      }
+      .hsc-item {
+        flex: none;
+        width: 106px;
+        scroll-snap-align: start;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .hsc-ico {
+        position: relative;
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        background: var(--sky);
+        border: 2px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        transition:
+          transform 0.15s,
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .hsc-ico:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(15, 42, 82, 0.12);
+      }
+      .hsc-item.on .hsc-ico {
+        border-color: var(--blue);
+        background: #fff;
+      }
+      .hsc-ico svg {
+        width: 50px;
+        height: 50px;
+      }
+      .hsc-badge {
+        position: absolute;
+        top: -4px;
+        right: -2px;
+        min-width: 22px;
+        height: 22px;
+        border-radius: 11px;
+        background: #fff;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 20px;
+        padding: 0 5px;
+      }
+      .hsc-item.on .hsc-badge {
+        background: var(--blue);
+        color: #fff;
+        border-color: var(--blue);
+      }
+      .hsc-name {
+        margin-top: 7px;
+        font-size: 13px;
+        font-weight: 650;
+        color: var(--navy);
+        line-height: 1.2;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+      }
+      .hsc-vol {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 1px;
+      }
+      .hsc-step {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 6px;
+        background: var(--navy);
+        border-radius: 999px;
+        padding: 3px;
+      }
+      .hsc-step button {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 0;
+        background: #fff;
+        color: var(--navy);
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+      .hsc-step button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .hsc-step span {
+        min-width: 22px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      /* Stage */
+      .hsc-stage {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 8px;
+        border-top: 1px solid var(--line);
+        background-color: var(--bg);
+        background-image:
+          repeating-linear-gradient(30deg, rgba(37, 99, 201, 0.06) 0 1px, transparent 1px 26px),
+          repeating-linear-gradient(150deg, rgba(37, 99, 201, 0.06) 0 1px, transparent 1px 26px);
+      }
+      .hsc-visual {
+        position: relative;
+        padding: 18px 12px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .hsc-visual svg.ctr {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        display: block;
+      }
+      .hsc-pill {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 11px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--navy);
+        box-shadow: 0 2px 6px rgba(15, 42, 82, 0.06);
+      }
+      .hsc-pill.multi {
+        background: var(--warn);
+        color: #fff;
+        border-color: var(--warn);
+      }
+      .hsc-units {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        margin-top: 4px;
+      }
+      .hsc-unit {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 4px 8px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .hsc-unit i {
+        display: block;
+        width: 40px;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--sky);
+        overflow: hidden;
+      }
+      .hsc-unit i b {
+        display: block;
+        height: 100%;
+        background: var(--blue);
+      }
+      .walls {
+        transition: opacity 0.35s ease;
+      }
+      .xray .walls {
+        opacity: 0.16;
+      }
+      .xray .roof {
+        opacity: 0.08;
+      }
+      .hidden-edge {
+        opacity: 0;
+        transition: opacity 0.35s;
+      }
+      .xray .hidden-edge {
+        opacity: 0.55;
+      }
+      /* Result */
+      .hsc-result {
+        padding: 22px 22px 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .hsc-result h2 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: 0.6px;
+        color: var(--navy);
+        font-weight: 800;
+      }
+      .hsc-sub {
+        margin: 4px 0 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .hsc-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .hsc-stat {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 10px;
+      }
+      .hsc-stat b {
+        display: block;
+        font-size: 19px;
+        color: var(--navy);
+        line-height: 1.15;
+      }
+      .hsc-stat small {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .hsc-bar {
+        margin-top: 12px;
+        height: 10px;
+        background: #e3eaf5;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .hsc-bar span {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--blue), var(--blue-2));
+        border-radius: 5px;
+        transition:
+          width 0.35s ease,
+          background 0.35s;
+      }
+      .hsc-bar.over span {
+        background: linear-gradient(90deg, var(--warn), #e9a948);
+      }
+      .hsc-barlab {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .hsc-rec {
+        margin: 10px 0 0;
+        font-size: 14px;
+        color: var(--ink);
+        background: #fff;
+        border-left: 3px solid var(--blue);
+        padding: 8px 10px;
+        border-radius: 0 8px 8px 0;
+      }
+      .hsc-mode {
+        display: flex;
+        gap: 6px;
+        margin: 0 0 12px;
+        background: #eef3fb;
+        border-radius: 10px;
+        padding: 4px;
+      }
+      .hsc-mode button {
+        flex: 1;
+        border: 0;
+        background: transparent;
+        border-radius: 8px;
+        padding: 8px 6px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 650;
+        color: var(--navy);
+        cursor: pointer;
+      }
+      .hsc-mode button[aria-pressed='true'] {
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(15, 42, 82, 0.12);
+        color: var(--blue);
+      }
+      .hsc-modenote {
+        margin: 0 0 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .hsc-guide {
+        margin: 12px 0 0;
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+      .hsc-prices {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .hsc-price {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+      }
+      .hsc-price .t {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      .hsc-price .s {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .hsc-price .p {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--navy);
+        margin-top: 4px;
+      }
+      .hsc-price .p em {
+        font-style: normal;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .hsc-price .x {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .hsc-price.ten {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        border: 2px solid var(--blue);
+        background: linear-gradient(135deg, #f3f7ff, #e6efff);
+      }
+      .hsc-price.ten[hidden] {
+        display: none;
+      }
+      .hsc-price.ten .tag {
+        display: inline-block;
+        background: var(--blue);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        margin-bottom: 3px;
+      }
+      .hsc-price.ten .p {
+        margin-top: 0;
+        text-align: right;
+      }
+      .hsc-price.ten .x {
+        text-align: right;
+      }
+      .hsc-pill.ten {
+        background: var(--blue);
+        color: #fff;
+        border-color: var(--blue);
+      }
+      .hsc-list {
+        margin-top: 10px;
+        font-size: 13px;
+      }
+      .hsc-list summary {
+        cursor: pointer;
+        color: var(--navy);
+        font-weight: 650;
+      }
+      .hsc-list ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+      .hsc-filled[hidden],
+      .hsc-sub[hidden] {
+        display: none;
+      }
+      .hsc-ctas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+      .hsc-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        border: 1px solid var(--navy);
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .hsc-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+      .hsc-btn.pri {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+      }
+      .hsc-btn.pri:hover {
+        background: #1d52ab;
+      }
+      .hsc-btn.sec {
+        background: #fff;
+        color: var(--navy);
+      }
+      .hsc-btn.sec:hover {
+        background: var(--sky);
+      }
+      .hsc-btn.ghost {
+        background: transparent;
+        border-color: transparent;
+        color: var(--muted);
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+      .hsc-btn.ghost:hover {
+        color: var(--navy);
+      }
+      .hsc-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 10px 20px;
+        border-top: 1px solid var(--line);
+        font-size: 11px;
+        color: var(--muted);
+        background: #fff;
+      }
+      :focus-visible {
+        outline: 3px solid #8fb4f0;
+        outline-offset: 2px;
+      }
+      /* Icon palette */
+      .a {
+        fill: var(--i-a);
+      }
+      .b {
+        fill: var(--i-b);
+      }
+      .c {
+        fill: var(--i-c);
+      }
+      .d {
+        fill: var(--i-d);
+      }
+      .k {
+        fill: var(--i-k);
+      }
+      .k2 {
+        fill: var(--i-k2);
+      }
+      .t {
+        fill: var(--i-t);
+      }
+      .w {
+        fill: var(--i-w);
+      }
+      .sa {
+        fill: none;
+        stroke: var(--i-a);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .sb {
+        fill: none;
+        stroke: var(--i-b);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      @media (max-width: 680px) {
+        .hsc-stage {
+          grid-template-columns: 1fr;
+        }
+        .hsc-result {
+          padding: 16px;
+        }
+        .hsc-head {
+          padding: 12px 14px;
+        }
+        .hsc-tag {
+          display: none;
+        }
+      }
+      @media (max-width: 420px) {
+        .hsc-stats {
+          grid-template-columns: 1fr 1fr;
+        }
+        .hsc-stats .hsc-stat:last-child {
+          grid-column: 1 / -1;
+        }
+        .hsc-prices {
+          grid-template-columns: 1fr;
+        }
+        .hsc-item {
+          width: 100px;
+        }
+        .hsc-btn {
+          flex: 1 1 auto;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hsc" id="hsc">
+      <header class="hsc-head">
+        <div class="hsc-brand">
+          <svg class="hsc-logo" viewBox="0 0 34 34" aria-hidden="true">
+            <rect width="34" height="34" rx="8" fill="#2563c9" />
+            <path
+              d="M8 12.5 17 8l9 4.5v10L17 27l-9-4.5z"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M8 12.5 17 17l9-4.5M17 17v10"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <div>
+            <h1 id="hsc-title">Hewitt Storage</h1>
+            <p id="hsc-subtitle">Storage calculator</p>
+          </div>
         </div>
-        <div class="hsc-bar" id="hsc-bar"><span id="hsc-bar-fill"></span></div>
-        <div class="hsc-barlab"><span>0%</span><span id="hsc-bar-txt">One 20ft container</span><span>100%</span></div>
-        <p class="hsc-rec hsc-floor" id="hsc-floor" hidden role="status" style="border-left-color:#d98a1f;background:#fff6e8;font-weight:600"></p>
-        <p class="hsc-rec" id="hsc-pal" hidden></p>
-        <p class="hsc-rec" id="hsc-rec"></p>
-        <p class="hsc-rec" id="hsc-alt" hidden></p>
-        <div class="hsc-prices">
-          <div class="hsc-price ten" id="hsc-ten" hidden><div><span class="tag" id="hsc-s-tag">10ft fits this</span><div class="t" id="hsc-s-lab"></div><div class="s" id="hsc-s-note" hidden style="display:none"></div></div><div><div class="p"><span id="hsc-s-p"></span> <em>+ VAT /month</em></div><div class="x" id="hsc-s-x"></div></div></div>
-          <div class="hsc-price"><div class="t" id="hsc-g-lab"></div><div class="s" id="hsc-g-note" hidden style="display:none"></div><div class="p"><span id="hsc-g-p"></span> <em>+ VAT /month</em></div><div class="x" id="hsc-g-x"></div></div>
-          <div class="hsc-price"><div class="t" id="hsc-u-lab"></div><div class="s" id="hsc-u-note" hidden style="display:none"></div><div class="p"><span id="hsc-u-p"></span> <em>+ VAT /month</em></div><div class="x" id="hsc-u-x"></div></div>
+        <span class="hsc-tag" id="hsc-tag" hidden style="display: none"></span>
+      </header>
+
+      <nav class="hsc-tabs" id="hsc-tabs" role="tablist" aria-label="Item categories"></nav>
+
+      <div class="hsc-strip-wrap">
+        <button class="hsc-arrow l" id="hsc-prev" type="button" aria-label="Scroll items left">
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <path
+              d="M9 2 4 7l5 5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+        <div class="hsc-strip" id="hsc-strip" role="tabpanel"></div>
+        <button class="hsc-arrow r" id="hsc-next" type="button" aria-label="Scroll items right">
+          <svg width="14" height="14" viewBox="0 0 14 14">
+            <path
+              d="M5 2l5 5-5 5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <section class="hsc-stage">
+        <div class="hsc-visual">
+          <span class="hsc-pill" id="hsc-pill">Empty</span>
+          <svg
+            class="ctr"
+            id="hsc-svg"
+            viewBox="0 0 360 340"
+            role="img"
+            aria-label="20ft container fill level"
+          ></svg>
+          <div class="hsc-units" id="hsc-units"></div>
         </div>
-        <details class="hsc-list"><summary id="hsc-list-sum">Your items</summary><ul id="hsc-list"></ul></details>
-      </div>
-      <p class="hsc-guide" id="hsc-guide">Please note: this is a guide only, practical space for loading has been factored in.</p>
-      <div class="hsc-ctas">
-        <a class="hsc-btn pri" id="hsc-enquire" hidden style="display:none" href="#" target="_top">Enquire / reserve</a>
-        <a class="hsc-btn sec" id="hsc-call" hidden style="display:none" href="#" target="_top"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 1.5h2l1 3.2-1.4 1A8 8 0 0 0 10.3 11l1-1.4 3.2 1v2A1.6 1.6 0 0 1 12.9 14.5 11.5 11.5 0 0 1 1.5 3.1 1.6 1.6 0 0 1 3.5 1.5z" fill="currentColor"/></svg><span id="hsc-call-txt">Call</span></a>
-        <a class="hsc-btn sec" id="hsc-email" hidden style="display:none" href="#" target="_top"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m2 4 6 5 6-5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Email</a>
-        <button class="hsc-btn ghost" id="hsc-reset" type="button">Reset</button>
-      </div>
+
+        <div class="hsc-result" aria-live="polite">
+          <h2>GET STORING</h2>
+          <div class="hsc-mode" id="hsc-mode" role="group" aria-label="How should it be packed?">
+            <button type="button" data-mode="room" aria-pressed="true">
+              Room to get in and organise</button
+            ><button type="button" data-mode="max" aria-pressed="false">Packed to the max</button>
+          </div>
+          <div class="hsc-mode hsc-lane" id="hsc-lane" role="group" aria-label="Loading lane">
+            <button type="button" data-lane="auto" aria-pressed="true">Lane: Auto</button
+            ><button type="button" data-lane="side" aria-pressed="false">Side</button
+            ><button type="button" data-lane="middle" aria-pressed="false">Middle</button>
+          </div>
+          <p class="hsc-modenote" id="hsc-modenote"></p>
+          <p class="hsc-sub" id="hsc-empty">Start by adding items to your storage unit</p>
+          <div class="hsc-filled" id="hsc-filled" hidden>
+            <div class="hsc-stats">
+              <div class="hsc-stat"><b id="hsc-vol">0</b><small>cu ft estimated</small></div>
+              <div class="hsc-stat">
+                <b id="hsc-pct">0%</b><small id="hsc-pct-lab">of one 20ft</small>
+              </div>
+              <div class="hsc-stat">
+                <b id="hsc-n">0</b><small id="hsc-n-lab">containers needed</small>
+              </div>
+            </div>
+            <div class="hsc-bar" id="hsc-bar"><span id="hsc-bar-fill"></span></div>
+            <div class="hsc-barlab">
+              <span>0%</span><span id="hsc-bar-txt">One 20ft container</span><span>100%</span>
+            </div>
+            <p
+              class="hsc-rec hsc-floor"
+              id="hsc-floor"
+              hidden
+              role="status"
+              style="border-left-color: #d98a1f; background: #fff6e8; font-weight: 600"
+            ></p>
+            <p class="hsc-rec" id="hsc-pal" hidden></p>
+            <p class="hsc-rec" id="hsc-rec"></p>
+            <p class="hsc-rec" id="hsc-alt" hidden></p>
+            <div class="hsc-prices">
+              <div class="hsc-price ten" id="hsc-ten" hidden>
+                <div>
+                  <span class="tag" id="hsc-s-tag">10ft fits this</span>
+                  <div class="t" id="hsc-s-lab"></div>
+                  <div class="s" id="hsc-s-note" hidden style="display: none"></div>
+                </div>
+                <div>
+                  <div class="p"><span id="hsc-s-p"></span> <em>+ VAT /month</em></div>
+                  <div class="x" id="hsc-s-x"></div>
+                </div>
+              </div>
+              <div class="hsc-price">
+                <div class="t" id="hsc-g-lab"></div>
+                <div class="s" id="hsc-g-note" hidden style="display: none"></div>
+                <div class="p"><span id="hsc-g-p"></span> <em>+ VAT /month</em></div>
+                <div class="x" id="hsc-g-x"></div>
+              </div>
+              <div class="hsc-price">
+                <div class="t" id="hsc-u-lab"></div>
+                <div class="s" id="hsc-u-note" hidden style="display: none"></div>
+                <div class="p"><span id="hsc-u-p"></span> <em>+ VAT /month</em></div>
+                <div class="x" id="hsc-u-x"></div>
+              </div>
+            </div>
+            <details class="hsc-list">
+              <summary id="hsc-list-sum">Your items</summary>
+              <ul id="hsc-list"></ul>
+            </details>
+          </div>
+          <p class="hsc-guide" id="hsc-guide">
+            Please note: this is a guide only, practical space for loading has been factored in.
+          </p>
+          <div class="hsc-ctas">
+            <a
+              class="hsc-btn pri"
+              id="hsc-enquire"
+              hidden
+              style="display: none"
+              href="#"
+              target="_top"
+              >Enquire / reserve</a
+            >
+            <a class="hsc-btn sec" id="hsc-call" hidden style="display: none" href="#" target="_top"
+              ><svg viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M3.5 1.5h2l1 3.2-1.4 1A8 8 0 0 0 10.3 11l1-1.4 3.2 1v2A1.6 1.6 0 0 1 12.9 14.5 11.5 11.5 0 0 1 1.5 3.1 1.6 1.6 0 0 1 3.5 1.5z"
+                  fill="currentColor"
+                /></svg
+              ><span id="hsc-call-txt">Call</span></a
+            >
+            <a
+              class="hsc-btn sec"
+              id="hsc-email"
+              hidden
+              style="display: none"
+              href="#"
+              target="_top"
+              ><svg viewBox="0 0 16 16" aria-hidden="true">
+                <rect
+                  x="1.5"
+                  y="3"
+                  width="13"
+                  height="10"
+                  rx="1.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+                <path d="m2 4 6 5 6-5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg
+              >Email</a
+            >
+            <button class="hsc-btn ghost" id="hsc-reset" type="button">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="hsc-foot">
+        <span id="hsc-disclaimer"></span>
+        <span id="hsc-footbrand"></span>
+      </footer>
     </div>
-  </section>
 
-  <footer class="hsc-foot">
-    <span id="hsc-disclaimer"></span>
-    <span id="hsc-footbrand"></span>
-  </footer>
-</div>
-
-<script>
-/* =====================================================================
+    <script>
+      /* =====================================================================
    HEWITT STORAGE – CALCULATOR CONFIG
    Edit prices, contact details, container size and item volumes here.
    Volumes are approximate cubic feet (cu ft) per item.
    ===================================================================== */
-var CALC_CONFIG = {
-  businessName: 'Hewitt Storage',
-  location: '',
+      var CALC_CONFIG = {
+        businessName: 'Hewitt Storage',
+        location: '',
 
-  container: {
-    label: '20ft container',
-    lengthFt: 20, widthFt: 8, heightFt: 8,
-    internalCuFt: 1172,        // internal volume of a 20ft steel container (~5.9 × 2.35 × 2.39 m ≈ 33 m³)
-    packingEfficiency: 0.70    // share of gross volume realistically usable for a mixed load once you allow
-                               // for gaps, uneven stacking and a loading lane to reach things (UK guides: ~60–75%)
-  },
+        container: {
+          label: '20ft container',
+          lengthFt: 20,
+          widthFt: 8,
+          heightFt: 8,
+          internalCuFt: 1172, // internal volume of a 20ft steel container (~5.9 × 2.35 × 2.39 m ≈ 33 m³)
+          packingEfficiency: 0.7, // share of gross volume realistically usable for a mixed load once you allow
+          // for gaps, uneven stacking and a loading lane to reach things (UK guides: ~60–75%)
+        },
 
-  // Space is worked out on a FLOOR PLAN (see FIT ENGINE below the config): a clear 0.65 m loading lane runs front
-  // to back, down the middle (two 0.85 m zones) or along one side (one 1.70 m zone); stacked to 2.1 m.
-  // Capacity: 20ft 5.90 × 1.70 = 10.03 m² × 2.1 = 21.06 m³; 10ft 2.80 × 1.70 = 4.76 m² × 2.1 = 10.00 m³.
-  // The values below are kept for reference only; the engine uses item dimensions, not cu ft.
-  usableCuFt20: 750,
-  usableCuFt10: 375,
+        // Space is worked out on a FLOOR PLAN (see FIT ENGINE below the config): a clear 0.65 m loading lane runs front
+        // to back, down the middle (two 0.85 m zones) or along one side (one 1.70 m zone); stacked to 2.1 m.
+        // Capacity: 20ft 5.90 × 1.70 = 10.03 m² × 2.1 = 21.06 m³; 10ft 2.80 × 1.70 = 4.76 m² × 2.1 = 10.00 m³.
+        // The values below are kept for reference only; the engine uses item dimensions, not cu ft.
+        usableCuFt20: 750,
+        usableCuFt10: 375,
 
-  container10: {
-    label: '10ft container',
-    lengthFt: 10,
-    internalCuFt: 560
-  },
+        container10: {
+          label: '10ft container',
+          lengthFt: 10,
+          internalCuFt: 560,
+        },
 
-  pricing: {
-    currency: '£',
-    vatRate: 0.20,             // used only for the small "inc VAT" line
-    ground:   { label: 'Ground level 20ft', note: '', monthly: 125 },
-    upstairs: { label: 'Upper level 20ft',           note: '', monthly: 105 },
-    small10:  { label: '10ft container',           note: '',            monthly: 90 }
-  },
+        pricing: {
+          currency: '£',
+          vatRate: 0.2, // used only for the small "inc VAT" line
+          ground: { label: 'Ground level 20ft', note: '', monthly: 125 },
+          upstairs: { label: 'Upper level 20ft', note: '', monthly: 105 },
+          small10: { label: '10ft container', note: '', monthly: 90 },
+        },
 
-  contact: {
-    enquireUrl: 'reserve.htm',   // the site's reservation page (relative, same folder)
-    phoneDisplay: '01695 681000',
-    phoneTel: '+441695681000',
-    email: 'andrew@hewittstorage.co.uk',
-    emailSubject: 'Storage enquiry – Hewitt Storage calculator'
-  },
+        contact: {
+          enquireUrl: 'reserve.htm', // the site's reservation page (relative, same folder)
+          phoneDisplay: '01695 681000',
+          phoneTel: '+441695681000',
+          email: 'andrew@hewittstorage.co.uk',
+          emailSubject: 'Storage enquiry – Hewitt Storage calculator',
+        },
 
-  maxPerItem: 500,           // per-item cap (was 99, which silently capped 100+ boxes)
+        maxPerItem: 500, // per-item cap (was 99, which silently capped 100+ boxes)
 
-  // FLOOR-PLAN FIT MODEL (12/10/2026). Each item has:
-  //   d: [length, depth, height] in metres AS STORED (beds dismantled, mattresses on edge, white goods upright).
-  //   mode: 'floor'  – must stand on the floor (takes lane length; never goes on top of anything)
-  //         'stack'  – can stand on the floor OR on top of something (boxes, chairs, small furniture)
-  //         'edge'   – flat piece stood on edge against the wall (mattresses, divan bases); several share one 0.85 m deep strip
-  //         'pallet' – floor only, placed first, nothing on top (see pallet notes above)
-  //   top:  what may go on top of it: 'any' (boxes etc.), 'light' (small/medium boxes, chairs only), 'none'
-  //   inner: share of the item's own volume usable for boxes (bookcase / shelving bay shelves)
-  //   sofa: sofas go seat-to-seat 2 high (if under 2.0 m), an odd one stands on end
-  //   light: true if this stack item is light enough to go on a 'light' surface (e.g. a sofa seat or a washing machine)
-  //   cuft: approximate volume shown to the customer (UK removal-company charts)
-  categories: [
-    { id: 'living', label: 'Living', items: [
-      { id: 'chair',        name: 'Chair',            cuft: 12.9, icon: 'chair',      d: [0.55, 0.70, 0.95], mode: 'stack', light: true, maxStack: 2, stackH: 0.45 },   // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm footprint with legs/backs offset
-      { id: 'armchair',     name: 'Armchair',         cuft: 25.7, icon: 'armchair',   d: [0.90, 0.85, 0.95], mode: 'floor', top: 'light' },
-      { id: 'sofa2',        name: '2 seat sofa',      cuft: 43.2, icon: 'sofa2',      d: [1.60, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true, maxStack: 2, stackH: 0.65 },
-      { id: 'sofa3',        name: '3 seat sofa',      cuft: 54.0, icon: 'sofa3',      d: [2.00, 0.90, 0.85], mode: 'floor', top: 'light', sofa: true, maxStack: 2, stackH: 0.65 },
-      { id: 'coffeetable',  name: 'Coffee table',     cuft: 9.6, icon: 'coffeetable', d: [1.10, 0.55, 0.45], mode: 'stack', maxStack: 2, top: 'light' },
-      { id: 'tvunit',       name: 'TV / TV unit',     cuft: 11.4, icon: 'tvunit',     d: [1.20, 0.45, 0.60], mode: 'stack', maxStack: 1, top: 'light' },
-      { id: 'bookcase',     name: 'Bookcase',         cuft: 15.3, icon: 'bookcase',   d: [0.80, 0.30, 1.80], mode: 'floor', top: 'any', inner: 0.75 }   // shelves hold boxes/books
-    ]},
-    { id: 'dining', label: 'Dining', items: [
-      { id: 'dtable46',     name: 'Dining table (4–6)', cuft: 35.8, icon: 'dtable46', d: [1.50, 0.90, 0.75], mode: 'floor' },   // legs off, top on edge,
-      { id: 'dtable8',      name: 'Dining table (8+)',  cuft: 53.0, icon: 'dtable8',  d: [2.00, 1.00, 0.75], mode: 'floor' },   // legs off, top on edge,
-      { id: 'dchair',       name: 'Dining chair',       cuft: 7.2,  icon: 'dchair',   d: [0.45, 0.50, 0.90], mode: 'stack', light: true, maxStack: 2, stackH: 0.45 }   // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm with legs/backs offset
-    ]},
-    { id: 'bedroom', label: 'Bedroom', items: [
-      { id: 'bedsingle',    name: 'Single bed',       cuft: 54.3, icon: 'bedsingle', d: [1.90, 0.90, 0.90], mode: 'floor', firm: true },   // dismantled: divan/frame on edge
-      { id: 'beddouble',    name: 'Double bed',       cuft: 81.5, icon: 'beddouble', d: [1.90, 1.35, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 68 cm) on edge
-      { id: 'bedking',      name: 'King bed',         cuft: 95.4, icon: 'bedking',   d: [2.00, 1.50, 0.90], mode: 'floor', firm: true },   // 2-piece divan (2 × 76 cm) on edge
-      { id: 'wardrobe',     name: 'Wardrobe',         cuft: 39.2, icon: 'wardrobe',  d: [1.00, 0.60, 1.85], mode: 'floor', top: 'any' },
-      { id: 'drawers',      name: 'Chest of drawers', cuft: 10.8, icon: 'drawers',   d: [0.80, 0.45, 0.85], mode: 'stack', maxStack: 1, top: 'any' },
-      { id: 'bedside',      name: 'Bedside table',    cuft: 3.5,  icon: 'bedside',   d: [0.45, 0.40, 0.55], mode: 'stack', maxStack: 2, top: 'any' },
-      { id: 'mattress',     name: 'Mattress',         cuft: 22.6, icon: 'mattress',  d: [1.90, 0.25, 1.35], mode: 'edge' }    // double, stood on its long edge
-    ]},
-    { id: 'kitchen', label: 'Kitchen & appliances', items: [
-      { id: 'fridge',       name: 'Fridge freezer',   cuft: 24.8, icon: 'fridge',     d: [0.60, 0.65, 1.80], mode: 'floor', top: 'light' },   // light items on top; white goods never on each other
-      { id: 'washer',       name: 'Washing machine',  cuft: 10.8, icon: 'washer',     d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
-      { id: 'dishwasher',   name: 'Dishwasher',       cuft: 10.8, icon: 'dishwasher', d: [0.60, 0.60, 0.85], mode: 'floor', top: 'light' },
-      { id: 'cooker',       name: 'Cooker',           cuft: 11.4, icon: 'cooker',     d: [0.60, 0.60, 0.90], mode: 'floor', top: 'light' }
-    ]},
-    { id: 'boxes', label: 'Boxes', items: [
-      { id: 'boxs',         name: 'Small box',        cuft: 1.4, dims: 'approx. 45×30×30 cm', icon: 'boxs', d: [0.45, 0.30, 0.30], mode: 'stack', light: true, box: true },
-      { id: 'boxm',         name: 'Medium box',       cuft: 2.8, dims: 'approx. 50×40×40 cm', icon: 'boxm', d: [0.50, 0.40, 0.40], mode: 'stack', light: true, box: true },
-      { id: 'boxl',         name: 'Large box',        cuft: 4.3, dims: 'approx. 60×45×45 cm', icon: 'boxl', d: [0.60, 0.45, 0.45], mode: 'stack', light: true, box: true }   // large boxes = bedding/linen; books go in small boxes
-    ]},
-    { id: 'business', label: 'Business', items: [
-      { id: 'palleteuro',   name: 'Euro pallet', cuft: 40.7, dims: 'approx. 120×80 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'E' },
-      { id: 'palletuk',     name: 'UK pallet',   cuft: 50.9, dims: 'approx. 120×100 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'U' },
-      { id: 'pallethalf',   name: 'Half pallet', cuft: 20.3, dims: 'approx. 80×60 cm footprint, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'H' },
-      { id: 'filing',       name: 'Filing cabinet',   cuft: 13.6, icon: 'filing',      d: [0.47, 0.62, 1.32], mode: 'floor', top: 'any' },
-      { id: 'desk',         name: 'Desk',             cuft: 26.0, icon: 'desk',        d: [1.40, 0.70, 0.75], mode: 'floor', top: 'any' },   // stored assembled, not stacked; boxes/chairs on top
-      { id: 'officechair',  name: 'Office chair',     cuft: 15.7, icon: 'officechair', d: [0.65, 0.65, 1.05], mode: 'stack', light: true, maxStack: 1 },
-      { id: 'shelving',     name: 'Shelving bay',     cuft: 25.7, icon: 'shelving',    d: [0.90, 0.45, 1.80], mode: 'floor', top: 'any', inner: 0.8 }   // shelf bays hold boxes
-    ]},
-    { id: 'trades', label: 'Trades', items: [
-      { id: 'pallet4ft',    name: '4ft pallet of goods', cuft: 52.7, dims: 'approx. 122×102 cm, 1.2 m high · not stacked', icon: 'pallet', mode: 'pallet', pal: 'F' },
-      { id: 'mixer',        name: 'Concrete mixer',   cuft: 35.4, icon: 'mixer',       d: [1.10, 0.70, 1.30], mode: 'floor' },   // upright, never tipped, nothing on it
-      { id: 'wheelbarrow',  name: 'Wheelbarrow',      cuft: 21.6, icon: 'wheelbarrow', d: [1.45, 0.65, 0.65], mode: 'floor' },   // upright on its wheel, nothing on it
-      { id: 'ladder2',      name: 'Double ladder',    cuft: 7.2, icon: 'ladder',      d: [3.00, 0.45, 0.15], mode: 'floor' },   // 2-section extension, closed, lies flat lengthwise
-      { id: 'stepladder',   name: 'Step ladder',      cuft: 3.4, icon: 'stepladder',  d: [1.60, 0.50, 0.12], mode: 'floor' },   // 6-tread, folded, lies flat lengthwise
-      { id: 'sitebox',      name: 'Site box',         cuft: 20.3, icon: 'sitebox',     d: [1.28, 0.67, 0.67], mode: 'floor' },   // steel site box, flat top
-      { id: 'scaffold',     name: 'Scaffold tower (folded)', cuft: 13.4, icon: 'scaffold', d: [1.90, 0.80, 0.25], mode: 'floor' },   // folding tower, lies flat lengthwise
-      { id: 'plasterboard', name: 'Plasterboard bundle', cuft: 25.4, icon: 'plasterboard', d: [2.40, 1.20, 0.25], mode: 'floor' },   // 20 sheets x 12.5 mm, flat or on edge
-      { id: 'pbsheet',      name: 'Plasterboard sheet', cuft: 1.3, icon: 'plasterboard', d: [2.40, 1.20, 0.0125], mode: 'floor' }   // one 12.5 mm sheet, flat or on edge, stacks with sheets and bundles
-    ]}
-  ]
-};
-/* ======================= END OF CONFIG ======================= */
+        // FLOOR-PLAN FIT MODEL (12/10/2026). Each item has:
+        //   d: [length, depth, height] in metres AS STORED (beds dismantled, mattresses on edge, white goods upright).
+        //   mode: 'floor'  – must stand on the floor (takes lane length; never goes on top of anything)
+        //         'stack'  – can stand on the floor OR on top of something (boxes, chairs, small furniture)
+        //         'edge'   – flat piece stood on edge against the wall (mattresses, divan bases); several share one 0.85 m deep strip
+        //         'pallet' – floor only, placed first, nothing on top (see pallet notes above)
+        //   top:  what may go on top of it: 'any' (boxes etc.), 'light' (small/medium boxes, chairs only), 'none'
+        //   inner: share of the item's own volume usable for boxes (bookcase / shelving bay shelves)
+        //   sofa: sofas go seat-to-seat 2 high (if under 2.0 m), an odd one stands on end
+        //   light: true if this stack item is light enough to go on a 'light' surface (e.g. a sofa seat or a washing machine)
+        //   cuft: approximate volume shown to the customer (UK removal-company charts)
+        categories: [
+          {
+            id: 'living',
+            label: 'Living',
+            items: [
+              {
+                id: 'chair',
+                name: 'Chair',
+                cuft: 12.9,
+                icon: 'chair',
+                d: [0.55, 0.7, 0.95],
+                mode: 'stack',
+                light: true,
+                maxStack: 2,
+                stackH: 0.45,
+              }, // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm footprint with legs/backs offset
+              {
+                id: 'armchair',
+                name: 'Armchair',
+                cuft: 25.7,
+                icon: 'armchair',
+                d: [0.9, 0.85, 0.95],
+                mode: 'floor',
+                top: 'light',
+              },
+              {
+                id: 'sofa2',
+                name: '2 seat sofa',
+                cuft: 43.2,
+                icon: 'sofa2',
+                d: [1.6, 0.9, 0.85],
+                mode: 'floor',
+                top: 'light',
+                sofa: true,
+                maxStack: 2,
+                stackH: 0.65,
+              },
+              {
+                id: 'sofa3',
+                name: '3 seat sofa',
+                cuft: 54.0,
+                icon: 'sofa3',
+                d: [2.0, 0.9, 0.85],
+                mode: 'floor',
+                top: 'light',
+                sofa: true,
+                maxStack: 2,
+                stackH: 0.65,
+              },
+              {
+                id: 'coffeetable',
+                name: 'Coffee table',
+                cuft: 9.6,
+                icon: 'coffeetable',
+                d: [1.1, 0.55, 0.45],
+                mode: 'stack',
+                maxStack: 2,
+                top: 'light',
+              },
+              {
+                id: 'tvunit',
+                name: 'TV / TV unit',
+                cuft: 11.4,
+                icon: 'tvunit',
+                d: [1.2, 0.45, 0.6],
+                mode: 'stack',
+                maxStack: 1,
+                top: 'light',
+              },
+              {
+                id: 'bookcase',
+                name: 'Bookcase',
+                cuft: 15.3,
+                icon: 'bookcase',
+                d: [0.8, 0.3, 1.8],
+                mode: 'floor',
+                top: 'any',
+                inner: 0.75,
+              }, // shelves hold boxes/books
+            ],
+          },
+          {
+            id: 'dining',
+            label: 'Dining',
+            items: [
+              {
+                id: 'dtable46',
+                name: 'Dining table (4–6)',
+                cuft: 35.8,
+                icon: 'dtable46',
+                d: [1.5, 0.9, 0.75],
+                mode: 'floor',
+              }, // legs off, top on edge,
+              {
+                id: 'dtable8',
+                name: 'Dining table (8+)',
+                cuft: 53.0,
+                icon: 'dtable8',
+                d: [2.0, 1.0, 0.75],
+                mode: 'floor',
+              }, // legs off, top on edge,
+              {
+                id: 'dchair',
+                name: 'Dining chair',
+                cuft: 7.2,
+                icon: 'dchair',
+                d: [0.45, 0.5, 0.9],
+                mode: 'stack',
+                light: true,
+                maxStack: 2,
+                stackH: 0.45,
+              }, // 2 high seat-to-seat: pair ≈ 1.4 m high, ≈ 55×70 cm with legs/backs offset
+            ],
+          },
+          {
+            id: 'bedroom',
+            label: 'Bedroom',
+            items: [
+              {
+                id: 'bedsingle',
+                name: 'Single bed',
+                cuft: 54.3,
+                icon: 'bedsingle',
+                d: [1.9, 0.9, 0.9],
+                mode: 'floor',
+                firm: true,
+              }, // dismantled: divan/frame on edge
+              {
+                id: 'beddouble',
+                name: 'Double bed',
+                cuft: 81.5,
+                icon: 'beddouble',
+                d: [1.9, 1.35, 0.9],
+                mode: 'floor',
+                firm: true,
+              }, // 2-piece divan (2 × 68 cm) on edge
+              {
+                id: 'bedking',
+                name: 'King bed',
+                cuft: 95.4,
+                icon: 'bedking',
+                d: [2.0, 1.5, 0.9],
+                mode: 'floor',
+                firm: true,
+              }, // 2-piece divan (2 × 76 cm) on edge
+              {
+                id: 'wardrobe',
+                name: 'Wardrobe',
+                cuft: 39.2,
+                icon: 'wardrobe',
+                d: [1.0, 0.6, 1.85],
+                mode: 'floor',
+                top: 'any',
+              },
+              {
+                id: 'drawers',
+                name: 'Chest of drawers',
+                cuft: 10.8,
+                icon: 'drawers',
+                d: [0.8, 0.45, 0.85],
+                mode: 'stack',
+                maxStack: 1,
+                top: 'any',
+              },
+              {
+                id: 'bedside',
+                name: 'Bedside table',
+                cuft: 3.5,
+                icon: 'bedside',
+                d: [0.45, 0.4, 0.55],
+                mode: 'stack',
+                maxStack: 2,
+                top: 'any',
+              },
+              {
+                id: 'mattress',
+                name: 'Mattress',
+                cuft: 22.6,
+                icon: 'mattress',
+                d: [1.9, 0.25, 1.35],
+                mode: 'edge',
+              }, // double, stood on its long edge
+            ],
+          },
+          {
+            id: 'kitchen',
+            label: 'Kitchen & appliances',
+            items: [
+              {
+                id: 'fridge',
+                name: 'Fridge freezer',
+                cuft: 24.8,
+                icon: 'fridge',
+                d: [0.6, 0.65, 1.8],
+                mode: 'floor',
+                top: 'light',
+              }, // light items on top; white goods never on each other
+              {
+                id: 'washer',
+                name: 'Washing machine',
+                cuft: 10.8,
+                icon: 'washer',
+                d: [0.6, 0.6, 0.85],
+                mode: 'floor',
+                top: 'light',
+              },
+              {
+                id: 'dishwasher',
+                name: 'Dishwasher',
+                cuft: 10.8,
+                icon: 'dishwasher',
+                d: [0.6, 0.6, 0.85],
+                mode: 'floor',
+                top: 'light',
+              },
+              {
+                id: 'cooker',
+                name: 'Cooker',
+                cuft: 11.4,
+                icon: 'cooker',
+                d: [0.6, 0.6, 0.9],
+                mode: 'floor',
+                top: 'light',
+              },
+            ],
+          },
+          {
+            id: 'boxes',
+            label: 'Boxes',
+            items: [
+              {
+                id: 'boxs',
+                name: 'Small box',
+                cuft: 1.4,
+                dims: 'approx. 45×30×30 cm',
+                icon: 'boxs',
+                d: [0.45, 0.3, 0.3],
+                mode: 'stack',
+                light: true,
+                box: true,
+              },
+              {
+                id: 'boxm',
+                name: 'Medium box',
+                cuft: 2.8,
+                dims: 'approx. 50×40×40 cm',
+                icon: 'boxm',
+                d: [0.5, 0.4, 0.4],
+                mode: 'stack',
+                light: true,
+                box: true,
+              },
+              {
+                id: 'boxl',
+                name: 'Large box',
+                cuft: 4.3,
+                dims: 'approx. 60×45×45 cm',
+                icon: 'boxl',
+                d: [0.6, 0.45, 0.45],
+                mode: 'stack',
+                light: true,
+                box: true,
+              }, // large boxes = bedding/linen; books go in small boxes
+            ],
+          },
+          {
+            id: 'business',
+            label: 'Business',
+            items: [
+              {
+                id: 'palleteuro',
+                name: 'Euro pallet',
+                cuft: 40.7,
+                dims: 'approx. 120×80 cm footprint, 1.2 m high · not stacked',
+                icon: 'pallet',
+                mode: 'pallet',
+                pal: 'E',
+              },
+              {
+                id: 'palletuk',
+                name: 'UK pallet',
+                cuft: 50.9,
+                dims: 'approx. 120×100 cm footprint, 1.2 m high · not stacked',
+                icon: 'pallet',
+                mode: 'pallet',
+                pal: 'U',
+              },
+              {
+                id: 'pallethalf',
+                name: 'Half pallet',
+                cuft: 20.3,
+                dims: 'approx. 80×60 cm footprint, 1.2 m high · not stacked',
+                icon: 'pallet',
+                mode: 'pallet',
+                pal: 'H',
+              },
+              {
+                id: 'filing',
+                name: 'Filing cabinet',
+                cuft: 13.6,
+                icon: 'filing',
+                d: [0.47, 0.62, 1.32],
+                mode: 'floor',
+                top: 'any',
+              },
+              {
+                id: 'desk',
+                name: 'Desk',
+                cuft: 26.0,
+                icon: 'desk',
+                d: [1.4, 0.7, 0.75],
+                mode: 'floor',
+                top: 'any',
+              }, // stored assembled, not stacked; boxes/chairs on top
+              {
+                id: 'officechair',
+                name: 'Office chair',
+                cuft: 15.7,
+                icon: 'officechair',
+                d: [0.65, 0.65, 1.05],
+                mode: 'stack',
+                light: true,
+                maxStack: 1,
+              },
+              {
+                id: 'shelving',
+                name: 'Shelving bay',
+                cuft: 25.7,
+                icon: 'shelving',
+                d: [0.9, 0.45, 1.8],
+                mode: 'floor',
+                top: 'any',
+                inner: 0.8,
+              }, // shelf bays hold boxes
+            ],
+          },
+          {
+            id: 'trades',
+            label: 'Trades',
+            items: [
+              {
+                id: 'pallet4ft',
+                name: '4ft pallet of goods',
+                cuft: 52.7,
+                dims: 'approx. 122×102 cm, 1.2 m high · not stacked',
+                icon: 'pallet',
+                mode: 'pallet',
+                pal: 'F',
+              },
+              {
+                id: 'mixer',
+                name: 'Concrete mixer',
+                cuft: 35.4,
+                icon: 'mixer',
+                d: [1.1, 0.7, 1.3],
+                mode: 'floor',
+              }, // upright, never tipped, nothing on it
+              {
+                id: 'wheelbarrow',
+                name: 'Wheelbarrow',
+                cuft: 21.6,
+                icon: 'wheelbarrow',
+                d: [1.45, 0.65, 0.65],
+                mode: 'floor',
+              }, // upright on its wheel, nothing on it
+              {
+                id: 'ladder2',
+                name: 'Double ladder',
+                cuft: 7.2,
+                icon: 'ladder',
+                d: [3.0, 0.45, 0.15],
+                mode: 'floor',
+              }, // 2-section extension, closed, lies flat lengthwise
+              {
+                id: 'stepladder',
+                name: 'Step ladder',
+                cuft: 3.4,
+                icon: 'stepladder',
+                d: [1.6, 0.5, 0.12],
+                mode: 'floor',
+              }, // 6-tread, folded, lies flat lengthwise
+              {
+                id: 'sitebox',
+                name: 'Site box',
+                cuft: 20.3,
+                icon: 'sitebox',
+                d: [1.28, 0.67, 0.67],
+                mode: 'floor',
+              }, // steel site box, flat top
+              {
+                id: 'scaffold',
+                name: 'Scaffold tower (folded)',
+                cuft: 13.4,
+                icon: 'scaffold',
+                d: [1.9, 0.8, 0.25],
+                mode: 'floor',
+              }, // folding tower, lies flat lengthwise
+              {
+                id: 'plasterboard',
+                name: 'Plasterboard bundle',
+                cuft: 25.4,
+                icon: 'plasterboard',
+                d: [2.4, 1.2, 0.25],
+                mode: 'floor',
+              }, // 20 sheets x 12.5 mm, flat or on edge
+              {
+                id: 'pbsheet',
+                name: 'Plasterboard sheet',
+                cuft: 1.3,
+                icon: 'plasterboard',
+                d: [2.4, 1.2, 0.0125],
+                mode: 'floor',
+              }, // one 12.5 mm sheet, flat or on edge, stacks with sheets and bundles
+            ],
+          },
+        ],
+      };
+      /* ======================= END OF CONFIG ======================= */
 
-/* =====================================================================
+      /* =====================================================================
    STORAGE CALCULATOR ENGINE v3 (16/10/2026, Andy's spec: volume-based %)
    Internal size: 20ft 5.90 m long x 2.35 m wide x 2.39 m high; 10ft 2.82 m long, same width/height.
    Organise mode keeps a 0.65 m loading lane clear for the full length, along one side (one 1.70 m strip)
@@ -338,629 +1428,1745 @@ var CALC_CONFIG = {
    adds the shares, so adding anything always raises the reading, one item type alone rises in equal
    steps and reads 100% when no more fit. Containers are filled largest items first.
    ===================================================================== */
-var HS_FIT = { W: 2.35, LANE: 0.65, H: 2.1, INT_H: 2.39, BOX_H: 1.8, L20: 5.9, L10: 2.82, CU20: 1172, CU10: 560, PAL_H: 1.2, M3_CUFT: 35.3147, NEST_STEP: 0.32, NEST_MAX: 4, SHEET: 0.0125 };
-var HS_MODE = 'room';     // 'room' = organise (lane kept clear), 'max' = packed (no lane)
-var HS_LANE = 'auto';     // 'auto' | 'side' | 'middle'
-var HS_FIXED = { fridge: 1, washer: 1, dishwasher: 1, cooker: 1, chair: 1,
-  bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, desk: 1, wardrobe: 1,
-  mixer: 1, wheelbarrow: 1, sitebox: 1, plasterboard: 1, pbsheet: 1, ladder2: 1, stepladder: 1, scaffold: 1 };   // trades: ladders/tower lie flat lengthwise only, mixer never tipped
-var HS_EDGEOK = { plasterboard: 1, pbsheet: 1 };   // plasterboard: flat OR on its long edge (2.4 long x 1.2 high); whichever fits more (Andy 16/10)
-var HS_FLATSTACK = { ladder2: 1, stepladder: 1, plasterboard: 1, pbsheet: 1, scaffold: 1 };   // stack flat on each other up to 1.8 m (ladders: assumption; plasterboard + folded scaffold: Andy 16/10)   // assembled furniture stays upright (footprint may turn)
-var HS_UNDER = { dtable46: 0.70, dtable8: 0.70, desk: 0.70 };   // clear height underneath (beds assumed divan / low frame: none)   // stay upright (sofas/armchairs/chairs seat up)
-var HS_SEAT = { chair: 0.45 };   // living chairs go seat-to-seat 2 high: each extra chair adds 0.45 m
-var HS_PAL = { F: [1.22, 1.02], E: [1.2, 0.8], U: [1.2, 1.0], H: [0.8, 0.6] };
-function hsStrips(layout) { var F = HS_FIT; return layout === 'packed' ? [F.W] : layout === 'middle' ? [(F.W - F.LANE) / 2, (F.W - F.LANE) / 2] : [F.W - F.LANE]; }
-function hsFl(x, a) { return a > 0 ? Math.floor(x / a + 1e-9) : 0; }
-// Every way the item may stand: footprint a x b and how many high.
-function hsOrients(it, asTopper) {
-  var F = HS_FIT, out = [];
-  if (it.pal) { var p = HS_PAL[it.pal]; return [{ a: p[0], b: p[1], layers: 1, h: 0 }]; }
-  var d = it.d, perms = HS_EDGEOK[it.id] ? [[d[0], d[1], d[2]], [d[0], d[2], d[1]]] : HS_FIXED[it.id] ? [[d[0], d[1], d[2]]] :
-    [[d[0], d[1], d[2]], [d[0], d[2], d[1]], [d[1], d[2], d[0]]];   // (footprint pair, height); footprint is also turned 90 deg below
-  perms.forEach(function (q) {
-    var h = q[2]; if (h > F.H + 1e-9) return;
-    if (!asTopper && it.mode === 'edge' && h === d[1] && d[1] !== d[0] && d[1] !== d[2]) return;   // beds, tables, mattresses stay on edge
-    var layers = 1;
-    if (it.box || (HS_FLATSTACK[it.id] && h === d[2])) layers = Math.max(1, hsFl(F.BOX_H, h));   // on edge: not stacked
-    else if (HS_SEAT[it.id]) { layers = 1; while (layers < 2 && d[2] + layers * HS_SEAT[it.id] <= F.H + 1e-9) layers++; }
-    else if (it.id === 'dchair' && q[2] === d[2]) { layers = 1; while (layers < F.NEST_MAX && d[2] + layers * F.NEST_STEP <= F.H + 1e-9) layers++; }
-    var top = HS_SEAT[it.id] ? h + (layers - 1) * HS_SEAT[it.id] : it.id === 'dchair' ? h + (layers - 1) * F.NEST_STEP : (it.box || HS_FLATSTACK[it.id]) ? layers * h : h;
-    out.push({ a: q[0], b: q[1], layers: layers, h: h, top: top });
-  });
-  return out;
-}
-// Most of one footprint (a x b, may be turned 90 deg) on a strip L long x W deep. Tries rows of one way then the other
-// both along the length and across the width; plain guillotine rows that anyone can check with a tape measure.
-function hsStripCount(L, W, a, b) {
-  var best = 0, i, n;
-  for (i = 0; i <= hsFl(L, a); i++) { n = i * hsFl(W, b) + hsFl(L - i * a, b) * hsFl(W, a); if (n > best) best = n; }
-  for (i = 0; i <= hsFl(W, b); i++) { n = i * hsFl(L, a) + hsFl(W - i * b, a) * hsFl(L, b); if (n > best) best = n; }
-  return best;
-}
-var hsMaxCache = {};
-var hsOriCache = {};
-// Whole-load orientation (Andy 16/10): hsPlace may pin an item to one of its orientations (index into hsOrients) for a trial.
-var HS_OV = null;
-function hsK(it, L, layout) { return it.id + '|' + L + '|' + layout + (HS_OV && HS_OV[it.id] !== undefined ? '#' + HS_OV[it.id] : ''); }
-function hsOri(it, L, layout) { var k = hsK(it, L, layout); hsItemMax(it, L, layout); return hsOriCache[k]; }
-function hsItemMax(it, L, layout) {   // most of this item ONE container holds in this layout (on the floor, own stacking only)
-  var k = hsK(it, L, layout); if (hsMaxCache[k] !== undefined) return hsMaxCache[k];
-  var best = 0, bo = null, os = hsOrients(it), pin = HS_OV && HS_OV[it.id] !== undefined ? HS_OV[it.id] : -1;
-  os.forEach(function (o, i) { if (pin >= 0 && i !== pin) return;
-    var n = hsStrips(layout).reduce(function (s, W) { return s + hsStripCount(L, W, o.a, o.b); }, 0) * o.layers;
-    if (n > best) { best = n; bo = o; }
-  });
-  hsOriCache[k] = bo;
-  return (hsMaxCache[k] = best);
-}
-// How many containers' worth a load takes in one layout (1.0 = exactly one full container).
-function hsShare(load, L, layout) {
-  return load.reduce(function (s, x) { var m = hsItemMax(x.item, L, layout); return s + (m > 0 ? x.n / m : Infinity); }, 0);
-}
-// Layout used: packed, or the lane choice. Auto = side lane unless the middle lane holds this load in less space.
-function hsLayout(load, L, mode, lane) {
-  mode = mode || HS_MODE; lane = lane || HS_LANE;
-  if (mode === 'max') return { layout: 'packed', share: hsShare(load, L, 'packed') };
-  if (lane === 'side' || lane === 'middle') {
-    var f = hsShare(load, L, lane);
-    if (f === Infinity) {   // e.g. UK pallets are wider than a 0.85 m middle-lane strip: lane moves to the side.
-      // Kept monotonic: never less than the middle-lane share of the items that did fit plus the side share of the rest.
-      var mix = load.reduce(function (s, x) { var m = hsItemMax(x.item, L, lane); return s + x.n / (m > 0 ? m : hsItemMax(x.item, L, 'side')); }, 0);
-      return { layout: 'side', share: Math.max(hsShare(load, L, 'side'), mix), forced: lane };
-    }
-    return { layout: lane, share: f };
-  }
-  var s = hsShare(load, L, 'side'), m = hsShare(load, L, 'middle');
-  return m < s - 1e-9 ? { layout: 'middle', share: m } : { layout: 'side', share: s };
-}
-function hsContainers(share) { return share <= 0 ? 0 : Math.max(1, Math.ceil(share - 1e-9)); }
-var HS_LAYOUT_NAME = { side: 'along one side', middle: 'down the middle', packed: 'no lane (packed)' };
-function hsCatalog() { var a = []; CALC_CONFIG.categories.forEach(function (c) { c.items.forEach(function (it) { a.push(it); }); }); return a; }
-// ---- v3 volume model -------------------------------------------------------------
-// Usable cu ft: organise = full volume x (2.35 - 0.65) / 2.35 (lane taken off first); packed = full volume.
-function hsUsable(L, mode) { var F = HS_FIT, full = L === F.L10 ? F.CU10 : F.CU20; return (mode || HS_MODE) === 'max' ? full : full * (F.W - F.LANE) / F.W; }
-// Pallet cu ft (Andy gave footprint only): footprint x standard loaded height 1.2 m incl. pallet (confirmed by Andy 16/10): Euro 40.7, UK 50.9, Half 20.3 cu ft. Not stacked.
-function hsCuft(it) { return it.pal ? Math.round(HS_PAL[it.pal][0] * HS_PAL[it.pal][1] * HS_FIT.PAL_H * HS_FIT.M3_CUFT * 10) / 10 : it.cuft; }
-// ---- Phase 2: stacking on top (16/10/2026) ------------------------------------------
-// Light items that may go ON TOP of other things: boxes, chairs, dining chairs (nest to 4), office chairs, bedside tables.
-var HS_TOPPER = { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1, boxs: 1, boxm: 1, boxl: 1, chair: 1, dchair: 1, officechair: 1, bedside: 1 };
-// Things with a flat top (or a sofa / armchair seat, light items only, which all toppers are) that can take toppers.
-// Not bases: pallets, beds / tables / mattresses on edge, wardrobes, bookcases and shelving (already 1.8 m+), toppers.
-var HS_BASE = { sitebox: 1, plasterboard: 1, pbsheet: 1, bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, chair: 1, wardrobe: 1, bookcase: 1, shelving: 1, sofa2: 1, sofa3: 1, armchair: 1, coffeetable: 1, tvunit: 1, drawers: 1, fridge: 1, washer: 1, dishwasher: 1, cooker: 1, filing: 1, desk: 1 };
-var hsTopCache = {};
-// Light furniture goes only on beds, tables and desks (a mattress lies flat only on a bed frame).
-var HS_LIGHTFURN = { mattress: { bedsingle: 1, beddouble: 1, bedking: 1 }, drawers: 1, tvunit: 1, coffeetable: 1, bedside: 1, chair: 1, dchair: 1, officechair: 1 };
-var HS_FLATBASE = { bedsingle: 1, beddouble: 1, bedking: 1, dtable46: 1, dtable8: 1, desk: 1 };
-// How many of topper s fit on ONE base b (as b stands on the floor): footprint rows x layers up to 1.8 m (boxes) / 2.1 m.
-// Capped so a base never gives more room than the floor it stands on would (keeps "adding never lowers %").
-function hsTopCap(b, s, L, layout) {
-  var k = hsK(b, L, layout) + '>' + hsK(s, L, layout); if (hsTopCache[k] !== undefined) return hsTopCache[k];
-  var F = HS_FIT, bo = hsOri(b, L, layout), best = 0;
-  var lf = HS_LIGHTFURN[s.id], allowed = !lf || (lf === 1 ? (HS_FLATBASE[b.id] || !(s.id in { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1 })) : lf[b.id]);
-  if (bo && HS_EDGEOK[b.id] && bo.h !== b.d[2]) bo = null;   // on edge: nothing goes on top
-  if (bo && allowed) {
-    var top = bo.top !== undefined ? bo.top : bo.h;
-    var fit = function (room) {   // most of s in one space of the base's footprint with this headroom
-      var best1 = 0;
-      hsOrients(s, true).forEach(function (o) {
-        if (o.h > room + 1e-9) return;
-        var layers = s.box ? hsFl(Math.min(room, F.BOX_H), o.h) : HS_SEAT[s.id] ? Math.max(1, Math.min(o.layers, 1 + hsFl(room - o.h, HS_SEAT[s.id]))) : (s.id === 'dchair' && o.layers > 1 ? Math.max(1, Math.min(o.layers, 1 + hsFl(room - o.h, F.NEST_STEP))) : 1);
-        var n = hsStripCount(bo.a, bo.b, o.a, o.b) * layers; if (n > best1) best1 = n;
-      });
-      return best1;
-    };
-    best = fit(F.H - top) + (HS_UNDER[b.id] ? fit(HS_UNDER[b.id]) : 0);   // on top (to 2.1 m) + underneath (tables, desks)
-    var Mb = hsItemMax(b, L, layout), Ms = hsItemMax(s, L, layout);
-    best = Math.min(best, Math.floor(Ms * bo.layers / Mb + 1e-9));   // per floor column of the base   // never more than the same floor would hold
-  }
-  return (hsTopCache[k] = best);
-}
-// Does the load fit in k containers? Largest items first onto the floor; toppers that find no floor go on top of bases.
-// Floor share of one unit: its real footprint (as it stands, per stacked column) / usable floor area. Mixed loads add
-// footprints, so a gap beside a sofa can take a chair. One item type alone is also limited to its own row count M.
-function hsArea(it, L, layout) {
-  var o = hsOri(it, L, layout); if (!o) return Infinity;
-  var A = L * hsStrips(layout).reduce(function (s, W) { return s + W; }, 0);
-  return o.a * o.b / o.layers / A;
-}
-// Does the load fit in k containers? Largest items first onto the floor; toppers that find no floor go on top of bases.
-function hsPlace1(load, L, layout, k) {
-  // Floor-only items first (largest first), then items that can also go on top (largest first).
-  var sorted = load.slice().sort(function (p, q) { return (HS_TOPPER[p.item.id] ? 1 : 0) - (HS_TOPPER[q.item.id] ? 1 : 0) || hsCuft(q.item) - hsCuft(p.item); });
-  // Gaps: one item type packed in rows leaves gaps (n x (1/M - footprint share)). The biggest such gap in the load counts as
-  // used (rule 6) - other items can't be assumed to fill it. So one item alone is exactly n/M, as before.
-  var need = [], bases = [], Pa = 0, G = 0, stacked = 0;
-  sorted.forEach(function (x) { var m = hsItemMax(x.item, L, layout), a = hsArea(x.item, L, layout); Pa += x.n * a; G = Math.max(G, m > 0 ? x.n * Math.max(0, 1 / m - a) : Infinity); });
-  var P = Pa + G, R = k - G;
-  for (var i = 0; i < sorted.length; i++) {
-    var x = sorted[i], m = hsItemMax(x.item, L, layout), a = hsArea(x.item, L, layout);
-    if (m <= 0) return { ok: false, P: Infinity, stacked: 0 };
-    var lb = (hsOri(x.item, L, layout) || {}).layers || 1;
-    if (!HS_TOPPER[x.item.id]) {
-      if (x.n > k * m + 1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
-      R -= x.n * a; if (HS_BASE[x.item.id]) bases.push({ it: x.item, u: x.n / lb }); continue;
-    }
-    var onFloor = Math.min(x.n, Math.max(0, R) / a + 1e-9, k * m);
-    R -= onFloor * a; if (HS_BASE[x.item.id] && onFloor > 0) bases.push({ it: x.item, u: onFloor / lb });
-    if (x.n - onFloor > 1e-9) need.push({ it: x.item, r: x.n - onFloor });
-  }
-  if (R < -1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
-  bases.sort(function (p, q) { return hsCuft(q.it) - hsCuft(p.it); });
-  for (var j = 0; j < need.length; j++) {
-    var s = need[j];
-    for (var b = 0; b < bases.length && s.r > 1e-9; b++) {
-      var c = hsTopCap(bases[b].it, s.it, L, layout); if (c <= 0 || bases[b].u <= 1e-9) continue;
-      var q = Math.min(s.r, bases[b].u * c); s.r -= q; bases[b].u -= q / c; stacked += q;
-    }
-    if (s.r > 1e-9) return { ok: false, P: P, stacked: stacked, floorFull: true, fail: s.it.id, left: s.r };
-  }
-  return { ok: true, P: P, stacked: stacked, floorFull: P >= 1 - 1e-9 };
-}
-// Orientation options worth trying for an item in a mixed load: the one that fits most of it on the floor, plus (if
-// different) the best one that can still take things on top (e.g. plasterboard flat rather than on edge).
-function hsAlts(it, L, layout) {
-  if (it.pal || HS_TOPPER[it.id]) return null;
-  var F = HS_FIT, os = hsOrients(it), cnt = function (o) { return hsStrips(layout).reduce(function (s, W) { return s + hsStripCount(L, W, o.a, o.b); }, 0) * o.layers; };
-  var b0 = -1, b1 = -1;
-  os.forEach(function (o, i) {
-    var n = cnt(o); if (n <= 0) return;
-    if (b0 < 0 || n > cnt(os[b0])) b0 = i;
-    var baseOK = HS_BASE[it.id] && !(HS_EDGEOK[it.id] && o.h !== it.d[2]) && (o.top !== undefined ? o.top : o.h) < F.H - 0.1;
-    if (baseOK && (b1 < 0 || n > cnt(os[b1]))) b1 = i;
-  });
-  return b1 >= 0 && b1 !== b0 && b0 >= 0 ? [b0, b1] : null;
-}
-// Plasterboard sheets and bundles share columns: with any bundle in the load, sheets count as 1/20 of a bundle
-// (20 x 12.5 mm = 0.25 m) and stand the way the bundles do.
-function hsPool(load) {
-  var b = null, sh = 0;
-  load.forEach(function (x) { if (x.item.id === 'plasterboard') b = x; if (x.item.id === 'pbsheet') sh += x.n; });
-  if (!b || !sh) return load;
-  var out = load.filter(function (x) { return x.item.id !== 'pbsheet' && x.item.id !== 'plasterboard'; });
-  out.push({ item: b.item, n: b.n + sh * HS_FIT.SHEET / b.item.d[2] }); return out;
-}
-// Does the load fit in k containers? Tries every combination of the items' orientation options against the WHOLE load
-// and keeps the best (fits; then least floor used). Same items in a bigger load can still use any option, so adding never lowers containers.
-function hsPlace(load, L, layout, k) {
-  load = hsPool(load);
-  var alts = [];
-  load.forEach(function (x) { var a = hsAlts(x.item, L, layout); if (a) alts.push({ id: x.item.id, a: a }); });
-  if (!alts.length) return hsPlace1(load, L, layout, k);
-  var best = null, combos = 1 << Math.min(alts.length, 8);
-  for (var c = 0; c < combos; c++) {
-    var ov = {}, tag = [];
-    alts.forEach(function (al, i) { var oi = al.a[(c >> i) & 1]; ov[al.id] = oi; tag.push(al.id + ':' + oi); });
-    HS_OV = ov; var r = hsPlace1(load, L, layout, k); HS_OV = null;
-    r.ori = ov;
-    if (!best || (r.ok && !best.ok) || (r.ok === best.ok && (r.P < best.P - 1e-9 || (Math.abs(r.P - best.P) < 1e-9 && r.stacked < best.stacked)))) best = r;
-  }
-  return best;
-}
-function hsLayoutFor(load, L, mode, lane) {   // lane choice: Auto = side unless middle needs fewer containers / less floor
-  mode = mode || HS_MODE; lane = lane || HS_LANE;
-  if (mode === 'max') return { layout: 'packed' };
-  var fitsIn = function (lay) { for (var k = 1; k < 999; k++) if (hsPlace(load, L, lay, k).ok) return k; return 999; };
-  if (lane === 'side' || lane === 'middle') {
-    if (load.some(function (x) { return hsItemMax(x.item, L, lane) <= 0; })) return { layout: 'side', forced: lane };
-    return { layout: lane };
-  }
-  var s = fitsIn('side'), m = fitsIn('middle');
-  if (m < s) return { layout: 'middle' };
-  return { layout: 'side' };
-}
-// Reading: V = item cu ft / usable cu ft (equal steps). Containers = smallest k that holds the load (floor, then stacking)
-// with V <= k. In one container it shows V; 100% only when nothing on the item list could still go in (leftover = used).
-function hsStepT(it, U) { return Math.round(hsCuft(it) / U * 1000); }   // step in tenths of a %
-function hsEval(load, L, mode, lane) {
-  var lay = hsLayoutFor(load, L, mode, lane), U = hsUsable(L, mode), cu = load.reduce(function (s, x) { return s + x.n * hsCuft(x.item); }, 0);
-  // Strictly additive (16/10): each item has a fixed step in tenths of a percent = round(cu ft / usable x 1000).
-  // Total = sum of steps, so no rounding drift and no gap/floor contributions. Fit only decides notices / containers.
-  var T = load.reduce(function (s, x) { return s + x.n * hsStepT(x.item, U); }, 0), V = T / 1000, n = 1, pl;
-  while (n < 999) { pl = hsPlace(load, L, lay.layout, n); if (pl.ok && T <= n * 1000) break; n++; }
-  if (lay.forced) {   // middle lane asked for but some items too wide: never fewer containers than the middle needs for the rest
-    var rest = load.filter(function (x) { return hsItemMax(x.item, L, lay.forced) > 0; }), nm = 1;
-    var extra = load.reduce(function (s, x) { return hsItemMax(x.item, L, lay.forced) > 0 ? s : s + x.n / hsItemMax(x.item, L, 'side'); }, 0);
-    while (rest.length && nm < 999 && !hsPlace(rest, L, lay.forced, nm - extra).ok) nm++;
-    if (nm > n) { n = nm; pl = hsPlace(load, L, lay.layout, n); }
-  }
-  var full = false;
-  if (n === 1) full = hsCatalog().every(function (it) {
-    if (T + hsStepT(it, U) > 1000) return true;
-    return !hsPlace(load.concat([{ item: it, n: 1 }]), L, lay.layout, 1).ok;
-  });
-  var ratio = n === 1 ? Math.min(1, V) : n - 1 + Math.max(1e-6, Math.min(1, V - (n - 1)));
-  var anyTop = load.some(function (x) { return HS_BASE[x.item.id]; });
-  // Plasterboard orientation actually used (bundle decides when both are present: sheets share its columns).
-  var pbx = load.filter(function (x) { return x.item.id === 'plasterboard'; })[0] || load.filter(function (x) { return x.item.id === 'pbsheet'; })[0], pbOri = null;
-  if (pbx) { var pit = pbx.item, po = pl.ori && pl.ori[pit.id] !== undefined ? hsOrients(pit)[pl.ori[pit.id]] : hsOri(pit, L, lay.layout); pbOri = po && po.h === pit.d[2] ? 'flat' : 'edge'; }
-  return { T: T, full: full, layout: lay.layout, forced: lay.forced, usable: U, cu: cu, V: V, P: pl.P, stacked: pl.stacked,
-    pbOri: pbOri, floorFull: n === 1 && pl.P >= 1 - 1e-9, noStack: full && pl.P >= 1 - 1e-9 && !(pl.stacked > 0) && !anyTop, containers: n, ratio: ratio };
-}
-/* ======================= END OF ENGINE ======================= */
-
-(function () {
-  'use strict';
-  var C = CALC_CONFIG;
-
-  /* ---------- Icons (48x48, drawn for Hewitt Storage) ---------- */
-  function r(x, y, w, h, cls, rx) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"' + (rx ? ' rx="' + rx + '"' : '') + ' class="' + cls + '"/>'; }
-  function box(x, y, w, h) { // kraft cardboard box
-    return r(x, y, w, h, 'k', 1) + r(x, y, w, Math.max(3, h * 0.22), 'k2', 1) + r(x + w / 2 - w * 0.09, y, w * 0.18, h, 't');
-  }
-  function bed(x, w, pillows) {
-    var s = r(x, 4, w, 40, 'a', 2) + r(x + 2, 10, w - 4, 32, 'c', 1.5);
-    var pw = (w - 6 - (pillows - 1) * 2) / pillows;
-    for (var i = 0; i < pillows; i++) s += r(x + 3 + i * (pw + 2), 5.5, pw, 6, 'd', 2);
-    return s + r(x + 2, 20, w - 4, 22, 'b', 1.5);
-  }
-  var ICONS = {
-    chair: r(15, 7, 18, 19, 'b', 4) + r(12, 25, 24, 5, 'a', 1.5) + r(14, 30, 3, 12, 'a') + r(31, 30, 3, 12, 'a'),
-    armchair: r(12, 11, 24, 17, 'b', 4) + r(6, 19, 8, 17, 'a', 3) + r(34, 19, 8, 17, 'a', 3) + r(12, 26, 24, 10, 'c', 2) + r(8, 36, 3, 5, 'a') + r(37, 36, 3, 5, 'a'),
-    sofa2: r(9, 13, 30, 15, 'b', 4) + r(4, 21, 8, 15, 'a', 3) + r(36, 21, 8, 15, 'a', 3) + r(11.5, 26, 12, 10, 'c', 2) + r(24.5, 26, 12, 10, 'c', 2) + r(6, 36, 3, 4, 'a') + r(39, 36, 3, 4, 'a'),
-    sofa3: r(6, 13, 36, 15, 'b', 4) + r(1.5, 21, 7, 15, 'a', 3) + r(39.5, 21, 7, 15, 'a', 3) + r(9, 26, 9.6, 10, 'c', 2) + r(19.2, 26, 9.6, 10, 'c', 2) + r(29.4, 26, 9.6, 10, 'c', 2) + r(3, 36, 3, 4, 'a') + r(42, 36, 3, 4, 'a'),
-    coffeetable: r(5, 22, 38, 5, 'b', 1.5) + r(9, 27, 30, 3, 'd') + r(9, 27, 3, 12, 'a') + r(36, 27, 3, 12, 'a'),
-    tvunit: r(9, 5, 30, 20, 'a', 2) + r(11, 7, 26, 16, 'c', 1) + r(22, 25, 4, 4, 'a') + r(5, 29, 38, 12, 'b', 1.5) + r(7.5, 31.5, 15.5, 7, 'c', 1) + r(25, 31.5, 15.5, 7, 'c', 1),
-    bookcase: r(11, 4, 26, 40, 'a', 1.5) + r(14, 7, 20, 34, 'c') + r(14, 17, 20, 2, 'a') + r(14, 29, 20, 2, 'a') +
-      r(15, 9, 3, 8, 'b') + r(18.5, 10, 3, 7, 'd') + r(22, 9, 2.5, 8, 'b') + r(16, 21, 3, 8, 'd') + r(25, 22, 3, 7, 'b') + r(28.5, 21, 3, 8, 'b') + r(15.5, 33, 7, 8, 'b') + r(27, 34, 5, 7, 'd'),
-    dtable46: r(13, 9, 8, 11, 'd', 2) + r(27, 9, 8, 11, 'd', 2) + r(5, 18, 38, 5, 'b', 1.5) + r(11, 23, 26, 2.5, 'c') + r(8, 23, 3, 18, 'a') + r(37, 23, 3, 18, 'a'),
-    dtable8: r(4, 9, 7, 11, 'd', 2) + r(15, 9, 7, 11, 'd', 2) + r(26, 9, 7, 11, 'd', 2) + r(37, 9, 7, 11, 'd', 2) + r(1.5, 18, 45, 5, 'b', 1.5) + r(6, 23, 36, 2.5, 'c') + r(4, 23, 3, 18, 'a') + r(22.5, 23, 3, 18, 'a') + r(41, 23, 3, 18, 'a'),
-    dchair: r(15, 6, 18, 20, 'a', 2) + r(18, 9, 3, 14, 'c') + r(22.5, 9, 3, 14, 'c') + r(27, 9, 3, 14, 'c') + r(13, 25, 22, 5, 'b', 1.5) + r(15, 30, 3, 12, 'a') + r(30, 30, 3, 12, 'a'),
-    bedsingle: bed(15, 18, 1),
-    beddouble: bed(9, 30, 2),
-    bedking: bed(4, 40, 2),
-    wardrobe: r(10, 3, 28, 39, 'a', 1.5) + r(12.5, 5.5, 11, 34, 'b') + r(24.5, 5.5, 11, 34, 'b') + r(21, 20, 1.5, 6, 'c') + r(25.5, 20, 1.5, 6, 'c') + r(12, 42, 3, 3, 'a') + r(33, 42, 3, 3, 'a'),
-    drawers: r(8, 9, 32, 31, 'a', 1.5) + r(10.5, 11.5, 27, 7.5, 'b', 1) + r(10.5, 21, 27, 7.5, 'b', 1) + r(10.5, 30.5, 27, 7.5, 'b', 1) + r(21, 14.5, 6, 1.6, 'c') + r(21, 24, 6, 1.6, 'c') + r(21, 33.5, 6, 1.6, 'c') + r(10, 40, 3, 3, 'a') + r(35, 40, 3, 3, 'a'),
-    bedside: r(12, 15, 24, 25, 'a', 1.5) + r(14.5, 17.5, 19, 9, 'b', 1) + r(14.5, 28.5, 19, 9, 'b', 1) + r(21, 21.2, 6, 1.6, 'c') + r(21, 32.2, 6, 1.6, 'c') + r(14, 40, 3, 3, 'a') + r(31, 40, 3, 3, 'a'),
-    mattress: '<path d="M4 25 14 15h30L34 25z" class="d"/><path d="M4 25h30v9H4z" class="b"/><path d="M34 25l10-10v9l-10 10z" class="a"/>' +
-      '<circle cx="11" cy="29.5" r="1.2" class="c"/><circle cx="19" cy="29.5" r="1.2" class="c"/><circle cx="27" cy="29.5" r="1.2" class="c"/>',
-    fridge: r(13, 3, 22, 42, 'a', 2.5) + r(15, 5, 18, 15, 'c', 1) + r(15, 22, 18, 21, 'c', 1) + r(29, 8, 2, 8, 'b', 1) + r(29, 25, 2, 10, 'b', 1),
-    washer: r(8, 6, 32, 36, 'a', 2.5) + r(10, 8, 28, 6, 'b', 1) + '<circle cx="24" cy="28" r="10" class="c"/><circle cx="24" cy="28" r="6.5" class="b"/><circle cx="33" cy="11" r="1.6" class="c"/><circle cx="28" cy="11" r="1.2" class="d"/>',
-    dishwasher: r(8, 6, 32, 36, 'a', 2.5) + r(10, 8, 28, 5, 'b', 1) + r(10, 15, 28, 25, 'c', 1) + r(16, 18, 16, 2.5, 'a', 1.2) + '<circle cx="31" cy="10.5" r="1.2" class="c"/><circle cx="35" cy="10.5" r="1.2" class="d"/>',
-    cooker: r(8, 4, 32, 6, 'b', 1.5) + '<ellipse cx="16" cy="5.5" rx="4" ry="1" class="a"/><ellipse cx="32" cy="5.5" rx="4" ry="1" class="a"/>' + r(8, 10, 32, 34, 'a', 2) +
-      '<circle cx="13" cy="14" r="1.6" class="c"/><circle cx="19" cy="14" r="1.6" class="c"/><circle cx="29" cy="14" r="1.6" class="c"/><circle cx="35" cy="14" r="1.6" class="c"/>' + r(12, 19, 24, 2, 'd', 1) + r(12, 23, 24, 17, 'c', 1.5),
-    boxs: box(16, 23, 16, 14),
-    boxm: box(12, 17, 24, 20),
-    boxl: box(7, 10, 34, 28),
-    pallet: box(7, 10, 16.5, 11.5) + box(24.5, 10, 16.5, 11.5) + box(7, 22, 16.5, 11.5) + box(24.5, 22, 16.5, 11.5) +
-      r(4, 34, 40, 3, 'w') + r(5, 37, 5, 4, 'w') + r(21.5, 37, 5, 4, 'w') + r(38, 37, 5, 4, 'w') + r(4, 41, 40, 2.5, 'w'),
-    filing: r(14, 3, 20, 42, 'a', 1.5) + r(16, 5.5, 16, 8.5, 'b', 1) + r(16, 15.5, 16, 8.5, 'b', 1) + r(16, 25.5, 16, 8.5, 'b', 1) + r(16, 35.5, 16, 7.5, 'b', 1) +
-      r(21, 8.5, 6, 1.6, 'c') + r(21, 18.5, 6, 1.6, 'c') + r(21, 28.5, 6, 1.6, 'c') + r(21, 38.5, 6, 1.6, 'c'),
-    desk: r(10, 4, 15, 10, 'a', 1) + r(12, 6, 11, 6, 'c') + r(16.5, 14, 2, 2.5, 'a') + r(3, 16, 42, 4, 'b', 1) + r(5, 20, 3, 22, 'a') + r(28, 20, 15, 22, 'a') +
-      r(30, 22.5, 11, 5.5, 'b') + r(30, 29.5, 11, 5.5, 'b') + r(30, 36.5, 11, 4.5, 'b') + r(33, 24.5, 5, 1.4, 'c') + r(33, 31.5, 5, 1.4, 'c'),
-    officechair: r(15, 3, 18, 18, 'b', 5) + r(10, 17, 3, 9, 'a', 1.5) + r(35, 17, 3, 9, 'a', 1.5) + r(12, 22, 24, 5, 'a', 2.5) + r(22.5, 27, 3, 9, 'a') + r(11, 36, 26, 2.5, 'a', 1.2) +
-      '<circle cx="12" cy="41" r="2.4" class="b"/><circle cx="24" cy="41" r="2.4" class="b"/><circle cx="36" cy="41" r="2.4" class="b"/>',
-    shelving: r(8, 3, 3, 42, 'a') + r(37, 3, 3, 42, 'a') + r(8, 15, 32, 2.5, 'b') + r(8, 28, 32, 2.5, 'b') + r(8, 41, 32, 2.5, 'b') +
-      box(12, 6, 10, 9) + box(24, 8, 9, 7) + box(13, 20, 8, 8) + box(23, 19, 12, 9) + box(12, 33, 12, 8),
-    bike: '<circle cx="12" cy="31" r="8" class="sa" stroke-width="3"/><circle cx="36" cy="31" r="8" class="sa" stroke-width="3"/>' +
-      '<path d="M12 31 19 19h13l4 12M19 19l5 12 8-12M24 31H12" class="sb" stroke-width="3"/><path d="M16 15h6M30 14l2 5M28 13h5" class="sa" stroke-width="3"/>',
-    mower: '<path d="M32 21 41 6" class="sa" stroke-width="3"/>' + r(37, 3.5, 9, 3.5, 'a', 1.7) + '<path d="M7 29c0-6 3-9 9-9h14c5 0 7 3 7 9z" class="b"/>' + r(5, 28, 34, 4, 'a', 1.5) +
-      '<circle cx="11" cy="36" r="5" class="a"/><circle cx="11" cy="36" r="1.8" class="c"/><circle cx="33" cy="36" r="5" class="a"/><circle cx="33" cy="36" r="1.8" class="c"/>' + r(14, 23, 10, 2, 'c', 1),
-    gardenset: '<path d="M7 16Q24 1 41 16z" class="b"/>' + r(23, 15, 2, 26, 'a') + r(12, 27, 24, 3, 'd', 1.5) + r(15, 30, 2, 11, 'a') + r(31, 30, 2, 11, 'a') +
-      r(2, 22, 2.5, 19, 'a', 1) + r(2, 31, 8, 2.5, 'a', 1) + r(8, 33, 2, 8, 'a') + r(43.5, 22, 2.5, 19, 'a', 1) + r(38, 31, 8, 2.5, 'a', 1) + r(38, 33, 2, 8, 'a'),
-    toolchest: r(18, 4, 12, 3, 'a', 1.5) + r(9, 7, 30, 8, 'b', 2) + r(9, 15, 30, 24, 'a', 1.5) + r(11.5, 17.5, 25, 4.5, 'b', 1) + r(11.5, 24, 25, 4.5, 'b', 1) + r(11.5, 30.5, 25, 6, 'b', 1) +
-      r(21, 19, 6, 1.4, 'c') + r(21, 25.5, 6, 1.4, 'c') + r(21, 32.8, 6, 1.4, 'c') + '<circle cx="13" cy="41.5" r="2.5" class="d"/><circle cx="35" cy="41.5" r="2.5" class="d"/>'
-  };
-  function iconSvg(key) { return '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">' + (ICONS[key] || ICONS.boxm) + '</svg>'; }
-
-  /* ---------- State ---------- */
-  var counts = {}, itemsById = {}, activeCat = C.categories[0].id;
-  C.categories.forEach(function (cat) { cat.items.forEach(function (it) { counts[it.id] = 0; itemsById[it.id] = it; it.cat = cat.id; }); });
-  var usable = Math.round(hsUsable(HS_FIT.L20, 'room'));
-  var usable10 = Math.round(hsUsable(HS_FIT.L10, 'room'));
-
-  var $ = function (id) { return document.getElementById(id); };
-  function fmt(n, dp) { return Number(n).toLocaleString('en-GB', { minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0 }); }
-  function money(n) { return C.pricing.currency + fmt(n, n % 1 ? 2 : 0); }
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-
-  function hsItemVol(it) { return it.pal ? HS_PAL[it.pal][0] * HS_PAL[it.pal][1] : it.d[0] * it.d[1] * it.d[2]; }
-  function calc() {
-    var total = 0, lines = [], itemCount = 0, load = [];
-    C.categories.forEach(function (cat) {
-      cat.items.forEach(function (it) {
-        var n = counts[it.id];
-        if (n > 0) { total += n * it.cuft; itemCount += n; lines.push({ item: it, n: n, vol: n * it.cuft }); load.push({ item: it, n: n }); }
-      });
-    });
-    total = Math.round(total * 100) / 100;
-    var F = HS_FIT, L20 = F.L20, L10 = F.L10;
-    if (!load.length) return { total: 0, ratio: 0, pct: 0, containers: 0, lines: lines, itemCount: 0, fits10: false, palLine: '', fitLine: '', floorPct: 0, volPct: 0, units: [], layout: '' };
-    var r20 = hsEval(load, L20), ratio = r20.ratio, n = r20.containers;
-    var r10 = (C.container10 && C.pricing.small10) ? hsEval(load, L10) : { containers: 99 };
-    var fits10 = r10.containers === 1;
-    var units = [];
-    var laneNote = r20.forced ? 'A middle lane leaves only ' + fmt((F.W - F.LANE) / 2, 2) + 'm each side, too narrow for some of your items, so the lane goes along one side. ' : '';
-    var lay = r20.layout, usableW = lay === 'packed' ? F.W : F.W - F.LANE;
-    var fitLine = laneNote + 'How this is worked out: 20ft internal ' + fmt(L20, 2) + ' \u00d7 ' + fmt(F.W, 2) + ' \u00d7 ' + fmt(F.INT_H, 2) + 'm = ' + fmt(F.CU20) + ' cu ft (10ft ' + fmt(L10, 2) + 'm long = ' + fmt(F.CU10) + ' cu ft). ' +
-      (lay === 'packed' ? 'Packed wall to wall, no lane: all ' + fmt(r20.usable) + ' cu ft usable. ' : 'The ' + fmt(F.LANE, 2) + 'm loading lane (' + HS_LAYOUT_NAME[lay] + ', full length) is taken off first, leaving ' + fmt(r20.usable) + ' cu ft usable. ') +
-      'Furniture assumed assembled. Your items: ' + fmt(r20.cu) + ' cu ft.' + (load.every(function (x) { return !!x.item.pal; }) ? '' : ' Items go on the floor first, largest first; once the floor is full, boxes, chairs and bedside tables go on top of flat-topped furniture, beds, seats and appliances, and under tables and desks (tops no higher than ' + fmt(F.H, 1) + 'm; boxes to ' + fmt(F.BOX_H, 1) + 'm). Nothing goes on pallets.');
-    var floorNote = n !== 1 ? '' : r20.noStack ? 'Container full: the floor is full and no stacking assumed for these items, so the next item needs another container.' : r20.full ? 'Container full: nothing more fits on the floor or on top, so the next item needs another container.' : r20.floorFull ? 'Floor space full: further items will need to be stacked on top of others.' : '';
-    var P = { E: counts.palleteuro || 0, H: counts.pallethalf || 0, U: counts.palletuk || 0, F: counts.pallet4ft || 0 }, nPal = P.E + P.H + P.U + P.F;
-    var pbLine = r20.pbOri === 'edge' ? 'Plasterboard is shown stored on edge.' : r20.pbOri === 'flat' ? 'Plasterboard is shown stacked flat, as this fits the load better.' : '';
-    var palLine = nPal ? 'Pallets are loaded on the available floor space only, not stacked.' : '';
-    return { total: total, ratio: ratio, pct: ratio * 100, containers: n, lines: lines, itemCount: itemCount, fits10: fits10, share10: r10.ratio, eval20: r20, eval10: r10,
-      palLine: palLine, pbLine: pbLine, floorNote: floorNote, fitLine: fitLine, altLine: '', mode: HS_MODE, lane: HS_LANE, layout: lay, units: units, floorPct: 0, volPct: r20.V * 100 };
-  }
-
-  /* ---------- Static text from config ---------- */
-  $('hsc-title').textContent = C.businessName;
-  $('hsc-subtitle').textContent = C.location ? ('Storage calculator · ' + C.location) : 'Storage calculator';
-  $('hsc-tag').textContent = '';
-  $('hsc-g-lab').textContent = C.pricing.ground.label;
-  $('hsc-g-note').textContent = C.pricing.ground.note;
-  $('hsc-u-lab').textContent = C.pricing.upstairs.label;
-  $('hsc-u-note').textContent = C.pricing.upstairs.note;
-  if (C.pricing.small10) {
-    $('hsc-s-lab').textContent = C.pricing.small10.label;
-    $('hsc-s-note').textContent = C.pricing.small10.note;
-    $('hsc-s-tag').textContent = (C.container10 ? C.container10.lengthFt : 10) + 'ft fits this';
-  }
-  $('hsc-enquire').href = C.contact.enquireUrl;
-  $('hsc-call').href = 'tel:' + C.contact.phoneTel;
-  $('hsc-call-txt').textContent = 'Call ' + C.contact.phoneDisplay;
-  $('hsc-disclaimer').textContent = '';
-  $('hsc-footbrand').textContent = '\u00a9 2026 Hewitt Storage. All rights reserved.';
-
-  /* ---------- Tabs & items ---------- */
-  function renderTabs() {
-    $('hsc-tabs').innerHTML = C.categories.map(function (cat) {
-      var n = cat.items.reduce(function (s, it) { return s + counts[it.id]; }, 0);
-      return '<button type="button" role="tab" class="hsc-tab" data-cat="' + cat.id + '" aria-selected="' + (cat.id === activeCat) + '">' + esc(cat.label) +
-        (n ? '<span class="n">' + n + '</span>' : '') + '</button>';
-    }).join('');
-  }
-  function renderItems() {
-    var cat = C.categories.filter(function (c) { return c.id === activeCat; })[0];
-    $('hsc-strip').innerHTML = cat.items.map(function (it) {
-      var n = counts[it.id];
-      return '<div class="hsc-item' + (n ? ' on' : '') + '" data-id="' + it.id + '">' +
-        '<button type="button" class="hsc-ico" data-act="add" aria-label="Add ' + esc(it.name) + '">' + iconSvg(it.icon) + '<span class="hsc-badge">' + n + '</span></button>' +
-        '<div class="hsc-name">' + esc(it.name) + '</div>' + (it.dims ? '<div class="hsc-vol">' + esc(it.dims) + '</div>' : '') + '<div class="hsc-vol">≈ ' + fmt(it.cuft, it.cuft % 1 ? 1 : 0) + ' cu ft</div>' +
-        '<div class="hsc-step"><button type="button" data-act="dec" aria-label="Remove one ' + esc(it.name) + '"' + (n ? '' : ' disabled') + '>−</button>' +
-        '<span aria-live="polite">' + n + '</span><button type="button" data-act="inc" aria-label="Add one ' + esc(it.name) + '">+</button></div></div>';
-    }).join('');
-    $('hsc-strip').scrollLeft = 0;
-    updateArrows();
-  }
-  function refreshItem(id) {
-    var el = $('hsc-strip').querySelector('[data-id="' + id + '"]');
-    if (!el) return;
-    var n = counts[id];
-    el.classList.toggle('on', n > 0);
-    el.querySelector('.hsc-badge').textContent = n;
-    el.querySelector('.hsc-step span').textContent = n;
-    el.querySelector('[data-act="dec"]').disabled = n === 0;
-  }
-  function updateArrows() {
-    var s = $('hsc-strip');
-    $('hsc-prev').disabled = s.scrollLeft <= 2;
-    $('hsc-next').disabled = s.scrollLeft + s.clientWidth >= s.scrollWidth - 2;
-  }
-
-  $('hsc-tabs').addEventListener('click', function (e) {
-    var b = e.target.closest('.hsc-tab'); if (!b) return;
-    activeCat = b.getAttribute('data-cat'); renderTabs(); renderItems();
-  });
-  $('hsc-strip').addEventListener('click', function (e) {
-    var b = e.target.closest('button[data-act]'); if (!b) return;
-    var id = b.closest('.hsc-item').getAttribute('data-id'), act = b.getAttribute('data-act');
-    if (act === 'dec') counts[id] = Math.max(0, counts[id] - 1);
-    else counts[id] = Math.min(C.maxPerItem, counts[id] + 1);
-    refreshItem(id); renderTabs(); update();
-  });
-  $('hsc-strip').addEventListener('scroll', updateArrows, { passive: true });
-  $('hsc-prev').addEventListener('click', function () { var s = $('hsc-strip'); s.scrollLeft -= s.clientWidth * 0.8; });
-  $('hsc-next').addEventListener('click', function () { var s = $('hsc-strip'); s.scrollLeft += s.clientWidth * 0.8; });
-  window.addEventListener('resize', updateArrows);
-  $('hsc-reset').addEventListener('click', function () {
-    Object.keys(counts).forEach(function (k) { counts[k] = 0; });
-    renderTabs(); renderItems(); update();
-  });
-
-  /* ---------- Isometric container ---------- */
-  var SVGNS = 'http://www.w3.org/2000/svg', K = 13.2, CS = 0.8660254, SN = 0.5, OX = 250, OY = 128;
-  var LX = 8, LY = 20, LZ = 8.6; // x = width, y = length, z = height (ft, visual)
-  function P(x, y, z) { return ((x - y) * CS * K + OX).toFixed(1) + ',' + ((x + y) * SN * K - z * K + OY).toFixed(1); }
-  function poly(pts, fill, extra) { return '<polygon points="' + pts.map(function (p) { return P(p[0], p[1], p[2]); }).join(' ') + '" fill="' + fill + '"' + (extra || '') + '/>'; }
-  function line(a, b, stroke, w, extra) { var p = P.apply(null, a).split(','), q = P.apply(null, b).split(','); return '<line x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '" stroke="' + stroke + '" stroke-width="' + w + '"' + (extra || '') + ' stroke-linecap="round"/>'; }
-
-  function buildContainer() {
-    var s = '';
-    // ground shadow
-    s += poly([[-0.6, -0.6, 0], [LX + 1.4, -0.6, 0], [LX + 1.4, LY + 1.2, 0], [-0.6, LY + 1.2, 0]], 'rgba(15,42,82,0.12)');
-    // interior (seen in x-ray mode)
-    s += poly([[0, 0, 0], [LX, 0, 0], [LX, LY, 0], [0, LY, 0]], '#a07b4f');               // plywood floor
-    for (var f = 1; f < 10; f++) s += line([0, f * 2, 0], [LX, f * 2, 0], '#8a6840', 0.6);
-    s += poly([[0, 0, 0], [0, LY, 0], [0, LY, LZ], [0, 0, LZ]], '#1b3f86');                // back long wall
-    s += poly([[0, 0, 0], [LX, 0, 0], [LX, 0, LZ], [0, 0, LZ]], '#163672');                // far end wall
-    s += '<g id="hsc-cargo"></g>';
-    // front walls (become translucent when items are added)
-    var w = '<g class="walls">';
-    w += poly([[LX, 0, 0], [LX, LY, 0], [LX, LY, LZ], [LX, 0, LZ]], '#1e4796');           // long side
-    for (var y = 0.6; y < LY - 0.3; y += 0.62) w += line([LX, y, 0.35], [LX, y, LZ - 0.35], (Math.round(y / 0.62) % 2) ? '#2a58ad' : '#163a7e', 1.1);
-    w += line([LX, 0.2, 0.3], [LX, LY - 0.2, 0.3], '#173f8f', 2) + line([LX, 0.2, LZ - 0.3], [LX, LY - 0.2, LZ - 0.3], '#173f8f', 2);
-    w += poly([[0, LY, 0], [LX, LY, 0], [LX, LY, LZ], [0, LY, LZ]], '#1a4290');           // door end
-    w += line([LX / 2, LY, 0.25], [LX / 2, LY, LZ - 0.25], '#0f2c6b', 1.6);
-    [1.2, 2.8, 5.2, 6.8].forEach(function (x) {
-      w += line([x, LY, 0.5], [x, LY, LZ - 0.5], '#c9d6ea', 1.6);
-      w += line([x, LY, 3.4], [x + (x < LX / 2 ? 0.55 : -0.55), LY, 3.4], '#c9d6ea', 2.2);
-      w += line([x - 0.18, LY, 1.4], [x + 0.18, LY, 1.4], '#c9d6ea', 2) + line([x - 0.18, LY, LZ - 1.4], [x + 0.18, LY, LZ - 1.4], '#c9d6ea', 2);
-    });
-    // Hewitt Storage yellow ref plate, upper-left door (decorative)
-    w += '<g class="hs-plate" aria-hidden="true">' + poly([[1.45, LY, 7.75], [2.6, LY, 7.75], [2.6, LY, 6.85], [1.45, LY, 6.85]], '#f5c400', ' stroke="#111" stroke-width="0.6"');
-    var pc = P(2.025, LY, 7.12).split(',');
-    w += '<text transform="matrix(' + CS + ',' + SN + ',0,1,' + pc[0] + ',' + pc[1] + ')" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="9" fill="#111">HS</text></g>';
-    w += '</g><g class="walls roof">' + poly([[0, 0, LZ], [LX, 0, LZ], [LX, LY, LZ], [0, LY, LZ]], '#2856ab');
-    for (var ry = 1; ry < LY; ry += 1) w += line([0.3, ry, LZ], [LX - 0.3, ry, LZ], '#3363b8', 0.8);
-    w += '</g>';
-    s += w;
-    // frame edges
-    var E = '#0b2257';
-    s += '<g class="hidden-edge">' + line([0, 0, 0], [0, 0, LZ], E, 1.4, ' stroke-dasharray="3 3"') + line([0, 0, 0], [LX, 0, 0], E, 1.4, ' stroke-dasharray="3 3"') + line([0, 0, 0], [0, LY, 0], E, 1.4, ' stroke-dasharray="3 3"') + '</g>';
-    s += line([0, 0, LZ], [LX, 0, LZ], E, 2.4) + line([LX, 0, LZ], [LX, LY, LZ], E, 2.4) + line([LX, LY, LZ], [0, LY, LZ], E, 2.4) + line([0, LY, LZ], [0, 0, LZ], E, 2.4);
-    s += line([LX, 0, 0], [LX, 0, LZ], E, 2.4) + line([LX, LY, 0], [LX, LY, LZ], E, 2.4) + line([0, LY, 0], [0, LY, LZ], E, 2.4);
-    s += line([LX, 0, 0], [LX, LY, 0], E, 2.4) + line([LX, LY, 0], [0, LY, 0], E, 2.4);
-    $('hsc-svg').innerHTML = s;
-  }
-
-  var cargoHt = 1;
-  function drawCargo(fill) {   // fill = share of the floor really used; cargoHt = how high it is loaded
-    var g = $('hsc-cargo');
-    if (fill <= 0.0005) { g.innerHTML = ''; return; }
-    var x0 = 0.25, x1 = LX - 0.25, y0 = 0.25, h = Math.max(0.8, 7.2 * cargoHt), maxLen = LY - 0.5;
-    var len = Math.max(0.7, fill * maxLen), y1 = y0 + len, s = '';
-    s += poly([[x0, y0, h], [x1, y0, h], [x1, y1, h], [x0, y1, h]], '#e6bd7f');
-    s += poly([[x1, y0, 0], [x1, y1, 0], [x1, y1, h], [x1, y0, h]], '#cf9a55');
-    s += poly([[x0, y1, 0], [x1, y1, 0], [x1, y1, h], [x0, y1, h]], '#b9853f');
-    var L = 'rgba(110,70,25,0.55)';
-    for (var y = y0 + 2.4; y < y1 - 0.2; y += 2.4) { s += line([x1, y, 0], [x1, y, h], L, 1) + line([x0, y, h], [x1, y, h], L, 1); }
-    g.innerHTML = s;
-  }
-  var shownFill = 0, animId = null;
-  function animateFill(target) {
-    if (animId) cancelAnimationFrame(animId);
-    var from = shownFill, start = null, dur = 380;
-    if (!window.requestAnimationFrame || Math.abs(target - from) < 0.0001) { shownFill = target; drawCargo(target); return; }
-    function step(ts) {
-      if (start === null) start = ts;
-      var t = Math.min(1, (ts - start) / dur), e = 1 - Math.pow(1 - t, 3);
-      shownFill = from + (target - from) * e; drawCargo(shownFill);
-      if (t < 1) animId = requestAnimationFrame(step); else animId = null;
-    }
-    animId = requestAnimationFrame(step);
-  }
-
-  /* ---------- Results ---------- */
-  function recommendation(r) {
-    var n = r.containers, e = r.eval20 || {};
-    if (n > 1) return 'You\u2019ll need ' + n + ' \u00d7 ' + C.container.label + 's. Ask us about side-by-side units so everything stays together.';
-    if (e.full) return 'One ' + C.container.label + ' \u2013 full. Anything more will need another container.';
-    if (e.floorFull) return 'One ' + C.container.label + ' \u2013 the floor is full, so anything more must be stacked on top' + (e.stacked > 0.5 ? ' (' + Math.round(e.stacked) + ' item' + (Math.round(e.stacked) === 1 ? '' : 's') + ' already stacked)' : '') + '.';
-    if (r.fits10) return 'A ' + C.container10.lengthFt + 'ft unit fits this \u2014 ' + money(C.pricing.small10.monthly) + ' + VAT/month. Want room to grow? An upper level 20ft is ' + money(C.pricing.upstairs.monthly) + ' + VAT.';
-    var busy = Math.max(r.pct, (e.P || 0) * 100);
-    if (busy <= 35) return 'Plenty of room \u2013 one ' + C.container.label + ' with space to spare.';
-    if (busy <= 75) return 'One ' + C.container.label + ' fits this, with some room left.';
-    return 'One ' + C.container.label + ' \u2013 a snug fit, with little floor space left.';
-  }
-
-  function pctTxt(r) { return r.containers > 1 ? '+' + (r.containers - 1) + ' container' + (r.containers > 2 ? 's' : '') : pct1(r.ratio) + '%'; }
-  function pct1(x) { return x >= 1 - 1e-9 ? '100' : Math.min(99.9, Math.round(x * 1000) / 10).toFixed(1); }   // one decimal, no forced minimum, never shows 100 unless full
-  function update() {
-    var r = calc(), has = r.total > 0, n = r.containers;
-    window.HSC_FLOOR = r.eval20 ? Math.min(1, r.eval20.P) : 0;
-    $('hsc-svg').classList.toggle('xray', has);
-    $('hsc-empty').hidden = has;
-    $('hsc-filled').hidden = !has;
-    var pill = $('hsc-pill');
-    pill.textContent = !has ? 'Empty' : (n > 1 ? n + ' \u00d7 20ft needed' : pctTxt(r) + ' full' + (r.fits10 ? ' \u00b7 fits a ' + C.container10.lengthFt + 'ft' : ''));
-    pill.classList.toggle('multi', n > 1);
-    pill.classList.toggle('ten', !!r.fits10);
-    var ev = r.eval20 || {}, fl = n > 1 ? 1 : Math.min(1, ev.P || 0);   // floor really used, items in their real footprints
-    cargoHt = n > 1 || ev.full ? 1 : Math.max(0.15, Math.min(1, (ev.V || 0) / Math.max(fl, 1e-6)));
-    animateFill(has ? fl : 0);
-
-    var u = $('hsc-units');
-    if (n > 1) {
-      var h = '';
-      for (var i = 0; i < n; i++) { var f = Math.max(0, Math.min(1, r.ratio - i)); h += '<span class="hsc-unit">Unit ' + (i + 1) + '<i><b style="width:' + (f * 100).toFixed(0) + '%"></b></i>' + pct1(f) + '%</span>'; }
-      u.innerHTML = h;
-    } else u.innerHTML = '';
-
-    $('hsc-ten').hidden = !r.fits10;
-    if (has) {
-      $('hsc-vol').textContent = fmt(r.total, r.total % 1 ? 1 : 0);
-      $('hsc-pct').textContent = pctTxt(r);
-      $('hsc-pct-lab').textContent = n > 1 ? n + ' \u00d7 ' + C.container.lengthFt + 'ft needed' : 'of one ' + C.container.lengthFt + 'ft (usable)';
-      $('hsc-n').textContent = n;
-      $('hsc-n-lab').textContent = (n === 1 ? 'container' : 'containers') + ' needed';
-      $('hsc-bar').classList.toggle('over', n > 1);
-      $('hsc-bar-fill').style.width = Math.min(100, r.pct).toFixed(1) + '%';
-      $('hsc-bar-txt').textContent = n > 1 ? 'Over one container \u2013 ' + n + ' needed' : 'One ' + C.container.label;
-      $('hsc-rec').textContent = recommendation(r);
-      $('hsc-floor').hidden = !r.floorNote; $('hsc-floor').textContent = r.floorNote || '';
-      $('hsc-alt').hidden = !r.altLine; $('hsc-alt').textContent = r.altLine || '';
-      var pl = [r.palLine, r.pbLine, r.fitLine].filter(Boolean).join(' ');
-      $('hsc-pal').hidden = !pl; $('hsc-pal').textContent = pl;
-      var g = C.pricing.ground.monthly, up = C.pricing.upstairs.monthly, vat = 1 + C.pricing.vatRate;
-      $('hsc-g-p').textContent = money(g * n);
-      $('hsc-u-p').textContent = money(up * n);
-      $('hsc-g-x').textContent = n + ' \u00d7 ' + money(g) + ' + VAT \u00b7 ' + money(Math.round(g * n * vat * 100) / 100) + ' inc VAT';
-      $('hsc-u-x').textContent = n + ' \u00d7 ' + money(up) + ' + VAT \u00b7 ' + money(Math.round(up * n * vat * 100) / 100) + ' inc VAT';
-      if (r.fits10) {
-        var sm = C.pricing.small10.monthly;
-        $('hsc-s-p').textContent = money(sm);
-        $('hsc-s-x').textContent = money(Math.round(sm * vat * 100) / 100) + ' inc VAT';
+      var HS_FIT = {
+        W: 2.35,
+        LANE: 0.65,
+        H: 2.1,
+        INT_H: 2.39,
+        BOX_H: 1.8,
+        L20: 5.9,
+        L10: 2.82,
+        CU20: 1172,
+        CU10: 560,
+        PAL_H: 1.2,
+        M3_CUFT: 35.3147,
+        NEST_STEP: 0.32,
+        NEST_MAX: 4,
+        SHEET: 0.0125,
+      };
+      var HS_MODE = 'room'; // 'room' = organise (lane kept clear), 'max' = packed (no lane)
+      var HS_LANE = 'auto'; // 'auto' | 'side' | 'middle'
+      var HS_FIXED = {
+        fridge: 1,
+        washer: 1,
+        dishwasher: 1,
+        cooker: 1,
+        chair: 1,
+        bedsingle: 1,
+        beddouble: 1,
+        bedking: 1,
+        dtable46: 1,
+        dtable8: 1,
+        desk: 1,
+        wardrobe: 1,
+        mixer: 1,
+        wheelbarrow: 1,
+        sitebox: 1,
+        plasterboard: 1,
+        pbsheet: 1,
+        ladder2: 1,
+        stepladder: 1,
+        scaffold: 1,
+      }; // trades: ladders/tower lie flat lengthwise only, mixer never tipped
+      var HS_EDGEOK = { plasterboard: 1, pbsheet: 1 }; // plasterboard: flat OR on its long edge (2.4 long x 1.2 high); whichever fits more (Andy 16/10)
+      var HS_FLATSTACK = { ladder2: 1, stepladder: 1, plasterboard: 1, pbsheet: 1, scaffold: 1 }; // stack flat on each other up to 1.8 m (ladders: assumption; plasterboard + folded scaffold: Andy 16/10)   // assembled furniture stays upright (footprint may turn)
+      var HS_UNDER = { dtable46: 0.7, dtable8: 0.7, desk: 0.7 }; // clear height underneath (beds assumed divan / low frame: none)   // stay upright (sofas/armchairs/chairs seat up)
+      var HS_SEAT = { chair: 0.45 }; // living chairs go seat-to-seat 2 high: each extra chair adds 0.45 m
+      var HS_PAL = { F: [1.22, 1.02], E: [1.2, 0.8], U: [1.2, 1.0], H: [0.8, 0.6] };
+      function hsStrips(layout) {
+        var F = HS_FIT;
+        return layout === 'packed'
+          ? [F.W]
+          : layout === 'middle'
+            ? [(F.W - F.LANE) / 2, (F.W - F.LANE) / 2]
+            : [F.W - F.LANE];
       }
-      $('hsc-list-sum').textContent = 'Your items (' + r.itemCount + ')';
-      $('hsc-list').innerHTML = r.lines.map(function (l) { return '<li>' + l.n + ' \u00d7 ' + esc(l.item.name) + ' \u2013 ' + fmt(l.vol, l.vol % 1 ? 1 : 0) + ' cu ft</li>'; }).join('');
-    }
-    $('hsc-email').href = mailto(r);
-    $('hsc-enquire').href = enquireHref(r);
-    reportHeight();
-    window.HSC_LAST = r; // exposed for testing/debugging
-  }
+      function hsFl(x, a) {
+        return a > 0 ? Math.floor(x / a + 1e-9) : 0;
+      }
+      // Every way the item may stand: footprint a x b and how many high.
+      function hsOrients(it, asTopper) {
+        var F = HS_FIT,
+          out = [];
+        if (it.pal) {
+          var p = HS_PAL[it.pal];
+          return [{ a: p[0], b: p[1], layers: 1, h: 0 }];
+        }
+        var d = it.d,
+          perms = HS_EDGEOK[it.id]
+            ? [
+                [d[0], d[1], d[2]],
+                [d[0], d[2], d[1]],
+              ]
+            : HS_FIXED[it.id]
+              ? [[d[0], d[1], d[2]]]
+              : [
+                  [d[0], d[1], d[2]],
+                  [d[0], d[2], d[1]],
+                  [d[1], d[2], d[0]],
+                ]; // (footprint pair, height); footprint is also turned 90 deg below
+        perms.forEach(function (q) {
+          var h = q[2];
+          if (h > F.H + 1e-9) return;
+          if (!asTopper && it.mode === 'edge' && h === d[1] && d[1] !== d[0] && d[1] !== d[2])
+            return; // beds, tables, mattresses stay on edge
+          var layers = 1;
+          if (it.box || (HS_FLATSTACK[it.id] && h === d[2]))
+            layers = Math.max(1, hsFl(F.BOX_H, h)); // on edge: not stacked
+          else if (HS_SEAT[it.id]) {
+            layers = 1;
+            while (layers < 2 && d[2] + layers * HS_SEAT[it.id] <= F.H + 1e-9) layers++;
+          } else if (it.id === 'dchair' && q[2] === d[2]) {
+            layers = 1;
+            while (layers < F.NEST_MAX && d[2] + layers * F.NEST_STEP <= F.H + 1e-9) layers++;
+          }
+          var top = HS_SEAT[it.id]
+            ? h + (layers - 1) * HS_SEAT[it.id]
+            : it.id === 'dchair'
+              ? h + (layers - 1) * F.NEST_STEP
+              : it.box || HS_FLATSTACK[it.id]
+                ? layers * h
+                : h;
+          out.push({ a: q[0], b: q[1], layers: layers, h: h, top: top });
+        });
+        return out;
+      }
+      // Most of one footprint (a x b, may be turned 90 deg) on a strip L long x W deep. Tries rows of one way then the other
+      // both along the length and across the width; plain guillotine rows that anyone can check with a tape measure.
+      function hsStripCount(L, W, a, b) {
+        var best = 0,
+          i,
+          n;
+        for (i = 0; i <= hsFl(L, a); i++) {
+          n = i * hsFl(W, b) + hsFl(L - i * a, b) * hsFl(W, a);
+          if (n > best) best = n;
+        }
+        for (i = 0; i <= hsFl(W, b); i++) {
+          n = i * hsFl(L, a) + hsFl(W - i * b, a) * hsFl(L, b);
+          if (n > best) best = n;
+        }
+        return best;
+      }
+      var hsMaxCache = {};
+      var hsOriCache = {};
+      // Whole-load orientation (Andy 16/10): hsPlace may pin an item to one of its orientations (index into hsOrients) for a trial.
+      var HS_OV = null;
+      function hsK(it, L, layout) {
+        return (
+          it.id +
+          '|' +
+          L +
+          '|' +
+          layout +
+          (HS_OV && HS_OV[it.id] !== undefined ? '#' + HS_OV[it.id] : '')
+        );
+      }
+      function hsOri(it, L, layout) {
+        var k = hsK(it, L, layout);
+        hsItemMax(it, L, layout);
+        return hsOriCache[k];
+      }
+      function hsItemMax(it, L, layout) {
+        // most of this item ONE container holds in this layout (on the floor, own stacking only)
+        var k = hsK(it, L, layout);
+        if (hsMaxCache[k] !== undefined) return hsMaxCache[k];
+        var best = 0,
+          bo = null,
+          os = hsOrients(it),
+          pin = HS_OV && HS_OV[it.id] !== undefined ? HS_OV[it.id] : -1;
+        os.forEach(function (o, i) {
+          if (pin >= 0 && i !== pin) return;
+          var n =
+            hsStrips(layout).reduce(function (s, W) {
+              return s + hsStripCount(L, W, o.a, o.b);
+            }, 0) * o.layers;
+          if (n > best) {
+            best = n;
+            bo = o;
+          }
+        });
+        hsOriCache[k] = bo;
+        return (hsMaxCache[k] = best);
+      }
+      // How many containers' worth a load takes in one layout (1.0 = exactly one full container).
+      function hsShare(load, L, layout) {
+        return load.reduce(function (s, x) {
+          var m = hsItemMax(x.item, L, layout);
+          return s + (m > 0 ? x.n / m : Infinity);
+        }, 0);
+      }
+      // Layout used: packed, or the lane choice. Auto = side lane unless the middle lane holds this load in less space.
+      function hsLayout(load, L, mode, lane) {
+        mode = mode || HS_MODE;
+        lane = lane || HS_LANE;
+        if (mode === 'max') return { layout: 'packed', share: hsShare(load, L, 'packed') };
+        if (lane === 'side' || lane === 'middle') {
+          var f = hsShare(load, L, lane);
+          if (f === Infinity) {
+            // e.g. UK pallets are wider than a 0.85 m middle-lane strip: lane moves to the side.
+            // Kept monotonic: never less than the middle-lane share of the items that did fit plus the side share of the rest.
+            var mix = load.reduce(function (s, x) {
+              var m = hsItemMax(x.item, L, lane);
+              return s + x.n / (m > 0 ? m : hsItemMax(x.item, L, 'side'));
+            }, 0);
+            return { layout: 'side', share: Math.max(hsShare(load, L, 'side'), mix), forced: lane };
+          }
+          return { layout: lane, share: f };
+        }
+        var s = hsShare(load, L, 'side'),
+          m = hsShare(load, L, 'middle');
+        return m < s - 1e-9 ? { layout: 'middle', share: m } : { layout: 'side', share: s };
+      }
+      function hsContainers(share) {
+        return share <= 0 ? 0 : Math.max(1, Math.ceil(share - 1e-9));
+      }
+      var HS_LAYOUT_NAME = {
+        side: 'along one side',
+        middle: 'down the middle',
+        packed: 'no lane (packed)',
+      };
+      function hsCatalog() {
+        var a = [];
+        CALC_CONFIG.categories.forEach(function (c) {
+          c.items.forEach(function (it) {
+            a.push(it);
+          });
+        });
+        return a;
+      }
+      // ---- v3 volume model -------------------------------------------------------------
+      // Usable cu ft: organise = full volume x (2.35 - 0.65) / 2.35 (lane taken off first); packed = full volume.
+      function hsUsable(L, mode) {
+        var F = HS_FIT,
+          full = L === F.L10 ? F.CU10 : F.CU20;
+        return (mode || HS_MODE) === 'max' ? full : (full * (F.W - F.LANE)) / F.W;
+      }
+      // Pallet cu ft (Andy gave footprint only): footprint x standard loaded height 1.2 m incl. pallet (confirmed by Andy 16/10): Euro 40.7, UK 50.9, Half 20.3 cu ft. Not stacked.
+      function hsCuft(it) {
+        return it.pal
+          ? Math.round(HS_PAL[it.pal][0] * HS_PAL[it.pal][1] * HS_FIT.PAL_H * HS_FIT.M3_CUFT * 10) /
+              10
+          : it.cuft;
+      }
+      // ---- Phase 2: stacking on top (16/10/2026) ------------------------------------------
+      // Light items that may go ON TOP of other things: boxes, chairs, dining chairs (nest to 4), office chairs, bedside tables.
+      var HS_TOPPER = {
+        mattress: 1,
+        drawers: 1,
+        tvunit: 1,
+        coffeetable: 1,
+        boxs: 1,
+        boxm: 1,
+        boxl: 1,
+        chair: 1,
+        dchair: 1,
+        officechair: 1,
+        bedside: 1,
+      };
+      // Things with a flat top (or a sofa / armchair seat, light items only, which all toppers are) that can take toppers.
+      // Not bases: pallets, beds / tables / mattresses on edge, wardrobes, bookcases and shelving (already 1.8 m+), toppers.
+      var HS_BASE = {
+        sitebox: 1,
+        plasterboard: 1,
+        pbsheet: 1,
+        bedsingle: 1,
+        beddouble: 1,
+        bedking: 1,
+        dtable46: 1,
+        dtable8: 1,
+        chair: 1,
+        wardrobe: 1,
+        bookcase: 1,
+        shelving: 1,
+        sofa2: 1,
+        sofa3: 1,
+        armchair: 1,
+        coffeetable: 1,
+        tvunit: 1,
+        drawers: 1,
+        fridge: 1,
+        washer: 1,
+        dishwasher: 1,
+        cooker: 1,
+        filing: 1,
+        desk: 1,
+      };
+      var hsTopCache = {};
+      // Light furniture goes only on beds, tables and desks (a mattress lies flat only on a bed frame).
+      var HS_LIGHTFURN = {
+        mattress: { bedsingle: 1, beddouble: 1, bedking: 1 },
+        drawers: 1,
+        tvunit: 1,
+        coffeetable: 1,
+        bedside: 1,
+        chair: 1,
+        dchair: 1,
+        officechair: 1,
+      };
+      var HS_FLATBASE = {
+        bedsingle: 1,
+        beddouble: 1,
+        bedking: 1,
+        dtable46: 1,
+        dtable8: 1,
+        desk: 1,
+      };
+      // How many of topper s fit on ONE base b (as b stands on the floor): footprint rows x layers up to 1.8 m (boxes) / 2.1 m.
+      // Capped so a base never gives more room than the floor it stands on would (keeps "adding never lowers %").
+      function hsTopCap(b, s, L, layout) {
+        var k = hsK(b, L, layout) + '>' + hsK(s, L, layout);
+        if (hsTopCache[k] !== undefined) return hsTopCache[k];
+        var F = HS_FIT,
+          bo = hsOri(b, L, layout),
+          best = 0;
+        var lf = HS_LIGHTFURN[s.id],
+          allowed =
+            !lf ||
+            (lf === 1
+              ? HS_FLATBASE[b.id] ||
+                !(s.id in { mattress: 1, drawers: 1, tvunit: 1, coffeetable: 1 })
+              : lf[b.id]);
+        if (bo && HS_EDGEOK[b.id] && bo.h !== b.d[2]) bo = null; // on edge: nothing goes on top
+        if (bo && allowed) {
+          var top = bo.top !== undefined ? bo.top : bo.h;
+          var fit = function (room) {
+            // most of s in one space of the base's footprint with this headroom
+            var best1 = 0;
+            hsOrients(s, true).forEach(function (o) {
+              if (o.h > room + 1e-9) return;
+              var layers = s.box
+                ? hsFl(Math.min(room, F.BOX_H), o.h)
+                : HS_SEAT[s.id]
+                  ? Math.max(1, Math.min(o.layers, 1 + hsFl(room - o.h, HS_SEAT[s.id])))
+                  : s.id === 'dchair' && o.layers > 1
+                    ? Math.max(1, Math.min(o.layers, 1 + hsFl(room - o.h, F.NEST_STEP)))
+                    : 1;
+              var n = hsStripCount(bo.a, bo.b, o.a, o.b) * layers;
+              if (n > best1) best1 = n;
+            });
+            return best1;
+          };
+          best = fit(F.H - top) + (HS_UNDER[b.id] ? fit(HS_UNDER[b.id]) : 0); // on top (to 2.1 m) + underneath (tables, desks)
+          var Mb = hsItemMax(b, L, layout),
+            Ms = hsItemMax(s, L, layout);
+          best = Math.min(best, Math.floor((Ms * bo.layers) / Mb + 1e-9)); // per floor column of the base   // never more than the same floor would hold
+        }
+        return (hsTopCache[k] = best);
+      }
+      // Does the load fit in k containers? Largest items first onto the floor; toppers that find no floor go on top of bases.
+      // Floor share of one unit: its real footprint (as it stands, per stacked column) / usable floor area. Mixed loads add
+      // footprints, so a gap beside a sofa can take a chair. One item type alone is also limited to its own row count M.
+      function hsArea(it, L, layout) {
+        var o = hsOri(it, L, layout);
+        if (!o) return Infinity;
+        var A =
+          L *
+          hsStrips(layout).reduce(function (s, W) {
+            return s + W;
+          }, 0);
+        return (o.a * o.b) / o.layers / A;
+      }
+      // Does the load fit in k containers? Largest items first onto the floor; toppers that find no floor go on top of bases.
+      function hsPlace1(load, L, layout, k) {
+        // Floor-only items first (largest first), then items that can also go on top (largest first).
+        var sorted = load.slice().sort(function (p, q) {
+          return (
+            (HS_TOPPER[p.item.id] ? 1 : 0) - (HS_TOPPER[q.item.id] ? 1 : 0) ||
+            hsCuft(q.item) - hsCuft(p.item)
+          );
+        });
+        // Gaps: one item type packed in rows leaves gaps (n x (1/M - footprint share)). The biggest such gap in the load counts as
+        // used (rule 6) - other items can't be assumed to fill it. So one item alone is exactly n/M, as before.
+        var need = [],
+          bases = [],
+          Pa = 0,
+          G = 0,
+          stacked = 0;
+        sorted.forEach(function (x) {
+          var m = hsItemMax(x.item, L, layout),
+            a = hsArea(x.item, L, layout);
+          Pa += x.n * a;
+          G = Math.max(G, m > 0 ? x.n * Math.max(0, 1 / m - a) : Infinity);
+        });
+        var P = Pa + G,
+          R = k - G;
+        for (var i = 0; i < sorted.length; i++) {
+          var x = sorted[i],
+            m = hsItemMax(x.item, L, layout),
+            a = hsArea(x.item, L, layout);
+          if (m <= 0) return { ok: false, P: Infinity, stacked: 0 };
+          var lb = (hsOri(x.item, L, layout) || {}).layers || 1;
+          if (!HS_TOPPER[x.item.id]) {
+            if (x.n > k * m + 1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
+            R -= x.n * a;
+            if (HS_BASE[x.item.id]) bases.push({ it: x.item, u: x.n / lb });
+            continue;
+          }
+          var onFloor = Math.min(x.n, Math.max(0, R) / a + 1e-9, k * m);
+          R -= onFloor * a;
+          if (HS_BASE[x.item.id] && onFloor > 0) bases.push({ it: x.item, u: onFloor / lb });
+          if (x.n - onFloor > 1e-9) need.push({ it: x.item, r: x.n - onFloor });
+        }
+        if (R < -1e-9) return { ok: false, P: P, stacked: 0, floorFull: true };
+        bases.sort(function (p, q) {
+          return hsCuft(q.it) - hsCuft(p.it);
+        });
+        for (var j = 0; j < need.length; j++) {
+          var s = need[j];
+          for (var b = 0; b < bases.length && s.r > 1e-9; b++) {
+            var c = hsTopCap(bases[b].it, s.it, L, layout);
+            if (c <= 0 || bases[b].u <= 1e-9) continue;
+            var q = Math.min(s.r, bases[b].u * c);
+            s.r -= q;
+            bases[b].u -= q / c;
+            stacked += q;
+          }
+          if (s.r > 1e-9)
+            return { ok: false, P: P, stacked: stacked, floorFull: true, fail: s.it.id, left: s.r };
+        }
+        return { ok: true, P: P, stacked: stacked, floorFull: P >= 1 - 1e-9 };
+      }
+      // Orientation options worth trying for an item in a mixed load: the one that fits most of it on the floor, plus (if
+      // different) the best one that can still take things on top (e.g. plasterboard flat rather than on edge).
+      function hsAlts(it, L, layout) {
+        if (it.pal || HS_TOPPER[it.id]) return null;
+        var F = HS_FIT,
+          os = hsOrients(it),
+          cnt = function (o) {
+            return (
+              hsStrips(layout).reduce(function (s, W) {
+                return s + hsStripCount(L, W, o.a, o.b);
+              }, 0) * o.layers
+            );
+          };
+        var b0 = -1,
+          b1 = -1;
+        os.forEach(function (o, i) {
+          var n = cnt(o);
+          if (n <= 0) return;
+          if (b0 < 0 || n > cnt(os[b0])) b0 = i;
+          var baseOK =
+            HS_BASE[it.id] &&
+            !(HS_EDGEOK[it.id] && o.h !== it.d[2]) &&
+            (o.top !== undefined ? o.top : o.h) < F.H - 0.1;
+          if (baseOK && (b1 < 0 || n > cnt(os[b1]))) b1 = i;
+        });
+        return b1 >= 0 && b1 !== b0 && b0 >= 0 ? [b0, b1] : null;
+      }
+      // Plasterboard sheets and bundles share columns: with any bundle in the load, sheets count as 1/20 of a bundle
+      // (20 x 12.5 mm = 0.25 m) and stand the way the bundles do.
+      function hsPool(load) {
+        var b = null,
+          sh = 0;
+        load.forEach(function (x) {
+          if (x.item.id === 'plasterboard') b = x;
+          if (x.item.id === 'pbsheet') sh += x.n;
+        });
+        if (!b || !sh) return load;
+        var out = load.filter(function (x) {
+          return x.item.id !== 'pbsheet' && x.item.id !== 'plasterboard';
+        });
+        out.push({ item: b.item, n: b.n + (sh * HS_FIT.SHEET) / b.item.d[2] });
+        return out;
+      }
+      // Does the load fit in k containers? Tries every combination of the items' orientation options against the WHOLE load
+      // and keeps the best (fits; then least floor used). Same items in a bigger load can still use any option, so adding never lowers containers.
+      function hsPlace(load, L, layout, k) {
+        load = hsPool(load);
+        var alts = [];
+        load.forEach(function (x) {
+          var a = hsAlts(x.item, L, layout);
+          if (a) alts.push({ id: x.item.id, a: a });
+        });
+        if (!alts.length) return hsPlace1(load, L, layout, k);
+        var best = null,
+          combos = 1 << Math.min(alts.length, 8);
+        for (var c = 0; c < combos; c++) {
+          var ov = {},
+            tag = [];
+          alts.forEach(function (al, i) {
+            var oi = al.a[(c >> i) & 1];
+            ov[al.id] = oi;
+            tag.push(al.id + ':' + oi);
+          });
+          HS_OV = ov;
+          var r = hsPlace1(load, L, layout, k);
+          HS_OV = null;
+          r.ori = ov;
+          if (
+            !best ||
+            (r.ok && !best.ok) ||
+            (r.ok === best.ok &&
+              (r.P < best.P - 1e-9 || (Math.abs(r.P - best.P) < 1e-9 && r.stacked < best.stacked)))
+          )
+            best = r;
+        }
+        return best;
+      }
+      function hsLayoutFor(load, L, mode, lane) {
+        // lane choice: Auto = side unless middle needs fewer containers / less floor
+        mode = mode || HS_MODE;
+        lane = lane || HS_LANE;
+        if (mode === 'max') return { layout: 'packed' };
+        var fitsIn = function (lay) {
+          for (var k = 1; k < 999; k++) if (hsPlace(load, L, lay, k).ok) return k;
+          return 999;
+        };
+        if (lane === 'side' || lane === 'middle') {
+          if (
+            load.some(function (x) {
+              return hsItemMax(x.item, L, lane) <= 0;
+            })
+          )
+            return { layout: 'side', forced: lane };
+          return { layout: lane };
+        }
+        var s = fitsIn('side'),
+          m = fitsIn('middle');
+        if (m < s) return { layout: 'middle' };
+        return { layout: 'side' };
+      }
+      // Reading: V = item cu ft / usable cu ft (equal steps). Containers = smallest k that holds the load (floor, then stacking)
+      // with V <= k. In one container it shows V; 100% only when nothing on the item list could still go in (leftover = used).
+      function hsStepT(it, U) {
+        return Math.round((hsCuft(it) / U) * 1000);
+      } // step in tenths of a %
+      function hsEval(load, L, mode, lane) {
+        var lay = hsLayoutFor(load, L, mode, lane),
+          U = hsUsable(L, mode),
+          cu = load.reduce(function (s, x) {
+            return s + x.n * hsCuft(x.item);
+          }, 0);
+        // Strictly additive (16/10): each item has a fixed step in tenths of a percent = round(cu ft / usable x 1000).
+        // Total = sum of steps, so no rounding drift and no gap/floor contributions. Fit only decides notices / containers.
+        var T = load.reduce(function (s, x) {
+            return s + x.n * hsStepT(x.item, U);
+          }, 0),
+          V = T / 1000,
+          n = 1,
+          pl;
+        while (n < 999) {
+          pl = hsPlace(load, L, lay.layout, n);
+          if (pl.ok && T <= n * 1000) break;
+          n++;
+        }
+        if (lay.forced) {
+          // middle lane asked for but some items too wide: never fewer containers than the middle needs for the rest
+          var rest = load.filter(function (x) {
+              return hsItemMax(x.item, L, lay.forced) > 0;
+            }),
+            nm = 1;
+          var extra = load.reduce(function (s, x) {
+            return hsItemMax(x.item, L, lay.forced) > 0
+              ? s
+              : s + x.n / hsItemMax(x.item, L, 'side');
+          }, 0);
+          while (rest.length && nm < 999 && !hsPlace(rest, L, lay.forced, nm - extra).ok) nm++;
+          if (nm > n) {
+            n = nm;
+            pl = hsPlace(load, L, lay.layout, n);
+          }
+        }
+        var full = false;
+        if (n === 1)
+          full = hsCatalog().every(function (it) {
+            if (T + hsStepT(it, U) > 1000) return true;
+            return !hsPlace(load.concat([{ item: it, n: 1 }]), L, lay.layout, 1).ok;
+          });
+        var ratio = n === 1 ? Math.min(1, V) : n - 1 + Math.max(1e-6, Math.min(1, V - (n - 1)));
+        var anyTop = load.some(function (x) {
+          return HS_BASE[x.item.id];
+        });
+        // Plasterboard orientation actually used (bundle decides when both are present: sheets share its columns).
+        var pbx =
+            load.filter(function (x) {
+              return x.item.id === 'plasterboard';
+            })[0] ||
+            load.filter(function (x) {
+              return x.item.id === 'pbsheet';
+            })[0],
+          pbOri = null;
+        if (pbx) {
+          var pit = pbx.item,
+            po =
+              pl.ori && pl.ori[pit.id] !== undefined
+                ? hsOrients(pit)[pl.ori[pit.id]]
+                : hsOri(pit, L, lay.layout);
+          pbOri = po && po.h === pit.d[2] ? 'flat' : 'edge';
+        }
+        return {
+          T: T,
+          full: full,
+          layout: lay.layout,
+          forced: lay.forced,
+          usable: U,
+          cu: cu,
+          V: V,
+          P: pl.P,
+          stacked: pl.stacked,
+          pbOri: pbOri,
+          floorFull: n === 1 && pl.P >= 1 - 1e-9,
+          noStack: full && pl.P >= 1 - 1e-9 && !(pl.stacked > 0) && !anyTop,
+          containers: n,
+          ratio: ratio,
+        };
+      }
+      /* ======================= END OF ENGINE ======================= */
 
-  // Passes a short summary to the reservation page so the form is pre-filled.
-  function enquireHref(r) {
-    var base = C.contact.enquireUrl;
-    if (!(r.total > 0)) return base;
-    var unit = r.fits10 ? '10ft' : 'unsure';
-    var items = r.lines.map(function (l) { return l.n + ' x ' + l.item.name; }).join(', ');
-    if (items.length > 400) items = items.slice(0, 397) + '...';
-    var summary = 'From the storage calculator: approx. ' + fmt(r.total, 0) + ' cu ft (' + (r.containers > 1 ? r.containers + ' containers' : pctTxt(r) + ' of one 20ft') + '), ' +
-      r.containers + ' x 20ft needed' + (r.fits10 ? ' - a 10ft would fit' : '') + '. Items: ' + items;
-    return base + (base.indexOf('?') < 0 ? '?' : '&') + 'unit=' + unit + '&calc=' + encodeURIComponent(summary);
-  }
+      (function () {
+        'use strict';
+        var C = CALC_CONFIG;
 
-  function mailto(r) {
-    var c = C.contact, n = r.containers, body;
-    if (r.total > 0) {
-      body = 'Hi,\n\nI\u2019ve used the storage calculator on your website and would like to enquire about storage.\n\nItems:\n' +
-        r.lines.map(function (l) { return '- ' + l.n + ' x ' + l.item.name; }).join('\n') +
-        '\n\nEstimated volume: ' + fmt(r.total, r.total % 1 ? 1 : 0) + ' cu ft' +
-        '\nSpace used: approx. ' + (n > 1 ? n + ' containers' : pctTxt(r) + ' of one') + ' ' + C.container.label + ' (usable space)' +
-        '\nContainers needed: ' + n +
-        '\nEstimate: ground level 20ft ' + money(C.pricing.ground.monthly * n) + ' + VAT/month, or Upper level 20ft ' + money(C.pricing.upstairs.monthly * n) + ' + VAT/month' +
-        (r.fits10 ? '\n10ft option: the calculator suggests a ' + C.container10.label + ' would fit this \u2013 ' + money(C.pricing.small10.monthly) + ' + VAT/month' : '') +
-        '\n\nPreferred option (' + (r.fits10 ? '10ft / ' : '') + 'ground level / upper level):\nPreferred start date:\nName:\nPhone:\n\nThanks';
-    } else {
-      body = 'Hi,\n\nI\u2019d like to enquire about container storage.\n\nWhat I need to store:\nPreferred start date:\nName:\nPhone:\n\nThanks';
-    }
-    return 'mailto:' + c.email + '?subject=' + encodeURIComponent(c.emailSubject) + '&body=' + encodeURIComponent(body);
-  }
+        /* ---------- Icons (48x48, drawn for Hewitt Storage) ---------- */
+        function r(x, y, w, h, cls, rx) {
+          return (
+            '<rect x="' +
+            x +
+            '" y="' +
+            y +
+            '" width="' +
+            w +
+            '" height="' +
+            h +
+            '"' +
+            (rx ? ' rx="' + rx + '"' : '') +
+            ' class="' +
+            cls +
+            '"/>'
+          );
+        }
+        function box(x, y, w, h) {
+          // kraft cardboard box
+          return (
+            r(x, y, w, h, 'k', 1) +
+            r(x, y, w, Math.max(3, h * 0.22), 'k2', 1) +
+            r(x + w / 2 - w * 0.09, y, w * 0.18, h, 't')
+          );
+        }
+        function bed(x, w, pillows) {
+          var s = r(x, 4, w, 40, 'a', 2) + r(x + 2, 10, w - 4, 32, 'c', 1.5);
+          var pw = (w - 6 - (pillows - 1) * 2) / pillows;
+          for (var i = 0; i < pillows; i++) s += r(x + 3 + i * (pw + 2), 5.5, pw, 6, 'd', 2);
+          return s + r(x + 2, 20, w - 4, 22, 'b', 1.5);
+        }
+        var ICONS = {
+          chair:
+            r(15, 7, 18, 19, 'b', 4) +
+            r(12, 25, 24, 5, 'a', 1.5) +
+            r(14, 30, 3, 12, 'a') +
+            r(31, 30, 3, 12, 'a'),
+          armchair:
+            r(12, 11, 24, 17, 'b', 4) +
+            r(6, 19, 8, 17, 'a', 3) +
+            r(34, 19, 8, 17, 'a', 3) +
+            r(12, 26, 24, 10, 'c', 2) +
+            r(8, 36, 3, 5, 'a') +
+            r(37, 36, 3, 5, 'a'),
+          sofa2:
+            r(9, 13, 30, 15, 'b', 4) +
+            r(4, 21, 8, 15, 'a', 3) +
+            r(36, 21, 8, 15, 'a', 3) +
+            r(11.5, 26, 12, 10, 'c', 2) +
+            r(24.5, 26, 12, 10, 'c', 2) +
+            r(6, 36, 3, 4, 'a') +
+            r(39, 36, 3, 4, 'a'),
+          sofa3:
+            r(6, 13, 36, 15, 'b', 4) +
+            r(1.5, 21, 7, 15, 'a', 3) +
+            r(39.5, 21, 7, 15, 'a', 3) +
+            r(9, 26, 9.6, 10, 'c', 2) +
+            r(19.2, 26, 9.6, 10, 'c', 2) +
+            r(29.4, 26, 9.6, 10, 'c', 2) +
+            r(3, 36, 3, 4, 'a') +
+            r(42, 36, 3, 4, 'a'),
+          coffeetable:
+            r(5, 22, 38, 5, 'b', 1.5) +
+            r(9, 27, 30, 3, 'd') +
+            r(9, 27, 3, 12, 'a') +
+            r(36, 27, 3, 12, 'a'),
+          tvunit:
+            r(9, 5, 30, 20, 'a', 2) +
+            r(11, 7, 26, 16, 'c', 1) +
+            r(22, 25, 4, 4, 'a') +
+            r(5, 29, 38, 12, 'b', 1.5) +
+            r(7.5, 31.5, 15.5, 7, 'c', 1) +
+            r(25, 31.5, 15.5, 7, 'c', 1),
+          bookcase:
+            r(11, 4, 26, 40, 'a', 1.5) +
+            r(14, 7, 20, 34, 'c') +
+            r(14, 17, 20, 2, 'a') +
+            r(14, 29, 20, 2, 'a') +
+            r(15, 9, 3, 8, 'b') +
+            r(18.5, 10, 3, 7, 'd') +
+            r(22, 9, 2.5, 8, 'b') +
+            r(16, 21, 3, 8, 'd') +
+            r(25, 22, 3, 7, 'b') +
+            r(28.5, 21, 3, 8, 'b') +
+            r(15.5, 33, 7, 8, 'b') +
+            r(27, 34, 5, 7, 'd'),
+          dtable46:
+            r(13, 9, 8, 11, 'd', 2) +
+            r(27, 9, 8, 11, 'd', 2) +
+            r(5, 18, 38, 5, 'b', 1.5) +
+            r(11, 23, 26, 2.5, 'c') +
+            r(8, 23, 3, 18, 'a') +
+            r(37, 23, 3, 18, 'a'),
+          dtable8:
+            r(4, 9, 7, 11, 'd', 2) +
+            r(15, 9, 7, 11, 'd', 2) +
+            r(26, 9, 7, 11, 'd', 2) +
+            r(37, 9, 7, 11, 'd', 2) +
+            r(1.5, 18, 45, 5, 'b', 1.5) +
+            r(6, 23, 36, 2.5, 'c') +
+            r(4, 23, 3, 18, 'a') +
+            r(22.5, 23, 3, 18, 'a') +
+            r(41, 23, 3, 18, 'a'),
+          dchair:
+            r(15, 6, 18, 20, 'a', 2) +
+            r(18, 9, 3, 14, 'c') +
+            r(22.5, 9, 3, 14, 'c') +
+            r(27, 9, 3, 14, 'c') +
+            r(13, 25, 22, 5, 'b', 1.5) +
+            r(15, 30, 3, 12, 'a') +
+            r(30, 30, 3, 12, 'a'),
+          bedsingle: bed(15, 18, 1),
+          beddouble: bed(9, 30, 2),
+          bedking: bed(4, 40, 2),
+          wardrobe:
+            r(10, 3, 28, 39, 'a', 1.5) +
+            r(12.5, 5.5, 11, 34, 'b') +
+            r(24.5, 5.5, 11, 34, 'b') +
+            r(21, 20, 1.5, 6, 'c') +
+            r(25.5, 20, 1.5, 6, 'c') +
+            r(12, 42, 3, 3, 'a') +
+            r(33, 42, 3, 3, 'a'),
+          drawers:
+            r(8, 9, 32, 31, 'a', 1.5) +
+            r(10.5, 11.5, 27, 7.5, 'b', 1) +
+            r(10.5, 21, 27, 7.5, 'b', 1) +
+            r(10.5, 30.5, 27, 7.5, 'b', 1) +
+            r(21, 14.5, 6, 1.6, 'c') +
+            r(21, 24, 6, 1.6, 'c') +
+            r(21, 33.5, 6, 1.6, 'c') +
+            r(10, 40, 3, 3, 'a') +
+            r(35, 40, 3, 3, 'a'),
+          bedside:
+            r(12, 15, 24, 25, 'a', 1.5) +
+            r(14.5, 17.5, 19, 9, 'b', 1) +
+            r(14.5, 28.5, 19, 9, 'b', 1) +
+            r(21, 21.2, 6, 1.6, 'c') +
+            r(21, 32.2, 6, 1.6, 'c') +
+            r(14, 40, 3, 3, 'a') +
+            r(31, 40, 3, 3, 'a'),
+          mattress:
+            '<path d="M4 25 14 15h30L34 25z" class="d"/><path d="M4 25h30v9H4z" class="b"/><path d="M34 25l10-10v9l-10 10z" class="a"/>' +
+            '<circle cx="11" cy="29.5" r="1.2" class="c"/><circle cx="19" cy="29.5" r="1.2" class="c"/><circle cx="27" cy="29.5" r="1.2" class="c"/>',
+          fridge:
+            r(13, 3, 22, 42, 'a', 2.5) +
+            r(15, 5, 18, 15, 'c', 1) +
+            r(15, 22, 18, 21, 'c', 1) +
+            r(29, 8, 2, 8, 'b', 1) +
+            r(29, 25, 2, 10, 'b', 1),
+          washer:
+            r(8, 6, 32, 36, 'a', 2.5) +
+            r(10, 8, 28, 6, 'b', 1) +
+            '<circle cx="24" cy="28" r="10" class="c"/><circle cx="24" cy="28" r="6.5" class="b"/><circle cx="33" cy="11" r="1.6" class="c"/><circle cx="28" cy="11" r="1.2" class="d"/>',
+          dishwasher:
+            r(8, 6, 32, 36, 'a', 2.5) +
+            r(10, 8, 28, 5, 'b', 1) +
+            r(10, 15, 28, 25, 'c', 1) +
+            r(16, 18, 16, 2.5, 'a', 1.2) +
+            '<circle cx="31" cy="10.5" r="1.2" class="c"/><circle cx="35" cy="10.5" r="1.2" class="d"/>',
+          cooker:
+            r(8, 4, 32, 6, 'b', 1.5) +
+            '<ellipse cx="16" cy="5.5" rx="4" ry="1" class="a"/><ellipse cx="32" cy="5.5" rx="4" ry="1" class="a"/>' +
+            r(8, 10, 32, 34, 'a', 2) +
+            '<circle cx="13" cy="14" r="1.6" class="c"/><circle cx="19" cy="14" r="1.6" class="c"/><circle cx="29" cy="14" r="1.6" class="c"/><circle cx="35" cy="14" r="1.6" class="c"/>' +
+            r(12, 19, 24, 2, 'd', 1) +
+            r(12, 23, 24, 17, 'c', 1.5),
+          boxs: box(16, 23, 16, 14),
+          boxm: box(12, 17, 24, 20),
+          boxl: box(7, 10, 34, 28),
+          pallet:
+            box(7, 10, 16.5, 11.5) +
+            box(24.5, 10, 16.5, 11.5) +
+            box(7, 22, 16.5, 11.5) +
+            box(24.5, 22, 16.5, 11.5) +
+            r(4, 34, 40, 3, 'w') +
+            r(5, 37, 5, 4, 'w') +
+            r(21.5, 37, 5, 4, 'w') +
+            r(38, 37, 5, 4, 'w') +
+            r(4, 41, 40, 2.5, 'w'),
+          filing:
+            r(14, 3, 20, 42, 'a', 1.5) +
+            r(16, 5.5, 16, 8.5, 'b', 1) +
+            r(16, 15.5, 16, 8.5, 'b', 1) +
+            r(16, 25.5, 16, 8.5, 'b', 1) +
+            r(16, 35.5, 16, 7.5, 'b', 1) +
+            r(21, 8.5, 6, 1.6, 'c') +
+            r(21, 18.5, 6, 1.6, 'c') +
+            r(21, 28.5, 6, 1.6, 'c') +
+            r(21, 38.5, 6, 1.6, 'c'),
+          desk:
+            r(10, 4, 15, 10, 'a', 1) +
+            r(12, 6, 11, 6, 'c') +
+            r(16.5, 14, 2, 2.5, 'a') +
+            r(3, 16, 42, 4, 'b', 1) +
+            r(5, 20, 3, 22, 'a') +
+            r(28, 20, 15, 22, 'a') +
+            r(30, 22.5, 11, 5.5, 'b') +
+            r(30, 29.5, 11, 5.5, 'b') +
+            r(30, 36.5, 11, 4.5, 'b') +
+            r(33, 24.5, 5, 1.4, 'c') +
+            r(33, 31.5, 5, 1.4, 'c'),
+          officechair:
+            r(15, 3, 18, 18, 'b', 5) +
+            r(10, 17, 3, 9, 'a', 1.5) +
+            r(35, 17, 3, 9, 'a', 1.5) +
+            r(12, 22, 24, 5, 'a', 2.5) +
+            r(22.5, 27, 3, 9, 'a') +
+            r(11, 36, 26, 2.5, 'a', 1.2) +
+            '<circle cx="12" cy="41" r="2.4" class="b"/><circle cx="24" cy="41" r="2.4" class="b"/><circle cx="36" cy="41" r="2.4" class="b"/>',
+          shelving:
+            r(8, 3, 3, 42, 'a') +
+            r(37, 3, 3, 42, 'a') +
+            r(8, 15, 32, 2.5, 'b') +
+            r(8, 28, 32, 2.5, 'b') +
+            r(8, 41, 32, 2.5, 'b') +
+            box(12, 6, 10, 9) +
+            box(24, 8, 9, 7) +
+            box(13, 20, 8, 8) +
+            box(23, 19, 12, 9) +
+            box(12, 33, 12, 8),
+          bike:
+            '<circle cx="12" cy="31" r="8" class="sa" stroke-width="3"/><circle cx="36" cy="31" r="8" class="sa" stroke-width="3"/>' +
+            '<path d="M12 31 19 19h13l4 12M19 19l5 12 8-12M24 31H12" class="sb" stroke-width="3"/><path d="M16 15h6M30 14l2 5M28 13h5" class="sa" stroke-width="3"/>',
+          mower:
+            '<path d="M32 21 41 6" class="sa" stroke-width="3"/>' +
+            r(37, 3.5, 9, 3.5, 'a', 1.7) +
+            '<path d="M7 29c0-6 3-9 9-9h14c5 0 7 3 7 9z" class="b"/>' +
+            r(5, 28, 34, 4, 'a', 1.5) +
+            '<circle cx="11" cy="36" r="5" class="a"/><circle cx="11" cy="36" r="1.8" class="c"/><circle cx="33" cy="36" r="5" class="a"/><circle cx="33" cy="36" r="1.8" class="c"/>' +
+            r(14, 23, 10, 2, 'c', 1),
+          gardenset:
+            '<path d="M7 16Q24 1 41 16z" class="b"/>' +
+            r(23, 15, 2, 26, 'a') +
+            r(12, 27, 24, 3, 'd', 1.5) +
+            r(15, 30, 2, 11, 'a') +
+            r(31, 30, 2, 11, 'a') +
+            r(2, 22, 2.5, 19, 'a', 1) +
+            r(2, 31, 8, 2.5, 'a', 1) +
+            r(8, 33, 2, 8, 'a') +
+            r(43.5, 22, 2.5, 19, 'a', 1) +
+            r(38, 31, 8, 2.5, 'a', 1) +
+            r(38, 33, 2, 8, 'a'),
+          toolchest:
+            r(18, 4, 12, 3, 'a', 1.5) +
+            r(9, 7, 30, 8, 'b', 2) +
+            r(9, 15, 30, 24, 'a', 1.5) +
+            r(11.5, 17.5, 25, 4.5, 'b', 1) +
+            r(11.5, 24, 25, 4.5, 'b', 1) +
+            r(11.5, 30.5, 25, 6, 'b', 1) +
+            r(21, 19, 6, 1.4, 'c') +
+            r(21, 25.5, 6, 1.4, 'c') +
+            r(21, 32.8, 6, 1.4, 'c') +
+            '<circle cx="13" cy="41.5" r="2.5" class="d"/><circle cx="35" cy="41.5" r="2.5" class="d"/>',
+        };
+        function iconSvg(key) {
+          return (
+            '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">' +
+            (ICONS[key] || ICONS.boxm) +
+            '</svg>'
+          );
+        }
 
-  /* ---------- iframe auto-height (optional, see EMBED.md) ---------- */
-  var lastH = 0;
-  function reportHeight() {
-    if (window.parent === window) return;
-    var h = Math.ceil(document.body.getBoundingClientRect().height);
-    if (h !== lastH) { lastH = h; try { window.parent.postMessage({ type: 'hewitt-calc-height', height: h }, '*'); } catch (e) {} }
-  }
-  if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.body);
-  window.addEventListener('load', reportHeight);
+        /* ---------- State ---------- */
+        var counts = {},
+          itemsById = {},
+          activeCat = C.categories[0].id;
+        C.categories.forEach(function (cat) {
+          cat.items.forEach(function (it) {
+            counts[it.id] = 0;
+            itemsById[it.id] = it;
+            it.cat = cat.id;
+          });
+        });
+        var usable = Math.round(hsUsable(HS_FIT.L20, 'room'));
+        var usable10 = Math.round(hsUsable(HS_FIT.L10, 'room'));
 
-  /* ---------- Init ---------- */
-  buildContainer();
-  renderTabs();
-  renderItems();
-  update();
-  function setMode(m) {
-    HS_MODE = m === 'max' ? 'max' : 'room';
-    [].forEach.call($('hsc-mode').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === HS_MODE)); });
-    $('hsc-lane').hidden = HS_MODE === 'max'; $('hsc-lane').style.display = HS_MODE === 'max' ? 'none' : '';
-    $('hsc-modenote').textContent = HS_MODE === 'max' ? 'Packed wall to wall to 2.1m \u2013 the most it will hold, but you won\u2019t be able to walk in.' : 'A clear 0.65m loading lane front to back so you can get in to load, reach things and organise. Auto uses a side lane unless a middle lane fits your items better.';
-    update();
-  }
-  function setLane(l) {
-    HS_LANE = (l === 'side' || l === 'middle') ? l : 'auto';
-    [].forEach.call($('hsc-lane').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lane') === HS_LANE)); });
-    update();
-  }
-  $('hsc-mode').addEventListener('click', function (e) { var b = e.target.closest('button[data-mode]'); if (b) setMode(b.getAttribute('data-mode')); });
-  $('hsc-lane').addEventListener('click', function (e) { var b = e.target.closest('button[data-lane]'); if (b) setLane(b.getAttribute('data-lane')); });
-  setMode('room');
-  window.HSC = { setMode: setMode, setLane: setLane, itemMax: hsItemMax, evalLoad: hsEval, usableCu: hsUsable, cuft: hsCuft, mode: function () { return HS_MODE; }, config: C, counts: counts, calc: calc, usable: usable, usable10: usable10 };
-})();
-</script>
-</body>
+        var $ = function (id) {
+          return document.getElementById(id);
+        };
+        function fmt(n, dp) {
+          return Number(n).toLocaleString('en-GB', {
+            minimumFractionDigits: dp || 0,
+            maximumFractionDigits: dp || 0,
+          });
+        }
+        function money(n) {
+          return C.pricing.currency + fmt(n, n % 1 ? 2 : 0);
+        }
+        function esc(s) {
+          return String(s).replace(/[&<>"]/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+          });
+        }
+
+        function hsItemVol(it) {
+          return it.pal ? HS_PAL[it.pal][0] * HS_PAL[it.pal][1] : it.d[0] * it.d[1] * it.d[2];
+        }
+        function calc() {
+          var total = 0,
+            lines = [],
+            itemCount = 0,
+            load = [];
+          C.categories.forEach(function (cat) {
+            cat.items.forEach(function (it) {
+              var n = counts[it.id];
+              if (n > 0) {
+                total += n * it.cuft;
+                itemCount += n;
+                lines.push({ item: it, n: n, vol: n * it.cuft });
+                load.push({ item: it, n: n });
+              }
+            });
+          });
+          total = Math.round(total * 100) / 100;
+          var F = HS_FIT,
+            L20 = F.L20,
+            L10 = F.L10;
+          if (!load.length)
+            return {
+              total: 0,
+              ratio: 0,
+              pct: 0,
+              containers: 0,
+              lines: lines,
+              itemCount: 0,
+              fits10: false,
+              palLine: '',
+              fitLine: '',
+              floorPct: 0,
+              volPct: 0,
+              units: [],
+              layout: '',
+            };
+          var r20 = hsEval(load, L20),
+            ratio = r20.ratio,
+            n = r20.containers;
+          var r10 = C.container10 && C.pricing.small10 ? hsEval(load, L10) : { containers: 99 };
+          var fits10 = r10.containers === 1;
+          var units = [];
+          var laneNote = r20.forced
+            ? 'A middle lane leaves only ' +
+              fmt((F.W - F.LANE) / 2, 2) +
+              'm each side, too narrow for some of your items, so the lane goes along one side. '
+            : '';
+          var lay = r20.layout,
+            usableW = lay === 'packed' ? F.W : F.W - F.LANE;
+          var fitLine =
+            laneNote +
+            'How this is worked out: 20ft internal ' +
+            fmt(L20, 2) +
+            ' \u00d7 ' +
+            fmt(F.W, 2) +
+            ' \u00d7 ' +
+            fmt(F.INT_H, 2) +
+            'm = ' +
+            fmt(F.CU20) +
+            ' cu ft (10ft ' +
+            fmt(L10, 2) +
+            'm long = ' +
+            fmt(F.CU10) +
+            ' cu ft). ' +
+            (lay === 'packed'
+              ? 'Packed wall to wall, no lane: all ' + fmt(r20.usable) + ' cu ft usable. '
+              : 'The ' +
+                fmt(F.LANE, 2) +
+                'm loading lane (' +
+                HS_LAYOUT_NAME[lay] +
+                ', full length) is taken off first, leaving ' +
+                fmt(r20.usable) +
+                ' cu ft usable. ') +
+            'Furniture assumed assembled. Your items: ' +
+            fmt(r20.cu) +
+            ' cu ft.' +
+            (load.every(function (x) {
+              return !!x.item.pal;
+            })
+              ? ''
+              : ' Items go on the floor first, largest first; once the floor is full, boxes, chairs and bedside tables go on top of flat-topped furniture, beds, seats and appliances, and under tables and desks (tops no higher than ' +
+                fmt(F.H, 1) +
+                'm; boxes to ' +
+                fmt(F.BOX_H, 1) +
+                'm). Nothing goes on pallets.');
+          var floorNote =
+            n !== 1
+              ? ''
+              : r20.noStack
+                ? 'Container full: the floor is full and no stacking assumed for these items, so the next item needs another container.'
+                : r20.full
+                  ? 'Container full: nothing more fits on the floor or on top, so the next item needs another container.'
+                  : r20.floorFull
+                    ? 'Floor space full: further items will need to be stacked on top of others.'
+                    : '';
+          var P = {
+              E: counts.palleteuro || 0,
+              H: counts.pallethalf || 0,
+              U: counts.palletuk || 0,
+              F: counts.pallet4ft || 0,
+            },
+            nPal = P.E + P.H + P.U + P.F;
+          var pbLine =
+            r20.pbOri === 'edge'
+              ? 'Plasterboard is shown stored on edge.'
+              : r20.pbOri === 'flat'
+                ? 'Plasterboard is shown stacked flat, as this fits the load better.'
+                : '';
+          var palLine = nPal
+            ? 'Pallets are loaded on the available floor space only, not stacked.'
+            : '';
+          return {
+            total: total,
+            ratio: ratio,
+            pct: ratio * 100,
+            containers: n,
+            lines: lines,
+            itemCount: itemCount,
+            fits10: fits10,
+            share10: r10.ratio,
+            eval20: r20,
+            eval10: r10,
+            palLine: palLine,
+            pbLine: pbLine,
+            floorNote: floorNote,
+            fitLine: fitLine,
+            altLine: '',
+            mode: HS_MODE,
+            lane: HS_LANE,
+            layout: lay,
+            units: units,
+            floorPct: 0,
+            volPct: r20.V * 100,
+          };
+        }
+
+        /* ---------- Static text from config ---------- */
+        $('hsc-title').textContent = C.businessName;
+        $('hsc-subtitle').textContent = C.location
+          ? 'Storage calculator · ' + C.location
+          : 'Storage calculator';
+        $('hsc-tag').textContent = '';
+        $('hsc-g-lab').textContent = C.pricing.ground.label;
+        $('hsc-g-note').textContent = C.pricing.ground.note;
+        $('hsc-u-lab').textContent = C.pricing.upstairs.label;
+        $('hsc-u-note').textContent = C.pricing.upstairs.note;
+        if (C.pricing.small10) {
+          $('hsc-s-lab').textContent = C.pricing.small10.label;
+          $('hsc-s-note').textContent = C.pricing.small10.note;
+          $('hsc-s-tag').textContent =
+            (C.container10 ? C.container10.lengthFt : 10) + 'ft fits this';
+        }
+        $('hsc-enquire').href = C.contact.enquireUrl;
+        $('hsc-call').href = 'tel:' + C.contact.phoneTel;
+        $('hsc-call-txt').textContent = 'Call ' + C.contact.phoneDisplay;
+        $('hsc-disclaimer').textContent = '';
+        $('hsc-footbrand').textContent = '\u00a9 2026 Hewitt Storage. All rights reserved.';
+
+        /* ---------- Tabs & items ---------- */
+        function renderTabs() {
+          $('hsc-tabs').innerHTML = C.categories
+            .map(function (cat) {
+              var n = cat.items.reduce(function (s, it) {
+                return s + counts[it.id];
+              }, 0);
+              return (
+                '<button type="button" role="tab" class="hsc-tab" data-cat="' +
+                cat.id +
+                '" aria-selected="' +
+                (cat.id === activeCat) +
+                '">' +
+                esc(cat.label) +
+                (n ? '<span class="n">' + n + '</span>' : '') +
+                '</button>'
+              );
+            })
+            .join('');
+        }
+        function renderItems() {
+          var cat = C.categories.filter(function (c) {
+            return c.id === activeCat;
+          })[0];
+          $('hsc-strip').innerHTML = cat.items
+            .map(function (it) {
+              var n = counts[it.id];
+              return (
+                '<div class="hsc-item' +
+                (n ? ' on' : '') +
+                '" data-id="' +
+                it.id +
+                '">' +
+                '<button type="button" class="hsc-ico" data-act="add" aria-label="Add ' +
+                esc(it.name) +
+                '">' +
+                iconSvg(it.icon) +
+                '<span class="hsc-badge">' +
+                n +
+                '</span></button>' +
+                '<div class="hsc-name">' +
+                esc(it.name) +
+                '</div>' +
+                (it.dims ? '<div class="hsc-vol">' + esc(it.dims) + '</div>' : '') +
+                '<div class="hsc-vol">≈ ' +
+                fmt(it.cuft, it.cuft % 1 ? 1 : 0) +
+                ' cu ft</div>' +
+                '<div class="hsc-step"><button type="button" data-act="dec" aria-label="Remove one ' +
+                esc(it.name) +
+                '"' +
+                (n ? '' : ' disabled') +
+                '>−</button>' +
+                '<span aria-live="polite">' +
+                n +
+                '</span><button type="button" data-act="inc" aria-label="Add one ' +
+                esc(it.name) +
+                '">+</button></div></div>'
+              );
+            })
+            .join('');
+          $('hsc-strip').scrollLeft = 0;
+          updateArrows();
+        }
+        function refreshItem(id) {
+          var el = $('hsc-strip').querySelector('[data-id="' + id + '"]');
+          if (!el) return;
+          var n = counts[id];
+          el.classList.toggle('on', n > 0);
+          el.querySelector('.hsc-badge').textContent = n;
+          el.querySelector('.hsc-step span').textContent = n;
+          el.querySelector('[data-act="dec"]').disabled = n === 0;
+        }
+        function updateArrows() {
+          var s = $('hsc-strip');
+          $('hsc-prev').disabled = s.scrollLeft <= 2;
+          $('hsc-next').disabled = s.scrollLeft + s.clientWidth >= s.scrollWidth - 2;
+        }
+
+        $('hsc-tabs').addEventListener('click', function (e) {
+          var b = e.target.closest('.hsc-tab');
+          if (!b) return;
+          activeCat = b.getAttribute('data-cat');
+          renderTabs();
+          renderItems();
+        });
+        $('hsc-strip').addEventListener('click', function (e) {
+          var b = e.target.closest('button[data-act]');
+          if (!b) return;
+          var id = b.closest('.hsc-item').getAttribute('data-id'),
+            act = b.getAttribute('data-act');
+          if (act === 'dec') counts[id] = Math.max(0, counts[id] - 1);
+          else counts[id] = Math.min(C.maxPerItem, counts[id] + 1);
+          refreshItem(id);
+          renderTabs();
+          update();
+        });
+        $('hsc-strip').addEventListener('scroll', updateArrows, { passive: true });
+        $('hsc-prev').addEventListener('click', function () {
+          var s = $('hsc-strip');
+          s.scrollLeft -= s.clientWidth * 0.8;
+        });
+        $('hsc-next').addEventListener('click', function () {
+          var s = $('hsc-strip');
+          s.scrollLeft += s.clientWidth * 0.8;
+        });
+        window.addEventListener('resize', updateArrows);
+        $('hsc-reset').addEventListener('click', function () {
+          Object.keys(counts).forEach(function (k) {
+            counts[k] = 0;
+          });
+          renderTabs();
+          renderItems();
+          update();
+        });
+
+        /* ---------- Isometric container ---------- */
+        var SVGNS = 'http://www.w3.org/2000/svg',
+          K = 13.2,
+          CS = 0.8660254,
+          SN = 0.5,
+          OX = 250,
+          OY = 128;
+        var LX = 8,
+          LY = 20,
+          LZ = 8.6; // x = width, y = length, z = height (ft, visual)
+        function P(x, y, z) {
+          return (
+            ((x - y) * CS * K + OX).toFixed(1) + ',' + ((x + y) * SN * K - z * K + OY).toFixed(1)
+          );
+        }
+        function poly(pts, fill, extra) {
+          return (
+            '<polygon points="' +
+            pts
+              .map(function (p) {
+                return P(p[0], p[1], p[2]);
+              })
+              .join(' ') +
+            '" fill="' +
+            fill +
+            '"' +
+            (extra || '') +
+            '/>'
+          );
+        }
+        function line(a, b, stroke, w, extra) {
+          var p = P.apply(null, a).split(','),
+            q = P.apply(null, b).split(',');
+          return (
+            '<line x1="' +
+            p[0] +
+            '" y1="' +
+            p[1] +
+            '" x2="' +
+            q[0] +
+            '" y2="' +
+            q[1] +
+            '" stroke="' +
+            stroke +
+            '" stroke-width="' +
+            w +
+            '"' +
+            (extra || '') +
+            ' stroke-linecap="round"/>'
+          );
+        }
+
+        function buildContainer() {
+          var s = '';
+          // ground shadow
+          s += poly(
+            [
+              [-0.6, -0.6, 0],
+              [LX + 1.4, -0.6, 0],
+              [LX + 1.4, LY + 1.2, 0],
+              [-0.6, LY + 1.2, 0],
+            ],
+            'rgba(15,42,82,0.12)'
+          );
+          // interior (seen in x-ray mode)
+          s += poly(
+            [
+              [0, 0, 0],
+              [LX, 0, 0],
+              [LX, LY, 0],
+              [0, LY, 0],
+            ],
+            '#a07b4f'
+          ); // plywood floor
+          for (var f = 1; f < 10; f++) s += line([0, f * 2, 0], [LX, f * 2, 0], '#8a6840', 0.6);
+          s += poly(
+            [
+              [0, 0, 0],
+              [0, LY, 0],
+              [0, LY, LZ],
+              [0, 0, LZ],
+            ],
+            '#1b3f86'
+          ); // back long wall
+          s += poly(
+            [
+              [0, 0, 0],
+              [LX, 0, 0],
+              [LX, 0, LZ],
+              [0, 0, LZ],
+            ],
+            '#163672'
+          ); // far end wall
+          s += '<g id="hsc-cargo"></g>';
+          // front walls (become translucent when items are added)
+          var w = '<g class="walls">';
+          w += poly(
+            [
+              [LX, 0, 0],
+              [LX, LY, 0],
+              [LX, LY, LZ],
+              [LX, 0, LZ],
+            ],
+            '#1e4796'
+          ); // long side
+          for (var y = 0.6; y < LY - 0.3; y += 0.62)
+            w += line(
+              [LX, y, 0.35],
+              [LX, y, LZ - 0.35],
+              Math.round(y / 0.62) % 2 ? '#2a58ad' : '#163a7e',
+              1.1
+            );
+          w +=
+            line([LX, 0.2, 0.3], [LX, LY - 0.2, 0.3], '#173f8f', 2) +
+            line([LX, 0.2, LZ - 0.3], [LX, LY - 0.2, LZ - 0.3], '#173f8f', 2);
+          w += poly(
+            [
+              [0, LY, 0],
+              [LX, LY, 0],
+              [LX, LY, LZ],
+              [0, LY, LZ],
+            ],
+            '#1a4290'
+          ); // door end
+          w += line([LX / 2, LY, 0.25], [LX / 2, LY, LZ - 0.25], '#0f2c6b', 1.6);
+          [1.2, 2.8, 5.2, 6.8].forEach(function (x) {
+            w += line([x, LY, 0.5], [x, LY, LZ - 0.5], '#c9d6ea', 1.6);
+            w += line([x, LY, 3.4], [x + (x < LX / 2 ? 0.55 : -0.55), LY, 3.4], '#c9d6ea', 2.2);
+            w +=
+              line([x - 0.18, LY, 1.4], [x + 0.18, LY, 1.4], '#c9d6ea', 2) +
+              line([x - 0.18, LY, LZ - 1.4], [x + 0.18, LY, LZ - 1.4], '#c9d6ea', 2);
+          });
+          // Hewitt Storage yellow ref plate, upper-left door (decorative)
+          w +=
+            '<g class="hs-plate" aria-hidden="true">' +
+            poly(
+              [
+                [1.45, LY, 7.75],
+                [2.6, LY, 7.75],
+                [2.6, LY, 6.85],
+                [1.45, LY, 6.85],
+              ],
+              '#f5c400',
+              ' stroke="#111" stroke-width="0.6"'
+            );
+          var pc = P(2.025, LY, 7.12).split(',');
+          w +=
+            '<text transform="matrix(' +
+            CS +
+            ',' +
+            SN +
+            ',0,1,' +
+            pc[0] +
+            ',' +
+            pc[1] +
+            ')" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="9" fill="#111">HS</text></g>';
+          w +=
+            '</g><g class="walls roof">' +
+            poly(
+              [
+                [0, 0, LZ],
+                [LX, 0, LZ],
+                [LX, LY, LZ],
+                [0, LY, LZ],
+              ],
+              '#2856ab'
+            );
+          for (var ry = 1; ry < LY; ry += 1)
+            w += line([0.3, ry, LZ], [LX - 0.3, ry, LZ], '#3363b8', 0.8);
+          w += '</g>';
+          s += w;
+          // frame edges
+          var E = '#0b2257';
+          s +=
+            '<g class="hidden-edge">' +
+            line([0, 0, 0], [0, 0, LZ], E, 1.4, ' stroke-dasharray="3 3"') +
+            line([0, 0, 0], [LX, 0, 0], E, 1.4, ' stroke-dasharray="3 3"') +
+            line([0, 0, 0], [0, LY, 0], E, 1.4, ' stroke-dasharray="3 3"') +
+            '</g>';
+          s +=
+            line([0, 0, LZ], [LX, 0, LZ], E, 2.4) +
+            line([LX, 0, LZ], [LX, LY, LZ], E, 2.4) +
+            line([LX, LY, LZ], [0, LY, LZ], E, 2.4) +
+            line([0, LY, LZ], [0, 0, LZ], E, 2.4);
+          s +=
+            line([LX, 0, 0], [LX, 0, LZ], E, 2.4) +
+            line([LX, LY, 0], [LX, LY, LZ], E, 2.4) +
+            line([0, LY, 0], [0, LY, LZ], E, 2.4);
+          s += line([LX, 0, 0], [LX, LY, 0], E, 2.4) + line([LX, LY, 0], [0, LY, 0], E, 2.4);
+          $('hsc-svg').innerHTML = s;
+        }
+
+        var cargoHt = 1;
+        function drawCargo(fill) {
+          // fill = share of the floor really used; cargoHt = how high it is loaded
+          var g = $('hsc-cargo');
+          if (fill <= 0.0005) {
+            g.innerHTML = '';
+            return;
+          }
+          var x0 = 0.25,
+            x1 = LX - 0.25,
+            y0 = 0.25,
+            h = Math.max(0.8, 7.2 * cargoHt),
+            maxLen = LY - 0.5;
+          var len = Math.max(0.7, fill * maxLen),
+            y1 = y0 + len,
+            s = '';
+          s += poly(
+            [
+              [x0, y0, h],
+              [x1, y0, h],
+              [x1, y1, h],
+              [x0, y1, h],
+            ],
+            '#e6bd7f'
+          );
+          s += poly(
+            [
+              [x1, y0, 0],
+              [x1, y1, 0],
+              [x1, y1, h],
+              [x1, y0, h],
+            ],
+            '#cf9a55'
+          );
+          s += poly(
+            [
+              [x0, y1, 0],
+              [x1, y1, 0],
+              [x1, y1, h],
+              [x0, y1, h],
+            ],
+            '#b9853f'
+          );
+          var L = 'rgba(110,70,25,0.55)';
+          for (var y = y0 + 2.4; y < y1 - 0.2; y += 2.4) {
+            s += line([x1, y, 0], [x1, y, h], L, 1) + line([x0, y, h], [x1, y, h], L, 1);
+          }
+          g.innerHTML = s;
+        }
+        var shownFill = 0,
+          animId = null;
+        function animateFill(target) {
+          if (animId) cancelAnimationFrame(animId);
+          var from = shownFill,
+            start = null,
+            dur = 380;
+          if (!window.requestAnimationFrame || Math.abs(target - from) < 0.0001) {
+            shownFill = target;
+            drawCargo(target);
+            return;
+          }
+          function step(ts) {
+            if (start === null) start = ts;
+            var t = Math.min(1, (ts - start) / dur),
+              e = 1 - Math.pow(1 - t, 3);
+            shownFill = from + (target - from) * e;
+            drawCargo(shownFill);
+            if (t < 1) animId = requestAnimationFrame(step);
+            else animId = null;
+          }
+          animId = requestAnimationFrame(step);
+        }
+
+        /* ---------- Results ---------- */
+        function recommendation(r) {
+          var n = r.containers,
+            e = r.eval20 || {};
+          if (n > 1)
+            return (
+              'You\u2019ll need ' +
+              n +
+              ' \u00d7 ' +
+              C.container.label +
+              's. Ask us about side-by-side units so everything stays together.'
+            );
+          if (e.full)
+            return (
+              'One ' +
+              C.container.label +
+              ' \u2013 full. Anything more will need another container.'
+            );
+          if (e.floorFull)
+            return (
+              'One ' +
+              C.container.label +
+              ' \u2013 the floor is full, so anything more must be stacked on top' +
+              (e.stacked > 0.5
+                ? ' (' +
+                  Math.round(e.stacked) +
+                  ' item' +
+                  (Math.round(e.stacked) === 1 ? '' : 's') +
+                  ' already stacked)'
+                : '') +
+              '.'
+            );
+          if (r.fits10)
+            return (
+              'A ' +
+              C.container10.lengthFt +
+              'ft unit fits this \u2014 ' +
+              money(C.pricing.small10.monthly) +
+              ' + VAT/month. Want room to grow? An upper level 20ft is ' +
+              money(C.pricing.upstairs.monthly) +
+              ' + VAT.'
+            );
+          var busy = Math.max(r.pct, (e.P || 0) * 100);
+          if (busy <= 35)
+            return 'Plenty of room \u2013 one ' + C.container.label + ' with space to spare.';
+          if (busy <= 75) return 'One ' + C.container.label + ' fits this, with some room left.';
+          return 'One ' + C.container.label + ' \u2013 a snug fit, with little floor space left.';
+        }
+
+        function pctTxt(r) {
+          return r.containers > 1
+            ? '+' + (r.containers - 1) + ' container' + (r.containers > 2 ? 's' : '')
+            : pct1(r.ratio) + '%';
+        }
+        function pct1(x) {
+          return x >= 1 - 1e-9 ? '100' : Math.min(99.9, Math.round(x * 1000) / 10).toFixed(1);
+        } // one decimal, no forced minimum, never shows 100 unless full
+        function update() {
+          var r = calc(),
+            has = r.total > 0,
+            n = r.containers;
+          window.HSC_FLOOR = r.eval20 ? Math.min(1, r.eval20.P) : 0;
+          $('hsc-svg').classList.toggle('xray', has);
+          $('hsc-empty').hidden = has;
+          $('hsc-filled').hidden = !has;
+          var pill = $('hsc-pill');
+          pill.textContent = !has
+            ? 'Empty'
+            : n > 1
+              ? n + ' \u00d7 20ft needed'
+              : pctTxt(r) +
+                ' full' +
+                (r.fits10 ? ' \u00b7 fits a ' + C.container10.lengthFt + 'ft' : '');
+          pill.classList.toggle('multi', n > 1);
+          pill.classList.toggle('ten', !!r.fits10);
+          var ev = r.eval20 || {},
+            fl = n > 1 ? 1 : Math.min(1, ev.P || 0); // floor really used, items in their real footprints
+          cargoHt =
+            n > 1 || ev.full ? 1 : Math.max(0.15, Math.min(1, (ev.V || 0) / Math.max(fl, 1e-6)));
+          animateFill(has ? fl : 0);
+
+          var u = $('hsc-units');
+          if (n > 1) {
+            var h = '';
+            for (var i = 0; i < n; i++) {
+              var f = Math.max(0, Math.min(1, r.ratio - i));
+              h +=
+                '<span class="hsc-unit">Unit ' +
+                (i + 1) +
+                '<i><b style="width:' +
+                (f * 100).toFixed(0) +
+                '%"></b></i>' +
+                pct1(f) +
+                '%</span>';
+            }
+            u.innerHTML = h;
+          } else u.innerHTML = '';
+
+          $('hsc-ten').hidden = !r.fits10;
+          if (has) {
+            $('hsc-vol').textContent = fmt(r.total, r.total % 1 ? 1 : 0);
+            $('hsc-pct').textContent = pctTxt(r);
+            $('hsc-pct-lab').textContent =
+              n > 1
+                ? n + ' \u00d7 ' + C.container.lengthFt + 'ft needed'
+                : 'of one ' + C.container.lengthFt + 'ft (usable)';
+            $('hsc-n').textContent = n;
+            $('hsc-n-lab').textContent = (n === 1 ? 'container' : 'containers') + ' needed';
+            $('hsc-bar').classList.toggle('over', n > 1);
+            $('hsc-bar-fill').style.width = Math.min(100, r.pct).toFixed(1) + '%';
+            $('hsc-bar-txt').textContent =
+              n > 1 ? 'Over one container \u2013 ' + n + ' needed' : 'One ' + C.container.label;
+            $('hsc-rec').textContent = recommendation(r);
+            $('hsc-floor').hidden = !r.floorNote;
+            $('hsc-floor').textContent = r.floorNote || '';
+            $('hsc-alt').hidden = !r.altLine;
+            $('hsc-alt').textContent = r.altLine || '';
+            var pl = [r.palLine, r.pbLine, r.fitLine].filter(Boolean).join(' ');
+            $('hsc-pal').hidden = !pl;
+            $('hsc-pal').textContent = pl;
+            var g = C.pricing.ground.monthly,
+              up = C.pricing.upstairs.monthly,
+              vat = 1 + C.pricing.vatRate;
+            $('hsc-g-p').textContent = money(g * n);
+            $('hsc-u-p').textContent = money(up * n);
+            $('hsc-g-x').textContent =
+              n +
+              ' \u00d7 ' +
+              money(g) +
+              ' + VAT \u00b7 ' +
+              money(Math.round(g * n * vat * 100) / 100) +
+              ' inc VAT';
+            $('hsc-u-x').textContent =
+              n +
+              ' \u00d7 ' +
+              money(up) +
+              ' + VAT \u00b7 ' +
+              money(Math.round(up * n * vat * 100) / 100) +
+              ' inc VAT';
+            if (r.fits10) {
+              var sm = C.pricing.small10.monthly;
+              $('hsc-s-p').textContent = money(sm);
+              $('hsc-s-x').textContent = money(Math.round(sm * vat * 100) / 100) + ' inc VAT';
+            }
+            $('hsc-list-sum').textContent = 'Your items (' + r.itemCount + ')';
+            $('hsc-list').innerHTML = r.lines
+              .map(function (l) {
+                return (
+                  '<li>' +
+                  l.n +
+                  ' \u00d7 ' +
+                  esc(l.item.name) +
+                  ' \u2013 ' +
+                  fmt(l.vol, l.vol % 1 ? 1 : 0) +
+                  ' cu ft</li>'
+                );
+              })
+              .join('');
+          }
+          $('hsc-email').href = mailto(r);
+          $('hsc-enquire').href = enquireHref(r);
+          reportHeight();
+          window.HSC_LAST = r; // exposed for testing/debugging
+        }
+
+        // Passes a short summary to the reservation page so the form is pre-filled.
+        function enquireHref(r) {
+          var base = C.contact.enquireUrl;
+          if (!(r.total > 0)) return base;
+          var unit = r.fits10 ? '10ft' : 'unsure';
+          var items = r.lines
+            .map(function (l) {
+              return l.n + ' x ' + l.item.name;
+            })
+            .join(', ');
+          if (items.length > 400) items = items.slice(0, 397) + '...';
+          var summary =
+            'From the storage calculator: approx. ' +
+            fmt(r.total, 0) +
+            ' cu ft (' +
+            (r.containers > 1 ? r.containers + ' containers' : pctTxt(r) + ' of one 20ft') +
+            '), ' +
+            r.containers +
+            ' x 20ft needed' +
+            (r.fits10 ? ' - a 10ft would fit' : '') +
+            '. Items: ' +
+            items;
+          return (
+            base +
+            (base.indexOf('?') < 0 ? '?' : '&') +
+            'unit=' +
+            unit +
+            '&calc=' +
+            encodeURIComponent(summary)
+          );
+        }
+
+        function mailto(r) {
+          var c = C.contact,
+            n = r.containers,
+            body;
+          if (r.total > 0) {
+            body =
+              'Hi,\n\nI\u2019ve used the storage calculator on your website and would like to enquire about storage.\n\nItems:\n' +
+              r.lines
+                .map(function (l) {
+                  return '- ' + l.n + ' x ' + l.item.name;
+                })
+                .join('\n') +
+              '\n\nEstimated volume: ' +
+              fmt(r.total, r.total % 1 ? 1 : 0) +
+              ' cu ft' +
+              '\nSpace used: approx. ' +
+              (n > 1 ? n + ' containers' : pctTxt(r) + ' of one') +
+              ' ' +
+              C.container.label +
+              ' (usable space)' +
+              '\nContainers needed: ' +
+              n +
+              '\nEstimate: ground level 20ft ' +
+              money(C.pricing.ground.monthly * n) +
+              ' + VAT/month, or Upper level 20ft ' +
+              money(C.pricing.upstairs.monthly * n) +
+              ' + VAT/month' +
+              (r.fits10
+                ? '\n10ft option: the calculator suggests a ' +
+                  C.container10.label +
+                  ' would fit this \u2013 ' +
+                  money(C.pricing.small10.monthly) +
+                  ' + VAT/month'
+                : '') +
+              '\n\nPreferred option (' +
+              (r.fits10 ? '10ft / ' : '') +
+              'ground level / upper level):\nPreferred start date:\nName:\nPhone:\n\nThanks';
+          } else {
+            body =
+              'Hi,\n\nI\u2019d like to enquire about container storage.\n\nWhat I need to store:\nPreferred start date:\nName:\nPhone:\n\nThanks';
+          }
+          return (
+            'mailto:' +
+            c.email +
+            '?subject=' +
+            encodeURIComponent(c.emailSubject) +
+            '&body=' +
+            encodeURIComponent(body)
+          );
+        }
+
+        /* ---------- iframe auto-height (optional, see EMBED.md) ---------- */
+        var lastH = 0;
+        function reportHeight() {
+          if (window.parent === window) return;
+          var h = Math.ceil(document.body.getBoundingClientRect().height);
+          if (h !== lastH) {
+            lastH = h;
+            try {
+              window.parent.postMessage({ type: 'hewitt-calc-height', height: h }, '*');
+            } catch (e) {}
+          }
+        }
+        if (window.ResizeObserver) new ResizeObserver(reportHeight).observe(document.body);
+        window.addEventListener('load', reportHeight);
+
+        /* ---------- Init ---------- */
+        buildContainer();
+        renderTabs();
+        renderItems();
+        update();
+        function setMode(m) {
+          HS_MODE = m === 'max' ? 'max' : 'room';
+          [].forEach.call($('hsc-mode').querySelectorAll('button'), function (b) {
+            b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === HS_MODE));
+          });
+          $('hsc-lane').hidden = HS_MODE === 'max';
+          $('hsc-lane').style.display = HS_MODE === 'max' ? 'none' : '';
+          $('hsc-modenote').textContent =
+            HS_MODE === 'max'
+              ? 'Packed wall to wall to 2.1m \u2013 the most it will hold, but you won\u2019t be able to walk in.'
+              : 'A clear 0.65m loading lane front to back so you can get in to load, reach things and organise. Auto uses a side lane unless a middle lane fits your items better.';
+          update();
+        }
+        function setLane(l) {
+          HS_LANE = l === 'side' || l === 'middle' ? l : 'auto';
+          [].forEach.call($('hsc-lane').querySelectorAll('button'), function (b) {
+            b.setAttribute('aria-pressed', String(b.getAttribute('data-lane') === HS_LANE));
+          });
+          update();
+        }
+        $('hsc-mode').addEventListener('click', function (e) {
+          var b = e.target.closest('button[data-mode]');
+          if (b) setMode(b.getAttribute('data-mode'));
+        });
+        $('hsc-lane').addEventListener('click', function (e) {
+          var b = e.target.closest('button[data-lane]');
+          if (b) setLane(b.getAttribute('data-lane'));
+        });
+        setMode('room');
+        window.HSC = {
+          setMode: setMode,
+          setLane: setLane,
+          itemMax: hsItemMax,
+          evalLoad: hsEval,
+          usableCu: hsUsable,
+          cuft: hsCuft,
+          mode: function () {
+            return HS_MODE;
+          },
+          config: C,
+          counts: counts,
+          calc: calc,
+          usable: usable,
+          usable10: usable10,
+        };
+      })();
+    </script>
+  </body>
 </html>

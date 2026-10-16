@@ -385,3 +385,9 @@ For mixed loads, orientation is no longer chosen once per item type. For each or
 - Example, packed: 1 bundle + 245 medium boxes. Per-type choice (bundle on edge) needs 2 containers. The whole-load choice lays the bundle flat with boxes on it, so it fits in 1.
 - Bundles alone in packed still stand on edge (18 per 20ft).
 - The % is unchanged and strictly additive (sum of the displayed steps). Orientation only affects floor-full and +1 container. Every combination is still open when items are added, so adding never lowers the container count (tested).
+
+## Plasterboard orientation line (16 Oct 2026)
+Plasterboard keeps both options (flat or on edge). When the load includes a plasterboard sheet or bundle, the result shows the orientation actually used, word for word:
+- "Plasterboard is shown stored on edge." Examples: 5 bundles packed; 10 sheets packed; 2 bundles + 5 sheets packed.
+- "Plasterboard is shown stacked flat, as this fits the load better." Examples: 5 bundles organise (14 flat vs 12 on edge); 10 sheets organise; packed 1 bundle + 245 medium boxes (flat so the boxes go on top).
+With bundles and sheets together, the bundle's orientation decides, because sheets share its columns. There's no line without plasterboard. The % is unchanged (strictly additive).
